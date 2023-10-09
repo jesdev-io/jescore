@@ -1,18 +1,14 @@
 #include <Arduino.h>
-
-// put function declarations here:
-int myFunction(int, int);
+#include "core.h"
+#include "user_jobs.h"
 
 void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+    core_init();
+
+    core_register_job("help", 1024, 2, help);
+    core_register_job("stats", 1024, 2, stats);
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-}
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
 }
