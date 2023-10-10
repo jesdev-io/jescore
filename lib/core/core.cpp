@@ -40,6 +40,8 @@ err_t core_launch_job(const char* n){
 void core_job(void* p){
     while(true){
         job_struct_t* pj = sleep_until_notified();
+        core.state = e_state_spawning;
         core_launch_job(pj->name);
+        core.state = e_state_idle;
     }
 }
