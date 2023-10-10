@@ -2,6 +2,7 @@
 #include "core.h"
 #include "jobs.h"
 
+
 err_t jes_init(){
     return __core_init();
 }
@@ -19,5 +20,5 @@ err_t register_job(const char* name,
 
 
 err_t launch_job(const char* name){
-    __core_launch_job(name);
+    return __core_launch_job(name);
 }
