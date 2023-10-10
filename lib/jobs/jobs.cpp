@@ -24,7 +24,7 @@ err_t __register_job(job_struct_t** job_list,
 }
 
 
-job_struct_t* __get_job(job_struct_t** job_list, char* n){
+job_struct_t* __get_job(job_struct_t** job_list, const char* n){
     job_struct_t* cur = *job_list;
     while(cur != NULL){
         if(strcmp((cur)->name, n) == 0){ 
@@ -35,7 +35,7 @@ job_struct_t* __get_job(job_struct_t** job_list, char* n){
 }
 
 
-err_t __launch_job(job_struct_t** job_list, char* n){
+err_t __launch_job(job_struct_t** job_list, const char* n){
     BaseType_t stat;
     job_struct_t* pj = __get_job(job_list, n);
     if(pj == NULL){ return e_mem_null; }

@@ -49,7 +49,7 @@ err_t __register_job(job_struct_t** job_list,
 * @param job_list (job_struct_t**): head of job-llist
 * @param n (char*): job name (callable by CLI)
 * @returns job handle (job_struct_t*)*/
-job_struct_t* __get_job(job_struct_t** job_list, char* n);
+job_struct_t* __get_job(job_struct_t** job_list, const char* n);
 
 
 /*@brief Job creation wrapper 
@@ -57,7 +57,7 @@ job_struct_t* __get_job(job_struct_t** job_list, char* n);
 * @param n (char*): job name (callable by CLI)
 * @returns status (err_t), `e_no_err` if OK
 * @note Checks if task memory could be allocated.*/
-err_t __launch_job(job_struct_t** job_list, char* n);
+err_t __launch_job(job_struct_t** job_list, const char* n);
 
 
 /*@brief Job creation wrapper for cli based commands
