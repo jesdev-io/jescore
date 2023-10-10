@@ -51,7 +51,6 @@ void read_serial(void* p) {
         if(c == '\r' || c == '\n'){
             raw_str[i] = '\0'; // leave this until raw_str is not static
             int16_t ws_i = __get_ws_index(raw_str, MAX_JOB_NAME_LEN_BYTE);
-            Serial.println(ws_i);
             if(ws_i == 0){
                 Serial.println("Leading whitespace error");
             }
