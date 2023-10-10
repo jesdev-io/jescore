@@ -18,7 +18,6 @@ err_t __register_job(job_struct_t** job_list,
     pj->mem_size = m;
     pj->priority = p;
     pj->function = f;
-    pj->args = NULL;
     pj->pn = *job_list;
     *job_list = pj;
     return e_no_err;
@@ -28,7 +27,8 @@ err_t __register_job(job_struct_t** job_list,
 job_struct_t* __get_job(job_struct_t** job_list, char* n){
     job_struct_t* cur = *job_list;
     while(cur != NULL){
-        if(strcmp((cur)->name, n) == 0){ return cur; }
+        if(strcmp((cur)->name, n) == 0){ 
+            return cur; }
         cur = cur->pn;
     }
     return NULL;
@@ -42,19 +42,11 @@ err_t __launch_job(job_struct_t** job_list, char* n){
     stat = xTaskCreate(pj->function,
                 pj->name,
                 pj->mem_size,
-                (void*)*job_list,
+                (void*)job_list,
                 pj->priority,
                 &pj->handle);
     if(stat != pdPASS){ return e_mem_null; }
     return e_no_err;
-}
-
-
-err_t __launch_job_from_cli(job_struct_t** job_list, char* n, char* args){
-    job_struct_t* pj = __get_job(job_list, n);
-    if(pj == NULL){ return e_mem_null; }
-    pj->args = args;
-    return __launch_job(job_list, n);
 }
 
 
@@ -69,27 +61,33 @@ static err_t __copy_name(char* buf, char* n){
 }
 
 
-void job_notify(job_struct_t* pj, cmd_struct_t c, bool from_isr){
+void job_notify(job_struct_t* pjob_to_notify, 
+                job_struct_t* pjob_to_run, 
+                bool from_isr){
     if(from_isr){
         BaseType_t dummy = pdFALSE;
-        c.origin = e_origin_interrupt;
-        xTaskNotifyFromISR(pj->handle, 
-                           *(uint32_t*)&c, 
+        pjob_to_run->caller = e_origin_interrupt;
+        xTaskNotifyFromISR(pjob_to_notify->handle, 
+                           (uint32_t)pjob_to_run, 
                            eSetValueWithOverwrite, 
                            &dummy);
     }
     else{
-        xTaskNotify(pj->handle, *(uint32_t*)&c, eSetValueWithOverwrite);
+        xTaskNotify(pjob_to_notify->handle,
+                    (uint32_t)pjob_to_run,
+                    eSetValueWithOverwrite);
     }
 }
 
 
-cmd_struct_t job_notify_take(TickType_t ticks_to_wait){
-    uint32_t c = ulTaskNotifyTake(pdTRUE, ticks_to_wait);
-    return *(cmd_struct_t*)&c;
+job_struct_t* job_notify_take(TickType_t ticks_to_wait){
+    uint32_t raw = ulTaskNotifyTake(pdTRUE, ticks_to_wait);
+    job_struct_t* pjob_to_run = (job_struct_t*)raw;
+    return pjob_to_run;
 }
 
 
-cmd_struct_t sleep_until_notified(){
-    return job_notify_take(portMAX_DELAY);
+job_struct_t* sleep_until_notified(){
+    job_struct_t* pjob_to_run = job_notify_take(portMAX_DELAY);
+    return pjob_to_run;
 }

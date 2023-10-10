@@ -14,6 +14,7 @@
 * @param priority (uint8_t): priority of task
 * @param function void(*)(void* p): function itself, function pointer
 * @param args (void*): optional args obtained from CLI
+* @param caller (origin_t): Requesting entity of job
 * @param pn (job_struct_t*): pointer to next job (llist)*/
 typedef struct job_struct_t{
     char name[MAX_JOB_NAME_LEN_BYTE] = {0};
@@ -21,7 +22,8 @@ typedef struct job_struct_t{
     uint32_t mem_size = 0;
     uint8_t priority = 0;
     void (*function) (void* p) = NULL;
-    void* args = NULL;
+    char args[MAX_JOB_NAME_LEN_BYTE] = {0};
+    origin_t caller = e_origin_undefined;
     struct job_struct_t* pn = NULL;
 }job_struct_t;
 
@@ -45,7 +47,8 @@ err_t __register_job(job_struct_t** job_list,
 
 /*@brief Job getter based on name identifier
 * @param job_list (job_struct_t**): head of job-llist
-* @param n (char*): job name (callable by CLI)*/
+* @param n (char*): job name (callable by CLI)
+* @returns job handle (job_struct_t*)*/
 job_struct_t* __get_job(job_struct_t** job_list, char* n);
 
 
@@ -74,21 +77,23 @@ static err_t __copy_name(char* buf, char* n);
 
 
 /*@brief Task notification wrapper for FreeRTOS "xTaskNotify()"
-* @param pj task_struct_t*, handle to job to be notified
-* @param c cmd_struct_t, command to be sent
+* @param pjob_to_notify (task_struct_t*), handle to job to be notified
+* @param pjob_to_run (task_struct_t*), job that should be launched by the notified job
 * @param from_isr bool, specifies ISR or non-ISR origin*/
-void job_notify(job_struct_t* pj, cmd_struct_t c, bool from_isr);
+void job_notify(job_struct_t* pjob_to_notify, 
+                job_struct_t* pjob_to_run, 
+                bool from_isr);
 
 
 /*@brief Task notification wrapper for FreeRTOS "ulTaskNotifyTake"
 * @param ticks_to_wait TickType_t, timeout time, use "portMAX_DELAY" for blocking
-* @returns cmd_struct_t, received command*/
-cmd_struct_t job_notify_take(TickType_t ticks_to_wait);
+* @returns job_struct_t*, received job to launch*/
+job_struct_t* job_notify_take(TickType_t ticks_to_wait);
 
 
 /*@brief Task notification wrapper for FreeRTOS "ulTaskNotifyTake"
-* @returns cmd_struct_t, received command
+* @returns job_struct_t*, received job to launch
 * @note calls job_notify_take() with portMAX_DELAY*/
-cmd_struct_t sleep_until_notified();
+job_struct_t* sleep_until_notified();
 
 #endif

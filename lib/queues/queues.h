@@ -9,6 +9,9 @@ extern QueueHandle_t cli_queue;
 err_t queue_init();
 
 
-err_t cli_queue_send(char* item);
+err_t cli_queue_send(char* item, bool from_ISR);
+
+
+err_t cli_queue_receive(char* buf);
 
 #endif

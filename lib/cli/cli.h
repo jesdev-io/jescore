@@ -9,11 +9,11 @@
 #define BOOT_MSG        "\n***********\n\rjes-core CLI\n\r***********\n\r"
 #define CLI_HEADER      "jes-core $ "
 
-void initCLI(uint32_t baudrate);
+void init_cli(void* p);
 void serialISR(void);
-void processInput(void* param);
-void parseInput(char* input_string);
-void printBootMessage(void);
-void printCLIHead(void);
+void read_serial(void* param);
+static void __printBootMessage(void);
+static void __printCLIHead(void);
+static int16_t __get_ws_index(char* buf, uint16_t len);
 
 #endif

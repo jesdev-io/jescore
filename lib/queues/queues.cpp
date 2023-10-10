@@ -9,13 +9,19 @@ err_t cli_queue_init(){
     return e_no_err;
 }
 
-err_t cli_queue_send(char* item){
-    BaseType_t stat = xQueueSend(cli_queue, &item, portMAX_DELAY);
+err_t cli_queue_send(char* item, bool from_ISR){
+    BaseType_t stat;
+    if(from_ISR){
+        BaseType_t dummy = pdFALSE;
+        stat = xQueueSendFromISR(cli_queue, &item, &dummy);
+    }
+    else{
+        stat = xQueueSend(cli_queue, &item, portMAX_DELAY);
+    }
     if(stat != pdTRUE){
         return e_peripheral_block;
     }
     return e_no_err;
-
 }
 
 err_t cli_queue_receive(char* buf){

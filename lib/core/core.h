@@ -1,11 +1,7 @@
 #ifndef _CORE_H_
 #define _CORE_H_
 
-/*@brief Main core acting as finite state machine 
-* includes witchcraft from here: 
-* https://stackoverflow.com/questions/252748/how-can-i-use-an-array-of-function-pointers
-* More extremely smart withcery:
-* https://stackoverflow.com/a/9972417*/
+/*@brief Main core acting as finite state machine */
 
 #include "Arduino.h"
 #include "err.h"
@@ -29,7 +25,7 @@ typedef enum state_t{
 * @param task_list (task_struct_t*): pointers to task functions in array format*/
 typedef struct core_t{
     state_t state;
-    job_struct_t* base_job;
+    job_struct_t* job_list;
 }core_t;
 
 

@@ -9,7 +9,7 @@
 typedef enum origin_t{
     e_origin_undefined,
     e_origin_interrupt,
-    e_origin_task,
+    e_origin_cli,
     e_origin_core
 }origin_t;
 
@@ -18,7 +18,8 @@ typedef enum origin_t{
 */
 typedef enum cmd_t{
     e_cmd_undefined,
-    e_cmd_generic
+    e_cmd_generic,
+    e_cmd_read_queue
 }cmd_t;
 
 /*@brief Struct for sendable commands
@@ -33,7 +34,6 @@ typedef enum cmd_t{
 typedef struct cmd_struct_t{
     origin_t origin = e_origin_undefined;
     cmd_t content = e_cmd_undefined;
-    uint16_t o_value = 0;
 }cmd_struct_t;
 
 #endif

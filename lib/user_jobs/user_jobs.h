@@ -7,4 +7,7 @@ void stats(void* p);
 void help(void* p);
 
 
+void led(void* p);
+
+
 #endif
