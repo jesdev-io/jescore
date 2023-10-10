@@ -1,13 +1,13 @@
 #include <Arduino.h>
-#include "core.h"
+#include "jescore.h"
 #include "user_jobs.h"
 
 void setup() {
-    core_init();
+    jes_init();
 
-    core_register_job("help", 1024, 2, help);
-    core_register_job("stats", 1024, 2, stats);
-    core_register_job("led", 2048, 1, led);
+    register_job("help", 1024, 2, help);
+    register_job("stats", 1024, 2, stats);
+    register_job("led", 2048, 1, led);
 }
 
 void loop() {

@@ -8,6 +8,9 @@
 #include "commands.h"
 #include "jobs.h"
 
+#define CORE_JOB_NAME       "core"
+#define INIT_CLI_JOB_NAME   "initcli"
+
 
 /*@brief Types of states 
 * always prefixed with "e_state"*/
@@ -32,7 +35,7 @@ typedef struct core_t{
 /*@brief Core initializer 
 * @returns status (err_t), `e_no_err` if OK
 * @note Creates all tasks in default mode (stopped)*/
-err_t core_init();
+err_t __core_init();
 
 
 /*@brief Wrapper for __register_job(), register a new job to do
@@ -42,7 +45,7 @@ err_t core_init();
 * @param f (void (*)(void* p)): function itself, function pointer
 * @returns status (err_t), `e_no_err` if OK
 * @note Creates all tasks in default mode (stopped)*/
-err_t core_register_job(const char* n, 
+err_t __core_register_job(const char* n, 
                         uint32_t m,
                         uint8_t p, 
                         void (*f)(void* p));
@@ -51,15 +54,15 @@ err_t core_register_job(const char* n,
 /*@brief Job getter based on name identifier
 * @param n (char*): job name (callable by CLI)
 * @returns job_struct_t* handle to job*/
-job_struct_t* core_get_job(const char* n);
+job_struct_t* __core_get_job(const char* n);
 
 
 /*@brief Job creation wrapper
 * @param n (char*): job name (callable by CLI)
 * @returns status (err_t), `e_no_err` if OK*/
-err_t core_launch_job(const char* n);
+err_t __core_launch_job(const char* n);
 
 
-void core_job(void* p);
+void __core_job(void* p);
 
 #endif

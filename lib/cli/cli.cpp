@@ -12,7 +12,7 @@ void init_cli(void* p){
     Serial.begin(BAUDRATE);
     Serial.setTimeout(10);
     attachInterrupt(digitalPinToInterrupt(RX_PIN), serialISR, FALLING);
-    __register_job(job_list, "readserial", 4096, 1, read_serial);
+    __job_register_job(job_list, "readserial", 4096, 1, read_serial);
     __printBootMessage();
     __printCLIHead();
     vTaskDelete(NULL);
@@ -20,9 +20,9 @@ void init_cli(void* p){
 
 void serialISR(void) {
     detachInterrupt(digitalPinToInterrupt(RX_PIN));
-    job_struct_t* pj_to_do = __get_job(job_list, "readserial");
+    job_struct_t* pj_to_do = __job_get_job(job_list, "readserial");
     pj_to_do->caller = e_origin_interrupt;
-    job_notify(__get_job(job_list, "core"), pj_to_do, true);
+    __job_notify(__job_get_job(job_list, "core"), pj_to_do, true);
 }
 
 
@@ -59,13 +59,13 @@ void read_serial(void* p) {
                 if(ws_i != -1){
                     raw_str[ws_i] = '\0';
                 }
-                pj_to_do = __get_job(job_list, cmd_str);
+                pj_to_do = __job_get_job(job_list, cmd_str);
                 pj_to_do->caller = e_origin_cli;
                 if((uint16_t)ws_i < i){
                     arg_str = &raw_str[ws_i+1];
                     strcpy(pj_to_do->args, arg_str);
                 }
-                job_notify(__get_job(job_list, "core"), pj_to_do, false);
+                __job_notify(__job_get_job(job_list, "core"), pj_to_do, false);
             }
         }
         else{
