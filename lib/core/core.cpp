@@ -27,12 +27,12 @@ err_t core_register_job(const char* n,
 }
 
 
-job_struct_t* core_get_job(char* n){
+job_struct_t* core_get_job(const char* n){
     return __get_job(&core.job_list, n);
 }
 
 
-err_t core_launch_job(char* n){
+err_t core_launch_job(const char* n){
     return __launch_job(&core.job_list, n);
 }
 

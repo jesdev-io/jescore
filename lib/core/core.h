@@ -51,20 +51,13 @@ err_t core_register_job(const char* n,
 /*@brief Job getter based on name identifier
 * @param n (char*): job name (callable by CLI)
 * @returns job_struct_t* handle to job*/
-job_struct_t* core_get_job(char* n);
+job_struct_t* core_get_job(const char* n);
 
 
 /*@brief Job creation wrapper
 * @param n (char*): job name (callable by CLI)
 * @returns status (err_t), `e_no_err` if OK*/
-err_t core_launch_job(char* n);
-
-
-/*@brief Job creation wrapper for cli based commands
-* @param n (char*): job name (callable by CLI)
-* @param args (char*): optional args obtained from CLI
-* @returns status (err_t), `e_no_err` if OK*/
-err_t core_launch_job_from_cli(char* n, char* args);
+err_t core_launch_job(const char* n);
 
 
 void core_job(void* p);
