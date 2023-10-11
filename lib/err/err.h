@@ -1,11 +1,9 @@
 #ifndef _ERR_H_
 #define _ERR_H_
 
-/*@file 
-* @brief Error interpreter and handling */
+/// @file Error interpreter and handling.
 
-/* @brief Types of errors
-*/
+/// @brief Enums of errors.
 typedef enum err{
     e_no_err,
     e_mem_null,
@@ -16,10 +14,9 @@ typedef enum err{
     e_too_long,
 }err_t;
 
-/*@brief General error handler
-* @param e (err_t): Error to handle
-* @param args (void*): optional additional arguments 
-*/
+/// @brief General error handler.
+/// @param e: Error to handle.
+/// @param args: optional additional arguments.
 void err_handler(err_t e, void* args);
 
 #endif

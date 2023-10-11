@@ -1,6 +1,8 @@
 #ifndef _COMMANDS_H_
 #define _COMMANDS_H_
 
+/// @file Enums and structs for notification commands.
+
 #include <Arduino.h>
 
 /// @brief Enum for types of places where a command can

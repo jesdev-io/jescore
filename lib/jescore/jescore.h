@@ -1,6 +1,8 @@
 #ifndef _JESCORE_H_
 #define _JESCORE_H_
 
+/// @file Top API layer for user access.
+
 #include "core.h"
 #include "err.h"
 
