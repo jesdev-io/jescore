@@ -54,7 +54,7 @@ static err_t __job_copy_name(char* buf, char* n){
     if(buf == NULL || n == NULL){ return e_is_zero; }
     uint8_t i = 0;
     while(n[i] != '\0'){
-        if(++i == MAX_JOB_NAME_LEN_BYTE){ return e_too_long; }
+        if(++i == __MAX_JOB_NAME_LEN_BYTE){ return e_too_long; }
     }
     strcpy(buf, n);
     return e_no_err;

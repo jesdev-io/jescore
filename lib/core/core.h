@@ -1,7 +1,7 @@
 #ifndef _CORE_H_
 #define _CORE_H_
 
-/*@brief Main core acting as finite state machine */
+/// @file Main core acting as finite state machine.
 
 #include "Arduino.h"
 #include "err.h"
@@ -33,7 +33,7 @@ typedef struct core_t{
 
 
 /// @brief Core initializer.
-/// @return returns status, `e_no_err` if OK.
+/// @return status, `e_no_err` if OK.
 /// @note Registers/launches itself and CLI if `JES_DISABLE_CLI` is not defined
 err_t __core_init();
 
