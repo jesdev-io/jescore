@@ -5,13 +5,14 @@
 
 /// @brief Enums of errors.
 typedef enum err{
-    e_no_err,
-    e_mem_null,
-    e_is_zero,
-    e_param,
-    e_peripheral_block,
-    e_core_fail,
-    e_too_long,
+    e_err_no_err,
+    e_err_mem_null,
+    e_err_is_zero,
+    e_err_param,
+    e_err_peripheral_block,
+    e_err_core_fail,
+    e_err_too_long,
+    e_err_unknown_job,
 }err_t;
 
 /// @brief General error handler.
