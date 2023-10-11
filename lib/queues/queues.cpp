@@ -4,7 +4,7 @@
 QueueHandle_t cli_queue;
 
 err_t cli_queue_init(){
-    cli_queue = xQueueCreate(MAX_JOB_NAME_LEN_BYTE, sizeof(char));
+    cli_queue = xQueueCreate(__MAX_JOB_NAME_LEN_BYTE, sizeof(char));
     if(cli_queue == NULL){ return e_mem_null; }
     return e_no_err;
 }

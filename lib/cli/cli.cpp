@@ -37,7 +37,7 @@ static void __printCLIHead(void){
 
 
 void read_serial(void* p) {
-    static char raw_str[MAX_JOB_NAME_LEN_BYTE * 2] = {0};
+    static char raw_str[__MAX_JOB_NAME_LEN_BYTE * 2] = {0};
     char* cmd_str = &raw_str[0];
     char* arg_str = NULL;
     uint8_t sep_idx = 0;
@@ -46,11 +46,11 @@ void read_serial(void* p) {
     job_struct_t* pj_to_do = NULL;
     vTaskDelay(10 / portTICK_PERIOD_MS);
 
-    while(Serial.available() && i < MAX_JOB_NAME_LEN_BYTE - 1) {
+    while(Serial.available() && i < __MAX_JOB_NAME_LEN_BYTE - 1) {
         char c = Serial.read();
         if(c == '\r' || c == '\n'){
             raw_str[i] = '\0'; // leave this until raw_str is not static
-            int16_t ws_i = __get_ws_index(raw_str, MAX_JOB_NAME_LEN_BYTE);
+            int16_t ws_i = __get_ws_index(raw_str, __MAX_JOB_NAME_LEN_BYTE);
             if(ws_i == 0){
                 Serial.println("Leading whitespace error");
             }
