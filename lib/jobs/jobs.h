@@ -80,7 +80,7 @@ err_t __job_launch_job(job_struct_t** job_list, const char* n);
 /// @param buf: name buffer (job_struct->name).
 /// @param name: given name to copy (comes from CLI).
 /// @returns status, `e_no_err` if OK.
-static err_t __job_copy_name(char* buf, char* n);
+static inline err_t __job_copy_name(char* buf, char* n);
 
 
 /// @brief Task notification wrapper for FreeRTOS "xTaskNotify()".

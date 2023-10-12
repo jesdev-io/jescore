@@ -39,7 +39,7 @@ err_t __core_launch_job(const char* n){
 }
 
 
-void __err_handler(err_t e, void* args){
+static void __err_handler(err_t e, void* args){
 
     job_struct_t* err_print_job = __core_get_job(PRINT_JOB_NAME);
     const char* description = NULL;

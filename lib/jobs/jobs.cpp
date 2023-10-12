@@ -36,6 +36,7 @@ job_struct_t* __job_get_job(job_struct_t** job_list, const char* n){
 
 
 job_struct_t* __job_get_self(job_struct_t** job_list, void (*f)(void* p)){
+    /// TODO: Rename this, as this function is able to return other jobs as well
     job_struct_t* cur = *job_list;
     while(cur != NULL){
         if(cur->function == f){ 
@@ -61,7 +62,7 @@ err_t __job_launch_job(job_struct_t** job_list, const char* n){
 }
 
 
-static err_t __job_copy_name(char* buf, char* n){
+static inline err_t __job_copy_name(char* buf, char* n){
     if(buf == NULL || n == NULL){ return e_err_is_zero; }
     uint8_t i = 0;
     while(n[i] != '\0'){
