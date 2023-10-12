@@ -15,7 +15,7 @@ void init_cli(void* p){
     #ifndef JES_DISABLE_CLI
     Serial.setTimeout(10);
     attachInterrupt(digitalPinToInterrupt(RX_PIN), serialISR, FALLING);
-    __job_register_job(job_list, SERIAL_WRITE_NAME, 4096, 1, read_serial);
+    __job_register_job(job_list, SERIAL_READ_NAME, 4096, 1, read_serial);
     #endif
     __job_register_job(job_list, PRINT_JOB_NAME, 4096, 1, __base_job_echo);
     __cli_output_serial(BOOT_MSG);
@@ -24,7 +24,7 @@ void init_cli(void* p){
 
 void serialISR(void) {
     detachInterrupt(digitalPinToInterrupt(RX_PIN));
-    job_struct_t* pj_to_do = __job_get_job(job_list, SERIAL_WRITE_NAME);
+    job_struct_t* pj_to_do = __job_get_job(job_list, SERIAL_READ_NAME);
     pj_to_do->caller = e_origin_interrupt;
     __job_notify(__job_get_job(job_list, CORE_JOB_NAME), pj_to_do, true);
 }
@@ -46,7 +46,8 @@ void read_serial(void* p) {
             raw_str[i] = '\0'; // leave this until raw_str is not static
             int16_t ws_i = __get_ws_index(raw_str, __MAX_JOB_NAME_LEN_BYTE);
             if(ws_i == 0){
-                Serial.println("Leading whitespace error"); // needs fix
+                pj_to_do = __job_get_job(job_list, ERROR_HANDLER_NAME);
+                pj_to_do->error = e_err_leading_whitespace;
             }
             else{
                 if(ws_i != -1){
@@ -60,12 +61,17 @@ void read_serial(void* p) {
                         strcpy(pj_to_do->args, arg_str);
                     }
                 }
-                __job_notify(__job_get_job(job_list, CORE_JOB_NAME), pj_to_do, false);
             }
+            __job_notify(__job_get_job(job_list, CORE_JOB_NAME), pj_to_do, false);
         }
         else{
             raw_str[i++] = c;
         }
+    }
+    if(i == __MAX_JOB_NAME_LEN_BYTE){
+        pj_to_do = __job_get_job(job_list, ERROR_HANDLER_NAME);
+        pj_to_do->error = e_err_too_long;
+        __job_notify(__job_get_job(job_list, CORE_JOB_NAME), pj_to_do, false);
     }
     attachInterrupt(digitalPinToInterrupt(RX_PIN), serialISR, FALLING);
     vTaskDelete(NULL);
