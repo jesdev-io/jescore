@@ -32,6 +32,7 @@ typedef struct job_struct_t{
     void (*function) (void* p) = NULL;
     char args[__MAX_JOB_NAME_LEN_BYTE] = {0};
     origin_t caller = e_origin_undefined;
+    void* optional = NULL;
     struct job_struct_t* pn = NULL;
 }job_struct_t;
 
@@ -58,6 +59,13 @@ err_t __job_register_job(job_struct_t** job_list,
 /// @param n: job name (callable by CLI).
 /// @returns job handle.
 job_struct_t* __job_get_job(job_struct_t** job_list, const char* n);
+
+
+/// @brief Job getter based on function signature.
+/// @param job_list: head of job-llist.
+/// @param f: function pointer of calling function.
+/// @returns job handle.
+job_struct_t* __job_get_self(job_struct_t** job_list, void (*f)(void* p));
 
 
 /// @brief Job creation wrapper.

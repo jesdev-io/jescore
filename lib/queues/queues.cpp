@@ -5,8 +5,8 @@ QueueHandle_t cli_queue;
 
 err_t cli_queue_init(){
     cli_queue = xQueueCreate(__MAX_JOB_NAME_LEN_BYTE, sizeof(char));
-    if(cli_queue == NULL){ return e_mem_null; }
-    return e_no_err;
+    if(cli_queue == NULL){ return e_err_mem_null; }
+    return e_err_no_err;
 }
 
 err_t cli_queue_send(char* item, bool from_ISR){
@@ -19,15 +19,15 @@ err_t cli_queue_send(char* item, bool from_ISR){
         stat = xQueueSend(cli_queue, &item, portMAX_DELAY);
     }
     if(stat != pdTRUE){
-        return e_peripheral_block;
+        return e_err_peripheral_block;
     }
-    return e_no_err;
+    return e_err_no_err;
 }
 
 err_t cli_queue_receive(char* buf){
     BaseType_t stat = xQueueReceive(cli_queue, &buf, portMAX_DELAY);
     if(stat != pdTRUE){
-        return e_peripheral_block;
+        return e_err_peripheral_block;
     }
-    return e_no_err;
+    return e_err_no_err;
 }

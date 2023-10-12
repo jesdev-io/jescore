@@ -10,11 +10,13 @@ static job_struct_t** job_list = NULL;
 void init_cli(void* p){
     job_list = (job_struct_t**)p;
     Serial.begin(BAUDRATE);
+    #ifndef JES_DISABLE_CLI
     Serial.setTimeout(10);
     attachInterrupt(digitalPinToInterrupt(RX_PIN), serialISR, FALLING);
     __job_register_job(job_list, "readserial", 4096, 1, read_serial);
-    __printBootMessage();
-    __printCLIHead();
+    #endif
+    __job_register_job(job_list, "echo", 4096, 1, __echo);
+    __output_serial(BOOT_MSG);
     vTaskDelete(NULL);
 }
 
@@ -26,12 +28,8 @@ void serialISR(void) {
 }
 
 
-static void __printBootMessage(void){
-    Serial.println(BOOT_MSG);
-}
-
-
-static void __printCLIHead(void){
+static void __output_serial(const char* s){
+    Serial.println(s);
     Serial.print(CLI_HEADER);
 }
 
@@ -52,17 +50,19 @@ void read_serial(void* p) {
             raw_str[i] = '\0'; // leave this until raw_str is not static
             int16_t ws_i = __get_ws_index(raw_str, __MAX_JOB_NAME_LEN_BYTE);
             if(ws_i == 0){
-                Serial.println("Leading whitespace error");
+                Serial.println("Leading whitespace error"); // needs fix
             }
             else{
                 if(ws_i != -1){
                     raw_str[ws_i] = '\0';
                 }
                 pj_to_do = __job_get_job(job_list, cmd_str);
-                pj_to_do->caller = e_origin_cli;
-                if((uint16_t)ws_i < i){
-                    arg_str = &raw_str[ws_i+1];
-                    strcpy(pj_to_do->args, arg_str);
+                if(pj_to_do){
+                    pj_to_do->caller = e_origin_cli;
+                    if((uint16_t)ws_i < i){
+                        arg_str = &raw_str[ws_i+1];
+                        strcpy(pj_to_do->args, arg_str);
+                    }
                 }
                 __job_notify(__job_get_job(job_list, "core"), pj_to_do, false);
             }
@@ -72,7 +72,13 @@ void read_serial(void* p) {
         }
     }
     attachInterrupt(digitalPinToInterrupt(RX_PIN), serialISR, FALLING);
-    __printCLIHead();
+    vTaskDelete(NULL);
+}
+
+
+void __echo(void* p){
+    job_struct_t* pj = __job_get_self((job_struct_t**)p, __echo);
+    __output_serial(pj->args);
     vTaskDelete(NULL);
 }
 

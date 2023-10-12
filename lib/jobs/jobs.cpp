@@ -35,6 +35,17 @@ job_struct_t* __job_get_job(job_struct_t** job_list, const char* n){
 }
 
 
+job_struct_t* __job_get_self(job_struct_t** job_list, void (*f)(void* p)){
+    job_struct_t* cur = *job_list;
+    while(cur != NULL){
+        if(cur->function == f){ 
+            return cur; }
+        cur = cur->pn;
+    }
+    return NULL;    // This makes no sense?
+}
+
+
 err_t __job_launch_job(job_struct_t** job_list, const char* n){
     BaseType_t stat;
     job_struct_t* pj = __job_get_job(job_list, n);

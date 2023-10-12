@@ -10,6 +10,7 @@
 
 #define CORE_JOB_NAME       "core"
 #define INIT_CLI_JOB_NAME   "initcli"
+#define PRINT_JOB_NAME      "echo"
 
 
 /// @brief Types of states.
@@ -60,6 +61,12 @@ job_struct_t* __core_get_job(const char* n);
 /// @param n: job name (callable by CLI).
 /// @return status, `e_no_err` if OK.
 err_t __core_launch_job(const char* n);
+
+
+/// @brief Core error handler.
+/// @param e: Error to handle.
+/// @param args: optional additional arguments.
+void err_handler(err_t e, void* args);
 
 
 /// @brief Main core job. Handles calls and runs jobs.
