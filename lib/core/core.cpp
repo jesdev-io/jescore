@@ -16,6 +16,8 @@ err_t __core_init(){
     if(stat != e_err_no_err){ return stat; }
     stat = __core_register_job(INIT_CLI_JOB_NAME, 2048, 1, init_cli);
     if(stat != e_err_no_err){ return stat; }
+    stat = __core_register_job(HEADER_PRINTER_NAME, 1024, 2, reprint_header);
+    if(stat != e_err_no_err){ return stat; }
     
     stat = __core_launch_job(CORE_JOB_NAME);
     if(stat != e_err_no_err){ return stat; }
