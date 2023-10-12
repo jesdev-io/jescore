@@ -8,9 +8,9 @@
 #include "commands.h"
 
 #ifndef MAX_JOB_NAME_LEN_BYTE
-#define __MAX_JOB_NAME_LEN_BYTE     16
+#define __MAX_JOB_NAME_LEN_BYTE     32
 #else
-#define __MAX_JOB_NAME_LEN_LIMIT    32
+#define __MAX_JOB_NAME_LEN_LIMIT    64
 #define __GET_SAFE_SIZE(SIZE, LIMIT) ((SIZE)<(LIMIT)?(SIZE):(LIMIT))
 #define __MAX_JOB_NAME_LEN_BYTE __GET_SAFE_SIZE(MAX_JOB_NAME_LEN_BYTE, MAX_JOB_NAME_LEN_LIMIT)
 #endif
@@ -21,9 +21,11 @@
 /// @param mem_size (uint32_t): allocated stack size for task.
 /// @param priority (uint8_t): priority of task.
 /// @param function void(*)(void* p): function itself, function pointer.
-/// @param args (void*): optional args obtained from CLI.
+/// @param args (char*): optional args obtained from CLI.
 /// @param caller (origin_t): Requesting entity of job.
-/// @param pn (job_struct_t*): pointer to next job (llist).
+/// @param optional (void*): Optional information.
+/// @param error (err_t): Error associated with fault from/in job. Gets used by the error handler
+/// @param pn (job_struct_t*): Pointer to next job (llist).
 typedef struct job_struct_t{
     char name[__MAX_JOB_NAME_LEN_BYTE] = {0};
     TaskHandle_t handle = NULL;
@@ -33,6 +35,7 @@ typedef struct job_struct_t{
     char args[__MAX_JOB_NAME_LEN_BYTE] = {0};
     origin_t caller = e_origin_undefined;
     void* optional = NULL;
+    err_t error = e_err_no_err;
     struct job_struct_t* pn = NULL;
 }job_struct_t;
 
