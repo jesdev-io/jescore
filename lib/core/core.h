@@ -62,7 +62,12 @@ err_t __core_launch_job(const char* n);
 /// @brief Core error handler.
 /// @param e: Error to handle.
 /// @param args: optional additional arguments.
-static void __err_handler(err_t e, void* args);
+static void __core_err_handler_inline(err_t e, void* args);
+
+
+/// @brief Error handler as callable job
+/// @param p: Mandatory args pointer.
+void __core_job_err_handler(void* p);
 
 
 /// @brief Main core job. Handles calls and runs jobs.

@@ -12,6 +12,8 @@ err_t __core_init(){
     if(stat != e_err_no_err){ return stat; }
     stat = __core_register_job(PRINT_JOB_NAME, 4096, 1, __base_job_echo);
     if(stat != e_err_no_err){ return stat; }
+    stat = __core_register_job(ERROR_HANDLER_NAME, 1024, 1, __core_job_err_handler);
+    if(stat != e_err_no_err){ return stat; }
     stat = __core_register_job(INIT_CLI_JOB_NAME, 2048, 1, init_cli);
     if(stat != e_err_no_err){ return stat; }
     
@@ -41,7 +43,7 @@ err_t __core_launch_job(const char* n){
 }
 
 
-static void __err_handler(err_t e, void* args){
+static void __core_err_handler_inline(err_t e, void* args){
 
     job_struct_t* err_print_job = __core_get_job(PRINT_JOB_NAME);
     const char* description = NULL;
@@ -51,7 +53,7 @@ static void __err_handler(err_t e, void* args){
         description = "Memory could not be allocated!";
         break;
     case e_err_is_zero:
-        description = "Result is 0 but was not supposed to be!";
+        description = "Result is unexpectedly 0!";
         break;
     case e_err_param:
         description = "Parameter error!";
@@ -68,6 +70,9 @@ static void __err_handler(err_t e, void* args){
     case e_err_unknown_job:
         description = "Job has not been registered!";
         break;
+    case e_err_leading_whitespace:
+        description = "Leading whitespace error!";
+        break;
     default:
         description = "Unknown error.";
         break;
@@ -77,13 +82,20 @@ static void __err_handler(err_t e, void* args){
 }
 
 
+void __core_job_err_handler(void* p){
+    job_struct_t* pj = __job_get_self((job_struct_t**)p, __core_job_err_handler);
+    __core_err_handler_inline(pj->error, NULL);
+    vTaskDelete(NULL);
+}
+
+
 void __core_job(void* p){
     while(true){
         job_struct_t* pj = __job_sleep_until_notified();
         if(pj == NULL){
             core.state = e_state_fault;
             err_t e = e_err_unknown_job;
-            __err_handler(e, (void*)pj);
+            __core_err_handler_inline(e, NULL);
         }
         else{
             core.state = e_state_spawning;
