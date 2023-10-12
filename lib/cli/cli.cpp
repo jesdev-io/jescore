@@ -26,7 +26,7 @@ void serialISR(void) {
     detachInterrupt(digitalPinToInterrupt(RX_PIN));
     job_struct_t* pj_to_do = __job_get_job(job_list, SERIAL_WRITE_NAME);
     pj_to_do->caller = e_origin_interrupt;
-    __job_notify(__job_get_job(job_list, "core"), pj_to_do, true);
+    __job_notify(__job_get_job(job_list, CORE_JOB_NAME), pj_to_do, true);
 }
 
 
@@ -60,7 +60,7 @@ void read_serial(void* p) {
                         strcpy(pj_to_do->args, arg_str);
                     }
                 }
-                __job_notify(__job_get_job(job_list, "core"), pj_to_do, false);
+                __job_notify(__job_get_job(job_list, CORE_JOB_NAME), pj_to_do, false);
             }
         }
         else{
