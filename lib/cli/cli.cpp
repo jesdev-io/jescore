@@ -1,5 +1,6 @@
 #include "string.h"
 #include "cli.h"
+#include "print_utils.h"
 #include "job_driver.h"
 
 
@@ -15,7 +16,7 @@ void init_cli(void* p){
     __job_register_job(job_list, "readserial", 4096, 1, read_serial);
     #endif
     __job_register_job(job_list, "echo", 4096, 1, __echo);
-    __output_serial(BOOT_MSG);
+    __cli_output_serial(BOOT_MSG);
     vTaskDelete(NULL);
 }
 
@@ -24,12 +25,6 @@ void serialISR(void) {
     job_struct_t* pj_to_do = __job_get_job(job_list, "readserial");
     pj_to_do->caller = e_origin_interrupt;
     __job_notify(__job_get_job(job_list, "core"), pj_to_do, true);
-}
-
-
-static void __output_serial(const char* s){
-    Serial.println(s);
-    Serial.print(CLI_HEADER);
 }
 
 
@@ -75,14 +70,7 @@ void read_serial(void* p) {
 }
 
 
-void __echo(void* p){
-    job_struct_t* pj = __job_get_self((job_struct_t**)p, __echo);
-    __output_serial(pj->args);
-    vTaskDelete(NULL);
-}
-
-
-static int16_t __get_ws_index(char* buf, uint16_t len){
+static inline int16_t __get_ws_index(char* buf, uint16_t len){
     int16_t i = 0;
     while(i < len){
         if(buf[i] == ' '){
