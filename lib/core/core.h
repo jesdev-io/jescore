@@ -8,10 +8,6 @@
 #include "commands.h"
 #include "job_driver.h"
 
-#define CORE_JOB_NAME       "core"
-#define INIT_CLI_JOB_NAME   "initcli"
-#define PRINT_JOB_NAME      "echo"
-
 
 /// @brief Types of states.
 /// @note Always prefixed with "e_state".

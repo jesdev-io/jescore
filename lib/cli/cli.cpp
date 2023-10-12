@@ -2,6 +2,8 @@
 #include "cli.h"
 #include "print_utils.h"
 #include "job_driver.h"
+#include "base_jobs.h"
+#include "job_names.h"
 
 
 static job_struct_t** job_list = NULL;
@@ -13,16 +15,16 @@ void init_cli(void* p){
     #ifndef JES_DISABLE_CLI
     Serial.setTimeout(10);
     attachInterrupt(digitalPinToInterrupt(RX_PIN), serialISR, FALLING);
-    __job_register_job(job_list, "readserial", 4096, 1, read_serial);
+    __job_register_job(job_list, SERIAL_WRITE_NAME, 4096, 1, read_serial);
     #endif
-    __job_register_job(job_list, "echo", 4096, 1, __echo);
+    __job_register_job(job_list, PRINT_JOB_NAME, 4096, 1, __base_job_echo);
     __cli_output_serial(BOOT_MSG);
     vTaskDelete(NULL);
 }
 
 void serialISR(void) {
     detachInterrupt(digitalPinToInterrupt(RX_PIN));
-    job_struct_t* pj_to_do = __job_get_job(job_list, "readserial");
+    job_struct_t* pj_to_do = __job_get_job(job_list, SERIAL_WRITE_NAME);
     pj_to_do->caller = e_origin_interrupt;
     __job_notify(__job_get_job(job_list, "core"), pj_to_do, true);
 }

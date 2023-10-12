@@ -7,6 +7,7 @@
 #define CLI_BUF_SIZE    128
 #define BAUDRATE        115200
 
+
 void init_cli(void* p);
 void serialISR(void);
 void read_serial(void* p);

@@ -1,5 +1,7 @@
 #include "core.h"
 #include "cli.h"
+#include "base_jobs.h"
+#include "job_names.h"
 
 static core_t core;
 
@@ -8,7 +10,7 @@ err_t __core_init(){
     err_t stat;
     stat = __core_register_job(CORE_JOB_NAME, 2048, 1, __core_job);
     if(stat != e_err_no_err){ return stat; }
-    stat = __core_register_job(PRINT_JOB_NAME, 4096, 1, __echo);
+    stat = __core_register_job(PRINT_JOB_NAME, 4096, 1, __base_job_echo);
     if(stat != e_err_no_err){ return stat; }
     stat = __core_register_job(INIT_CLI_JOB_NAME, 2048, 1, init_cli);
     if(stat != e_err_no_err){ return stat; }
