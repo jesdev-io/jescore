@@ -1,7 +1,6 @@
 #include "string.h"
 #include "cli.h"
-#include "jobs.h"
-#include "queues.h"
+#include "job_driver.h"
 
 
 static job_struct_t** job_list = NULL;

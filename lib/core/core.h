@@ -6,7 +6,7 @@
 #include "Arduino.h"
 #include "err.h"
 #include "commands.h"
-#include "jobs.h"
+#include "job_driver.h"
 
 #define CORE_JOB_NAME       "core"
 #define INIT_CLI_JOB_NAME   "initcli"

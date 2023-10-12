@@ -1,5 +1,5 @@
-#ifndef _JOBS_H_
-#define _JOBS_H_
+#ifndef _JOB_DRIVER_H_
+#define _JOB_DRIVER_H_
 
 /// @file Driver for jobs. Handles job registration, launching and inter-job communication.
 
