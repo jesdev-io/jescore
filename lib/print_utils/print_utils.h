@@ -1,6 +1,8 @@
 #ifndef _PRINT_UTILS_H_
 #define _PRINT_UTILS_H_
 
+#include <Arduino.h>
+
 #ifndef BOOT_MSG
 #define BOOT_MSG        "\n************\n\rjes-core CLI\n\r************\n\r"
 #endif
@@ -9,7 +11,7 @@
 #endif
 
 
-static void __cli_output_serial(const char* s);
+void __cli_output_serial(const char* s);
 
 
 #endif
