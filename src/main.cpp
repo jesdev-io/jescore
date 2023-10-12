@@ -2,11 +2,11 @@
 #include "jescore.h"
 
 void stats(void* p){
-
+    vTaskDelete(NULL);
 }
 
 void help(void* p){
-    
+    vTaskDelete(NULL);
 }
 
 
