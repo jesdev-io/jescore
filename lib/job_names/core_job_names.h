@@ -3,6 +3,7 @@
 
 #define CORE_JOB_NAME       "core"
 #define INIT_CLI_JOB_NAME   "initcli"
-#define SERIAL_WRITE_NAME   "serialwrite"
+#define SERIAL_READ_NAME   "serialread"
+#define ERROR_HANDLER_NAME  "errorhandler"
 
 #endif
