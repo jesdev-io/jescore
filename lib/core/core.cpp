@@ -39,7 +39,7 @@ err_t __core_launch_job(const char* n){
 }
 
 
-void err_handler(err_t e, void* args){
+void __err_handler(err_t e, void* args){
 
     job_struct_t* err_print_job = __core_get_job(PRINT_JOB_NAME);
     const char* description = NULL;
@@ -81,7 +81,7 @@ void __core_job(void* p){
         if(pj == NULL){
             core.state = e_state_fault;
             err_t e = e_err_unknown_job;
-            err_handler(e, (void*)pj);
+            __err_handler(e, (void*)pj);
         }
         else{
             core.state = e_state_spawning;
