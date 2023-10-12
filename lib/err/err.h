@@ -13,6 +13,7 @@ typedef enum err{
     e_err_core_fail,
     e_err_too_long,
     e_err_unknown_job,
+    e_err_leading_whitespace,
 }err_t;
 
 #endif
