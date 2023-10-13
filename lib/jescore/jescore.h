@@ -22,11 +22,16 @@ err_t register_job(const char* name,
                    uint8_t priority,
                    void (*function)(void* p));
 
-#ifdef JES_DISABLE_CLI
+
 /// @brief Start a registered job.
 /// @param name: String name of job as set in `register_job()` @
 /// @return Status. Returns `e_no_err` in case of successful launch.
 err_t launch_job(const char* name);
-#endif
+
+
+/// @brief Send string to printing job.
+/// @param s: string to print.
+/// @return Status. Returns `e_no_err` in case of successful launch.
+err_t to_printer(const char* s);
 
 #endif
