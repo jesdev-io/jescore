@@ -91,6 +91,11 @@ void __core_job_err_handler(void* p){
 }
 
 
+job_struct_t** __core_get_job_list(void){
+    return &core.job_list;
+}
+
+
 void __core_job(void* p){
     while(true){
         job_struct_t* pj = __job_sleep_until_notified();

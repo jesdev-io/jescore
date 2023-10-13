@@ -70,6 +70,11 @@ static void __core_err_handler_inline(err_t e, void* args);
 void __core_job_err_handler(void* p);
 
 
+/// @brief Get the main job list.
+/// @return job list.
+job_struct_t** __core_get_job_list();
+
+
 /// @brief Main core job. Handles calls and runs jobs.
 /// @param p: Mandatory args pointer.
 void __core_job(void* p);
