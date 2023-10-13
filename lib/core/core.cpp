@@ -19,9 +19,9 @@ err_t __core_init(){
     stat = __core_register_job(HEADER_PRINTER_NAME, 1024, 2, reprint_header);
     if(stat != e_err_no_err){ return stat; }
     
-    stat = __core_launch_job(CORE_JOB_NAME);
+    stat = __core_launch_job_by_name(CORE_JOB_NAME);
     if(stat != e_err_no_err){ return stat; }
-    stat = __core_launch_job(INIT_CLI_JOB_NAME);
+    stat = __core_launch_job_by_name(INIT_CLI_JOB_NAME);
     if(stat != e_err_no_err){ return stat; }
     core.state = e_state_idle;
     return e_err_no_err;
@@ -35,19 +35,19 @@ err_t __core_register_job(const char* n,
 }
 
 
-job_struct_t* __core_get_job(const char* n){
-    return __job_get_job(&core.job_list, n);
+job_struct_t* __core_get_job_by_name(const char* n){
+    return __job_get_job_by_name(&core.job_list, n);
 }
 
 
-err_t __core_launch_job(const char* n){
-    return __job_launch_job(&core.job_list, n);
+err_t __core_launch_job_by_name(const char* n){
+    return __job_launch_job_by_name(&core.job_list, n);
 }
 
 
 static void __core_err_handler_inline(err_t e, void* args){
 
-    job_struct_t* err_print_job = __core_get_job(PRINT_JOB_NAME);
+    job_struct_t* err_print_job = __core_get_job_by_name(PRINT_JOB_NAME);
     const char* description = NULL;
     switch (e)
     {
@@ -80,12 +80,12 @@ static void __core_err_handler_inline(err_t e, void* args){
         break;
     }
     strcpy(err_print_job->args, description);
-    __core_launch_job(PRINT_JOB_NAME);
+    __core_launch_job_by_name(PRINT_JOB_NAME);
 }
 
 
 void __core_job_err_handler(void* p){
-    job_struct_t* pj = __job_get_self((job_struct_t**)p, __core_job_err_handler);
+    job_struct_t* pj = __job_get_job_by_func((job_struct_t**)p, __core_job_err_handler);
     __core_err_handler_inline(pj->error, NULL);
     vTaskDelete(NULL);
 }
@@ -106,7 +106,7 @@ void __core_job(void* p){
         }
         else{
             core.state = e_state_spawning;
-            err_t e = __core_launch_job(pj->name);
+            err_t e = __core_launch_job_by_name(pj->name);
         }
         core.state = e_state_idle;
     }

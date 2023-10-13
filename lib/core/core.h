@@ -50,13 +50,13 @@ err_t __core_register_job(const char* n,
 /// @brief Job getter based on name identifier.
 /// @param n: job name (callable by CLI).
 /// @return handle to job.
-job_struct_t* __core_get_job(const char* n);
+job_struct_t* __core_get_job_by_name(const char* n);
 
 
 /// @brief Job creation wrapper.
 /// @param n: job name (callable by CLI).
 /// @return status, `e_no_err` if OK.
-err_t __core_launch_job(const char* n);
+err_t __core_launch_job_by_name(const char* n);
 
 
 /// @brief Core error handler.

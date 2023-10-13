@@ -61,14 +61,14 @@ err_t __job_register_job(job_struct_t** job_list,
 /// @param job_list: head of job-llist.
 /// @param n: job name (callable by CLI).
 /// @returns job handle.
-job_struct_t* __job_get_job(job_struct_t** job_list, const char* n);
+job_struct_t* __job_get_job_by_name(job_struct_t** job_list, const char* n);
 
 
 /// @brief Job getter based on function signature.
 /// @param job_list: head of job-llist.
-/// @param f: function pointer of calling function.
+/// @param f: function pointer of existing job.
 /// @returns job handle.
-job_struct_t* __job_get_self(job_struct_t** job_list, void (*f)(void* p));
+job_struct_t* __job_get_job_by_func(job_struct_t** job_list, void (*f)(void* p));
 
 
 /// @brief Job creation wrapper.
@@ -76,7 +76,7 @@ job_struct_t* __job_get_self(job_struct_t** job_list, void (*f)(void* p));
 /// @param n: job name (callable by CLI).
 /// @returns status, `e_no_err` if OK.
 /// @note Checks if task memory could be allocated.
-err_t __job_launch_job(job_struct_t** job_list, const char* n);
+err_t __job_launch_job_by_name(job_struct_t** job_list, const char* n);
 
 
 /// @brief Helper function for safety assertments around strcpy().

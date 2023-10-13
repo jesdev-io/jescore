@@ -21,14 +21,14 @@ err_t register_job(const char* name,
 
 
 err_t launch_job(const char* name){
-    return __core_launch_job(name);
+    return __core_launch_job_by_name(name);
 }
 
 
 err_t to_printer(const char* s){
     job_struct_t** job_list = __core_get_job_list();
-    job_struct_t* printer = __job_get_job(job_list, PRINT_JOB_NAME);
-    job_struct_t* core_job = __job_get_job(job_list, CORE_JOB_NAME);
+    job_struct_t* printer = __job_get_job_by_name(job_list, PRINT_JOB_NAME);
+    job_struct_t* core_job = __job_get_job_by_name(job_list, CORE_JOB_NAME);
     uint8_t i = 0;
     while(s[i] != '\0' && i < __MAX_JOB_NAME_LEN_BYTE){
         printer->args[i] = s[i];
