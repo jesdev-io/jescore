@@ -11,7 +11,8 @@ typedef enum origin_t{
     e_origin_undefined,
     e_origin_interrupt,
     e_origin_cli,
-    e_origin_core
+    e_origin_core,
+    e_origin_api,
 }origin_t;
 
 /// @brief Enum for command content types aka jobs to do.
