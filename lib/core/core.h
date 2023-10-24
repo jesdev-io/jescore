@@ -35,42 +35,6 @@ typedef struct core_t{
 err_t __core_init();
 
 
-/// @brief Wrapper for __register_job(), register a new job to do.
-/// @param n: job name (callable by CLI).
-/// @param m: allocated stack size for task.
-/// @param p: priority of job.
-/// @param f: function itself, function pointer.
-/// @return status, `e_no_err` if OK.
-err_t __core_register_job(const char* n, 
-                        uint32_t m,
-                        uint8_t p, 
-                        void (*f)(void* p));
-
-
-/// @brief Job getter based on name identifier.
-/// @param n: job name (callable by CLI).
-/// @return handle to job.
-job_struct_t* __core_get_job_by_name(const char* n);
-
-
-/// @brief Job getter based on associated function.
-/// @param f: function associated with job.
-/// @return handle to job.
-job_struct_t* __core_get_job_by_func(void (*f)(void* p));
-
-
-/// @brief Job getter based on task handle.
-/// @param t: Task handle.
-/// @return handle to job.
-job_struct_t* __core_get_job_by_handle(TaskHandle_t t);
-
-
-/// @brief Job creation wrapper.
-/// @param n: job name (callable by CLI).
-/// @return status, `e_no_err` if OK.
-err_t __core_launch_job_by_name(const char* n);
-
-
 /// @brief Core error handler.
 /// @param e: Error to handle.
 /// @param args: optional additional arguments.
