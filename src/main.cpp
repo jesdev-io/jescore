@@ -2,11 +2,11 @@
 #include "jescore.h"
 
 void stats(void* p){
-    vTaskDelete(NULL);
+
 }
 
 void help(void* p){
-    vTaskDelete(NULL);
+
 }
 
 
@@ -20,7 +20,6 @@ void led(void* p){
         digitalWrite(27, LOW);
     }
     act = !act;
-    vTaskDelete(NULL);
 }
 
 
