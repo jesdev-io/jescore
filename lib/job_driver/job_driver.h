@@ -41,7 +41,6 @@ typedef struct job_struct_t{
 
 
 /// @brief Job struct setter and list appender.
-/// @param job_list: head of job-llist.
 /// @param n: job name (callable by CLI).
 /// @param m: allocated stack size for task.
 /// @param p: priority of job.
@@ -50,33 +49,40 @@ typedef struct job_struct_t{
 /// @note Checks for plausible task parameters,
 /// e.g. forbids a mem size of 0 or empty
 /// task function pointers.
-err_t __job_register_job(job_struct_t** job_list,
-                     const char* n, 
-                     uint32_t m,
-                     uint8_t p, 
-                     void (*f)(void* p));
+err_t __job_register_job(const char* n, 
+                         uint32_t m,
+                         uint8_t p, 
+                         void (*f)(void* p));
 
 
 /// @brief Job getter based on name identifier.
-/// @param job_list: head of job-llist.
 /// @param n: job name (callable by CLI).
 /// @returns job handle.
-job_struct_t* __job_get_job_by_name(job_struct_t** job_list, const char* n);
+job_struct_t* __job_get_job_by_name(const char* n);
 
 
 /// @brief Job getter based on function signature.
-/// @param job_list: head of job-llist.
 /// @param f: function pointer of existing job.
 /// @returns job handle.
-job_struct_t* __job_get_job_by_func(job_struct_t** job_list, void (*f)(void* p));
+job_struct_t* __job_get_job_by_func(void (*f)(void* p));
+
+
+/// @brief Job getter based on task handle.
+/// @param t: handle to task within job (FreeRTOS).
+/// @returns job handle.
+job_struct_t* __job_get_job_by_handle(TaskHandle_t t);
 
 
 /// @brief Job creation wrapper.
-/// @param job_list: head of job-llist.
 /// @param n: job name (callable by CLI).
 /// @returns status, `e_no_err` if OK.
 /// @note Checks if task memory could be allocated.
-err_t __job_launch_job_by_name(job_struct_t** job_list, const char* n);
+err_t __job_launch_job_by_name(const char* n);
+
+
+/// @brief 
+/// @param p 
+void __job_runtime_env(void* p);
 
 
 /// @brief Helper function for safety assertments around strcpy().
