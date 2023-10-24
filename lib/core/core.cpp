@@ -10,19 +10,26 @@ err_t __core_init(){
     err_t stat;
     stat = __job_register_job(CORE_JOB_NAME, 2048, 1, __core_job);
     if(stat != e_err_no_err){ return stat; }
-    stat = __job_register_job(PRINT_JOB_NAME, 4096, 1, __base_job_echo);
-    if(stat != e_err_no_err){ return stat; }
     stat = __job_register_job(ERROR_HANDLER_NAME, 1024, 1, __core_job_err_handler);
+    if(stat != e_err_no_err){ return stat; }
+
+    #ifndef JES_DISABLE_CLI
+    stat = __job_register_job(PRINT_JOB_NAME, 4096, 1, __base_job_echo);
     if(stat != e_err_no_err){ return stat; }
     stat = __job_register_job(INIT_CLI_JOB_NAME, 2048, 1, init_cli);
     if(stat != e_err_no_err){ return stat; }
-    stat = __job_register_job(HEADER_PRINTER_NAME, 1024, 2, reprint_header);
+    stat = __job_register_job(HEADER_PRINTER_NAME, 1024, 1, reprint_header);
     if(stat != e_err_no_err){ return stat; }
+    #endif
     
     stat = __job_launch_job_by_name(CORE_JOB_NAME);
     if(stat != e_err_no_err){ return stat; }
+
+    #ifndef JES_DISABLE_CLI
     stat = __job_launch_job_by_name(INIT_CLI_JOB_NAME);
     if(stat != e_err_no_err){ return stat; }
+    #endif
+
     core.state = e_state_idle;
     return e_err_no_err;
 }
@@ -76,6 +83,13 @@ void __core_job_err_handler(void* p){
 
 job_struct_t** __core_get_job_list(void){
     return &core.job_list;
+}
+
+
+void __core_notify(job_struct_t* pjob_to_run, 
+                    bool from_isr){
+__job_notify(__job_get_job_by_name(CORE_JOB_NAME),
+             pjob_to_run, from_isr);
 }
 
 

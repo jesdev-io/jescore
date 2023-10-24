@@ -51,6 +51,13 @@ void __core_job_err_handler(void* p);
 job_struct_t** __core_get_job_list();
 
 
+/// @brief Notify the core with a job to do.
+/// @param pjob_to_run: job to run.
+/// @param from_isr: originating from an interrupt.
+void __core_notify(job_struct_t* pjob_to_run, 
+                    bool from_isr);
+
+
 /// @brief Main core job. Handles calls and runs jobs.
 /// @param p: Mandatory args pointer.
 void __core_job(void* p);
