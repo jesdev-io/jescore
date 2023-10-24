@@ -40,6 +40,16 @@ job_struct_t* __core_get_job_by_name(const char* n){
 }
 
 
+job_struct_t* __core_get_job_by_func(void (*f)(void* p)){
+    return __job_get_job_by_func(&core.job_list, f);
+}
+
+
+job_struct_t* __core_get_job_by_handle(TaskHandle_t t){
+    return __job_get_job_by_handle(&core.job_list, t);
+}
+
+
 err_t __core_launch_job_by_name(const char* n){
     return __job_launch_job_by_name(&core.job_list, n);
 }
