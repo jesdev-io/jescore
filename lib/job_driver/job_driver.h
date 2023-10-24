@@ -86,10 +86,10 @@ void __job_runtime_env(void* p);
 
 
 /// @brief Helper function for safety assertments around strcpy().
-/// @param buf: name buffer (job_struct->name).
-/// @param name: given name to copy (comes from CLI).
+/// @param buf: empty string buffer.
+/// @param n: given string to copy.
 /// @returns status, `e_no_err` if OK.
-static inline err_t __job_copy_name(char* buf, char* n);
+inline err_t __job_copy_name(char* buf, char* n);
 
 
 /// @brief Task notification wrapper for FreeRTOS "xTaskNotify()".

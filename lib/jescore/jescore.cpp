@@ -28,14 +28,8 @@ err_t launch_job(const char* name){
 err_t to_printer(const char* s){
     job_struct_t* printer = __job_get_job_by_name(PRINT_JOB_NAME);
     job_struct_t* core_job = __job_get_job_by_name(CORE_JOB_NAME);
-    uint8_t i = 0;
-    while(s[i] != '\0' && i < __MAX_JOB_NAME_LEN_BYTE){
-        printer->args[i] = s[i];
-        i++;
-    }
-    if(i == __MAX_JOB_NAME_LEN_BYTE){
-        return e_err_too_long;
-    }
+    err_t stat = __job_copy_name(printer->args, (char*)s);
+    if(stat != e_err_no_err){ return stat; }
     printer->caller = e_origin_api;
     __job_notify(core_job, printer, false);
     return e_err_no_err;

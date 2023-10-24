@@ -2,11 +2,11 @@
 #include "jescore.h"
 
 void stats(void* p){
-
+    to_printer("Not yet implemented!");
 }
 
 void help(void* p){
-
+    to_printer("Not yet implemented!");
 }
 
 

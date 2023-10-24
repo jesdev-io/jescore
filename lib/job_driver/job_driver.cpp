@@ -94,7 +94,7 @@ void __job_runtime_env(void* p){
 }
 
 
-static inline err_t __job_copy_name(char* buf, char* n){
+inline err_t __job_copy_name(char* buf, char* n){
     if(buf == NULL || n == NULL){ return e_err_is_zero; }
     uint8_t i = 0;
     while(n[i] != '\0'){
