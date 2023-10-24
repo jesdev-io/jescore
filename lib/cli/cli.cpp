@@ -11,27 +11,24 @@ static job_struct_t** job_list = NULL;
 void init_cli(void* p){
     job_list = (job_struct_t**)p;
     Serial.begin(BAUDRATE);
-    #ifndef JES_DISABLE_CLI
     Serial.setTimeout(10);
     attachInterrupt(digitalPinToInterrupt(RX_PIN), serialISR, FALLING);
-    __job_register_job(job_list, SERIAL_READ_NAME, 4096, 1, read_serial);
-    #endif
-    __job_register_job(job_list, PRINT_JOB_NAME, 4096, 1, __base_job_echo);
+    __job_register_job(SERIAL_READ_NAME, 4096, 1, read_serial);
+    __job_register_job(PRINT_JOB_NAME, 4096, 1, __base_job_echo);
     Serial.println(BOOT_MSG);
     Serial.print(CLI_HEADER);
-    vTaskDelete(NULL);
 }
 
 void serialISR(void) {
     detachInterrupt(digitalPinToInterrupt(RX_PIN));
-    job_struct_t* pj_to_do = __job_get_job_by_name(job_list, SERIAL_READ_NAME);
+    job_struct_t* pj_to_do = __job_get_job_by_name(SERIAL_READ_NAME);
     pj_to_do->caller = e_origin_interrupt;
-    __job_notify(__job_get_job_by_name(job_list, CORE_JOB_NAME), pj_to_do, true);
+    __job_notify(__job_get_job_by_name(CORE_JOB_NAME), pj_to_do, true);
 }
 
 
 void read_serial(void* p) {
-    static char raw_str[__MAX_JOB_NAME_LEN_BYTE * 2] = {0};
+    char raw_str[__MAX_JOB_NAME_LEN_BYTE * 2] = {0};
     char* cmd_str = &raw_str[0];
     char* arg_str = NULL;
     uint8_t sep_idx = 0;
@@ -46,14 +43,14 @@ void read_serial(void* p) {
             raw_str[i] = '\0'; // leave this until raw_str is not static
             int16_t ws_i = __get_ws_index(raw_str, __MAX_JOB_NAME_LEN_BYTE);
             if(ws_i == 0){
-                pj_to_do = __job_get_job_by_name(job_list, ERROR_HANDLER_NAME);
+                pj_to_do = __job_get_job_by_name(ERROR_HANDLER_NAME);
                 pj_to_do->error = e_err_leading_whitespace;
             }
             else{
                 if(ws_i != -1){
                     raw_str[ws_i] = '\0';
                 }
-                pj_to_do = __job_get_job_by_name(job_list, cmd_str);
+                pj_to_do = __job_get_job_by_name(cmd_str);
                 if(pj_to_do){
                     pj_to_do->caller = e_origin_cli;
                     if((uint16_t)ws_i < i){
@@ -62,27 +59,23 @@ void read_serial(void* p) {
                     }
                 }
             }
-            __job_notify(__job_get_job_by_name(job_list, CORE_JOB_NAME), pj_to_do, false);
+            __job_notify(__job_get_job_by_name(CORE_JOB_NAME), pj_to_do, false);
         }
         else{
             raw_str[i++] = c;
         }
     }
     if(i == __MAX_JOB_NAME_LEN_BYTE){
-        pj_to_do = __job_get_job_by_name(job_list, ERROR_HANDLER_NAME);
+        pj_to_do = __job_get_job_by_name(ERROR_HANDLER_NAME);
         pj_to_do->error = e_err_too_long;
-        __job_notify(__job_get_job_by_name(job_list, CORE_JOB_NAME), pj_to_do, false);
+        __job_notify(__job_get_job_by_name(CORE_JOB_NAME), pj_to_do, false);
     }
     attachInterrupt(digitalPinToInterrupt(RX_PIN), serialISR, FALLING);
-    pj_to_do = __job_get_job_by_name(job_list, HEADER_PRINTER_NAME);
-    __job_notify(__job_get_job_by_name(job_list, CORE_JOB_NAME), pj_to_do, false);
-    vTaskDelete(NULL);
 }
 
 
 void reprint_header(void* p){
     Serial.print(CLI_HEADER);
-    vTaskDelete(NULL);
 }
 
 

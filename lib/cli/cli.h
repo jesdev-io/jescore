@@ -11,7 +11,7 @@
 #define BOOT_MSG        "\n************\n\rjes-core CLI\n\r************\n\r"
 #endif
 #ifndef CLI_HEADER
-#define CLI_HEADER      "jes-core $ "
+#define CLI_HEADER      "\rjes-core $ "
 #endif
 
 void init_cli(void* p);
