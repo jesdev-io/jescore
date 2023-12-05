@@ -84,6 +84,7 @@ void __job_runtime_env(void* p){
     pj->function((void*)pj);
     /// ---------------------------
 
+    delay(10);
     #ifndef JES_DISABLE_CLI
     job_struct_t* pj_to_do = __job_get_job_by_name(HEADER_PRINTER_NAME);
     if(pj_to_do != pj){ // This is bad, fix it
