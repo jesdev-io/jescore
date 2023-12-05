@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include "jescore.h"
+#include "jescore_api.h"
 
 #define LED_PIN BUILTIN_LED
 
