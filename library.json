@@ -1,0 +1,21 @@
+{
+    "name": "jes-core",
+    "version": "1.0.0",
+    "description": "FreeRTOS attached core for easier multitasking and native CLI support",
+    "keywords": "core, FreeRTOS",
+    "repository":
+    {
+      "type": "git",
+      "url": "https://github.com/jake-is-ESD-protected/jes-core"
+    },
+    "authors":
+    [
+      {
+        "name": "jake-is-ESD-protected",
+        "url": "https://github.com/jake-is-ESD-protected"
+      }
+    ],
+    "license": "Apache 2.0",
+    "frameworks": "Arduino, esp-idf",
+    "platforms": "espressif32"
+  }
