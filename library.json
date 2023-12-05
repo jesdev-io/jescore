@@ -17,5 +17,20 @@
     ],
     "license": "Apache 2.0",
     "frameworks": "Arduino, esp-idf",
-    "platforms": "espressif32"
+    "platforms": "espressif32",
+    "build": {
+        "includeDir": ".",
+        "flags": [
+          "-I src",
+          "-I lib/base_jobs",
+          "-I lib/cli",
+          "-I lib/commands",
+          "-I lib/core",
+          "-I lib/err",
+          "-I lib/jescore_api",
+          "-I lib/job_driver",
+          "-I lib/job_names",
+          "-I lib/unified"
+        ]
+      }
   }
