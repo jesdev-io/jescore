@@ -19,6 +19,7 @@
     "frameworks": "Arduino, esp-idf",
     "platforms": "espressif32",
     "build": {
+        "srcDir": ".",
         "includeDir": ".",
         "flags": [
           "-I src",
