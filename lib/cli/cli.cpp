@@ -3,44 +3,65 @@
 #include "job_driver.h"
 #include "base_jobs.h"
 #include "job_names.h"
+#include "driver/uart.h"
+#include "uart.h"
 
 
 static job_struct_t** job_list = NULL;
+static QueueHandle_t queue_uart;
 
 
 void init_cli(void* p){
     job_list = (job_struct_t**)p;
-    Serial.begin(BAUDRATE);
-    Serial.setTimeout(10);
-    attachInterrupt(digitalPinToInterrupt(RX_PIN), serialISR, FALLING);
-    __job_register_job(SERIAL_READ_NAME, 4096, 1, read_serial);
+    uart_unif_init(BAUDRATE, CLI_BUF_SIZE, CLI_BUF_SIZE, (void*)&queue_uart);
+    __job_register_job(SERIAL_READ_NAME, 4096, 1, cli_server);
     __job_register_job(PRINT_JOB_NAME, 4096, 1, __base_job_echo);
-    Serial.println(BOOT_MSG);
-    Serial.print(CLI_HEADER);
-}
-
-void serialISR(void) {
-    detachInterrupt(digitalPinToInterrupt(RX_PIN));
     job_struct_t* pj_to_do = __job_get_job_by_name(SERIAL_READ_NAME);
-    pj_to_do->caller = e_origin_interrupt;
-    __job_notify(__job_get_job_by_name(CORE_JOB_NAME), pj_to_do, true);
+    pj_to_do->caller = e_origin_cli;
+    pj_to_do->is_loop = true;
+    __job_notify(__job_get_job_by_name(CORE_JOB_NAME), pj_to_do, false);
+    // __job_launch_job_by_name(SERIAL_READ_NAME);
+    delay(1000);
+    uart_unif_write((uint8_t*)BOOT_MSG, 44);
 }
 
-
-void read_serial(void* p) {
+void cli_server(void *pvParameters)
+{
     char raw_str[__MAX_JOB_NAME_LEN_BYTE * 2] = {0};
     char* cmd_str = &raw_str[0];
     char* arg_str = NULL;
-    uint8_t sep_idx = 0;
-    uint8_t i = 0;
-    uint8_t j = 0;
     job_struct_t* pj_to_do = NULL;
-    vTaskDelay(10 / portTICK_PERIOD_MS);
+    uart_event_t event;
 
-    while(Serial.available() && i < __MAX_JOB_NAME_LEN_BYTE - 1) {
-        char c = Serial.read();
-        if(c == '\r' || c == '\n'){
-            raw_str[i] = '\0'; // leave this until raw_str is not static
+    while(1) {
+        if (xQueueReceive(queue_uart, (void *)&event, (TickType_t)portMAX_DELAY)) {
+            switch (event.type) {
+            case UART_DATA:
+                uart_unif_read((uint8_t*)raw_str, event.size, portMAX_DELAY);
+                break;
+            case UART_FIFO_OVF:
+                uart_unif_flush();
+                xQueueReset(queue_uart);
+                break;
+            case UART_BUFFER_FULL:
+                uart_unif_flush();
+                pj_to_do = __job_get_job_by_name(ERROR_HANDLER_NAME);
+                pj_to_do->error = e_err_too_long;
+                __job_notify(__job_get_job_by_name(CORE_JOB_NAME), pj_to_do, false);
+                xQueueReset(queue_uart);
+                break;
+            case UART_BREAK:
+                break;
+            case UART_PARITY_ERR:
+                break;
+            case UART_FRAME_ERR:
+                break;
+            default:
+                break;
+            }
+            if(raw_str[event.size-1] == '\r'){
+                raw_str[event.size-1] = 0;
+            }
             int16_t ws_i = __get_ws_index(raw_str, __MAX_JOB_NAME_LEN_BYTE);
             if(ws_i == 0){
                 pj_to_do = __job_get_job_by_name(ERROR_HANDLER_NAME);
@@ -53,7 +74,7 @@ void read_serial(void* p) {
                 pj_to_do = __job_get_job_by_name(cmd_str);
                 if(pj_to_do){
                     pj_to_do->caller = e_origin_cli;
-                    if((uint16_t)ws_i < i){
+                    if((uint16_t)ws_i < (event.size-1)){
                         arg_str = &raw_str[ws_i+1];
                         strcpy(pj_to_do->args, arg_str);
                     }
@@ -61,21 +82,12 @@ void read_serial(void* p) {
             }
             __job_notify(__job_get_job_by_name(CORE_JOB_NAME), pj_to_do, false);
         }
-        else{
-            raw_str[i++] = c;
-        }
     }
-    if(i == __MAX_JOB_NAME_LEN_BYTE){
-        pj_to_do = __job_get_job_by_name(ERROR_HANDLER_NAME);
-        pj_to_do->error = e_err_too_long;
-        __job_notify(__job_get_job_by_name(CORE_JOB_NAME), pj_to_do, false);
-    }
-    attachInterrupt(digitalPinToInterrupt(RX_PIN), serialISR, FALLING);
 }
 
 
 void reprint_header(void* p){
-    Serial.print(CLI_HEADER);
+    uart_unif_write((uint8_t*)CLI_HEADER, 13);
 }
 
 

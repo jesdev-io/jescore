@@ -5,7 +5,7 @@
 #define ERROR_HANDLER_NAME  "errorhandler"
 #ifndef JES_DISABLE_CLI
 #define INIT_CLI_JOB_NAME   "initcli"
-#define SERIAL_READ_NAME    "serialread"
+#define SERIAL_READ_NAME    "cliserver"
 #define HEADER_PRINTER_NAME "headerprint"
 #endif
 
