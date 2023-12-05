@@ -22,6 +22,7 @@
 /// @param priority (uint8_t): priority of task.
 /// @param function void(*)(void* p): function itself, function pointer.
 /// @param args (char*): optional args obtained from CLI.
+/// @param is_loop (bool): defines if job runs forever or terminates
 /// @param caller (origin_t): Requesting entity of job.
 /// @param optional (void*): Optional information.
 /// @param error (jes_err_t): Error associated with fault from/in job. Gets used by the error handler
@@ -33,6 +34,7 @@ typedef struct job_struct_t{
     uint8_t priority = 0;
     void (*function) (void* p) = NULL;
     char args[__MAX_JOB_NAME_LEN_BYTE] = {0};
+    bool is_loop = false;
     origin_t caller = e_origin_undefined;
     void* optional = NULL;
     jes_err_t error = e_err_no_err;
