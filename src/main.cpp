@@ -1,7 +1,11 @@
 #include <Arduino.h>
 #include "jescore_api.h"
 
+#ifdef BUILTIN_LED
 #define LED_PIN BUILTIN_LED
+#else
+#define LED_PIN 2
+#endif
 
 bool act = false;
 
