@@ -5,9 +5,9 @@
 
 static core_t core;
 
-err_t __core_init(){
+jes_err_t __core_init(){
     core.state = e_state_init;
-    err_t stat;
+    jes_err_t stat;
     stat = __job_register_job(CORE_JOB_NAME, 2048, 1, __core_job);
     if(stat != e_err_no_err){ return stat; }
     stat = __job_register_job(ERROR_HANDLER_NAME, 1024, 1, __core_job_err_handler);
@@ -35,7 +35,7 @@ err_t __core_init(){
 }
 
 
-static void __core_err_handler_inline(err_t e, void* args){
+static void __core_err_handler_inline(jes_err_t e, void* args){
 
     job_struct_t* err_print_job = __job_get_job_by_name(PRINT_JOB_NAME);
     const char* description = NULL;
@@ -98,12 +98,12 @@ void __core_job(void* p){
         job_struct_t* pj = __job_sleep_until_notified();
         if(pj == NULL){
             core.state = e_state_fault;
-            err_t e = e_err_unknown_job;
+            jes_err_t e = e_err_unknown_job;
             __core_err_handler_inline(e, NULL);
         }
         else{
             core.state = e_state_spawning;
-            err_t e = __job_launch_job_by_name(pj->name);
+            jes_err_t e = __job_launch_job_by_name(pj->name);
         }
         core.state = e_state_idle;
     }

@@ -2,7 +2,7 @@
 #include "core.h"
 #include "core_job_names.h"
 
-err_t __job_register_job(const char* n, 
+jes_err_t __job_register_job(const char* n, 
                          uint32_t m,
                          uint8_t p, 
                          void (*f)(void* p)){
@@ -14,7 +14,7 @@ err_t __job_register_job(const char* n,
     }
     job_struct_t** job_list = __core_get_job_list();
     job_struct_t* pj = (job_struct_t*)malloc(sizeof(job_struct_t));
-    err_t stat = __job_copy_name(pj->name, (char*)n);
+    jes_err_t stat = __job_copy_name(pj->name, (char*)n);
     if(stat != e_err_no_err){ return stat; }
     pj->handle = NULL;
     pj->mem_size = m;
@@ -62,7 +62,7 @@ job_struct_t* __job_get_job_by_handle(TaskHandle_t t){
 }
 
 
-err_t __job_launch_job_by_name(const char* n){
+jes_err_t __job_launch_job_by_name(const char* n){
     BaseType_t stat;
     job_struct_t* pj = __job_get_job_by_name(n);
     if(pj == NULL){ return e_err_unknown_job; }
@@ -94,7 +94,7 @@ void __job_runtime_env(void* p){
 }
 
 
-inline err_t __job_copy_name(char* buf, char* n){
+jes_err_t __job_copy_name(char* buf, char* n){
     if(buf == NULL || n == NULL){ return e_err_is_zero; }
     uint8_t i = 0;
     while(n[i] != '\0'){

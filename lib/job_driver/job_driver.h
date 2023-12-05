@@ -24,7 +24,7 @@
 /// @param args (char*): optional args obtained from CLI.
 /// @param caller (origin_t): Requesting entity of job.
 /// @param optional (void*): Optional information.
-/// @param error (err_t): Error associated with fault from/in job. Gets used by the error handler
+/// @param error (jes_err_t): Error associated with fault from/in job. Gets used by the error handler
 /// @param pn (job_struct_t*): Pointer to next job (llist).
 typedef struct job_struct_t{
     char name[__MAX_JOB_NAME_LEN_BYTE] = {0};
@@ -35,7 +35,7 @@ typedef struct job_struct_t{
     char args[__MAX_JOB_NAME_LEN_BYTE] = {0};
     origin_t caller = e_origin_undefined;
     void* optional = NULL;
-    err_t error = e_err_no_err;
+    jes_err_t error = e_err_no_err;
     struct job_struct_t* pn = NULL;
 }job_struct_t;
 
@@ -49,7 +49,7 @@ typedef struct job_struct_t{
 /// @note Checks for plausible task parameters,
 /// e.g. forbids a mem size of 0 or empty
 /// task function pointers.
-err_t __job_register_job(const char* n, 
+jes_err_t __job_register_job(const char* n, 
                          uint32_t m,
                          uint8_t p, 
                          void (*f)(void* p));
@@ -77,7 +77,7 @@ job_struct_t* __job_get_job_by_handle(TaskHandle_t t);
 /// @param n: job name (callable by CLI).
 /// @returns status, `e_no_err` if OK.
 /// @note Checks if task memory could be allocated.
-err_t __job_launch_job_by_name(const char* n);
+jes_err_t __job_launch_job_by_name(const char* n);
 
 
 /// @brief 
@@ -89,7 +89,7 @@ void __job_runtime_env(void* p);
 /// @param buf: empty string buffer.
 /// @param n: given string to copy.
 /// @returns status, `e_no_err` if OK.
-inline err_t __job_copy_name(char* buf, char* n);
+jes_err_t __job_copy_name(char* buf, char* n);
 
 
 /// @brief Task notification wrapper for FreeRTOS "xTaskNotify()".

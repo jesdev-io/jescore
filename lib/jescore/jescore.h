@@ -8,7 +8,7 @@
 
 /// @brief Start the core and all of its abilities.
 /// @return Status. Returns `e_no_err` in case of successful launch.
-err_t jes_init();
+jes_err_t jes_init();
 
 
 /// @brief Add a job (function block) to the list of all known jobs.
@@ -17,7 +17,7 @@ err_t jes_init();
 /// @param priority: Priority of the job (1 is highest).
 /// @param function: Function to run when the job is called. has to be of signature `void my_func(void* p)`.
 /// @return Status. Returns `e_no_err` in case of successful launch.
-err_t register_job(const char* name,
+jes_err_t register_job(const char* name,
                    uint32_t mem_size,
                    uint8_t priority,
                    void (*function)(void* p));
@@ -26,12 +26,12 @@ err_t register_job(const char* name,
 /// @brief Start a registered job.
 /// @param name: String name of job as set in `register_job()` @
 /// @return Status. Returns `e_no_err` in case of successful launch.
-err_t launch_job(const char* name);
+jes_err_t launch_job(const char* name);
 
 
 /// @brief Send string to printing job.
 /// @param s: string to print.
 /// @return Status. Returns `e_no_err` in case of successful launch.
-err_t to_printer(const char* s);
+jes_err_t to_printer(const char* s);
 
 #endif
