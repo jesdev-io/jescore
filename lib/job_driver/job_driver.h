@@ -47,6 +47,7 @@ typedef struct job_struct_t{
 /// @param m: allocated stack size for task.
 /// @param p: priority of job.
 /// @param f: function itself, function pointer.
+/// @param is_loop: flag which describes the lifetime of the job.
 /// @returns status, `e_no_err` if OK.
 /// @note Checks for plausible task parameters,
 /// e.g. forbids a mem size of 0 or empty
@@ -54,7 +55,8 @@ typedef struct job_struct_t{
 jes_err_t __job_register_job(const char* n, 
                          uint32_t m,
                          uint8_t p, 
-                         void (*f)(void* p));
+                         void (*f)(void* p),
+                         bool is_loop);
 
 
 /// @brief Job getter based on name identifier.

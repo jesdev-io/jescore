@@ -12,11 +12,13 @@ jes_err_t jes_init(){
 jes_err_t register_job(const char* name,
                    uint32_t mem_size,
                    uint8_t priority,
-                   void (*function)(void* p)){
+                   void (*function)(void* p),
+                   bool is_loop){
     return __job_register_job(name,
                                mem_size,
                                priority,
-                               function);
+                               function,
+                               is_loop);
     }
 
 

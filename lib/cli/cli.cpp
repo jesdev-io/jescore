@@ -14,15 +14,12 @@ static QueueHandle_t queue_uart;
 void init_cli(void* p){
     job_list = (job_struct_t**)p;
     uart_unif_init(BAUDRATE, CLI_BUF_SIZE, CLI_BUF_SIZE, (void*)&queue_uart);
-    __job_register_job(SERIAL_READ_NAME, 4096, 1, cli_server);
-    __job_register_job(PRINT_JOB_NAME, 4096, 1, __base_job_echo);
+    __job_register_job(SERIAL_READ_NAME, 4096, 1, cli_server, true);
+    __job_register_job(PRINT_JOB_NAME, 4096, 1, __base_job_echo, false);
     job_struct_t* pj_to_do = __job_get_job_by_name(SERIAL_READ_NAME);
     pj_to_do->caller = e_origin_cli;
     pj_to_do->is_loop = true;
     __job_notify(__job_get_job_by_name(CORE_JOB_NAME), pj_to_do, false);
-    // __job_launch_job_by_name(SERIAL_READ_NAME);
-    delay(1000);
-    uart_unif_write((uint8_t*)BOOT_MSG, 44);
 }
 
 void cli_server(void *pvParameters)

@@ -5,7 +5,8 @@
 jes_err_t __job_register_job(const char* n, 
                          uint32_t m,
                          uint8_t p, 
-                         void (*f)(void* p)){
+                         void (*f)(void* p),
+                         bool is_loop){
     if(n == NULL || f == NULL){
         return e_err_is_zero;
     }
@@ -20,6 +21,7 @@ jes_err_t __job_register_job(const char* n,
     pj->mem_size = m;
     pj->priority = p;
     pj->function = f;
+    pj->is_loop = is_loop;
     pj->pn = *job_list;
     *job_list = pj;
     return e_err_no_err;
@@ -79,15 +81,22 @@ jes_err_t __job_launch_job_by_name(const char* n){
 
 void __job_runtime_env(void* p){
     job_struct_t* pj = (job_struct_t*)p;
+
+    #ifndef JES_DISABLE_CLI
+    job_struct_t* pj_to_do = __job_get_job_by_name(HEADER_PRINTER_NAME);
+    if(pj->is_loop && pj_to_do != pj){
+        __job_notify(__job_get_job_by_name(CORE_JOB_NAME), pj_to_do, false);
+    }
+    delay(10);
+    #endif
     
     /// This runs the user function
     pj->function((void*)pj);
     /// ---------------------------
 
-    delay(10);
     #ifndef JES_DISABLE_CLI
-    job_struct_t* pj_to_do = __job_get_job_by_name(HEADER_PRINTER_NAME);
-    if(pj_to_do != pj){ // This is bad, fix it
+    delay(10);
+    if(!pj->is_loop && pj_to_do != pj){ // This is bad, fix it
         __job_notify(__job_get_job_by_name(CORE_JOB_NAME), pj_to_do, false);
     }
     #endif

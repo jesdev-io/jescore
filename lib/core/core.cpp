@@ -8,17 +8,17 @@ static core_t core;
 jes_err_t __core_init(){
     core.state = e_state_init;
     jes_err_t stat;
-    stat = __job_register_job(CORE_JOB_NAME, 2048, 1, __core_job);
+    stat = __job_register_job(CORE_JOB_NAME, 2048, 1, __core_job, true);
     if(stat != e_err_no_err){ return stat; }
-    stat = __job_register_job(ERROR_HANDLER_NAME, 1024, 1, __core_job_err_handler);
+    stat = __job_register_job(ERROR_HANDLER_NAME, 1024, 1, __core_job_err_handler, false);
     if(stat != e_err_no_err){ return stat; }
 
     #ifndef JES_DISABLE_CLI
-    stat = __job_register_job(PRINT_JOB_NAME, 4096, 1, __base_job_echo);
+    stat = __job_register_job(PRINT_JOB_NAME, 4096, 1, __base_job_echo, false);
     if(stat != e_err_no_err){ return stat; }
-    stat = __job_register_job(INIT_CLI_JOB_NAME, 2048, 1, init_cli);
+    stat = __job_register_job(INIT_CLI_JOB_NAME, 2048, 1, init_cli, false);
     if(stat != e_err_no_err){ return stat; }
-    stat = __job_register_job(HEADER_PRINTER_NAME, 1024, 1, reprint_header);
+    stat = __job_register_job(HEADER_PRINTER_NAME, 1024, 1, reprint_header, false);
     if(stat != e_err_no_err){ return stat; }
     #endif
     

@@ -16,11 +16,13 @@ jes_err_t jes_init();
 /// @param mem_size: Dynamic memory size for job.
 /// @param priority: Priority of the job (1 is highest).
 /// @param function: Function to run when the job is called. has to be of signature `void my_func(void* p)`.
+/// @param is_loop: flag which describes the lifetime of the job.
 /// @return Status. Returns `e_no_err` in case of successful launch.
 jes_err_t register_job(const char* name,
                    uint32_t mem_size,
                    uint8_t priority,
-                   void (*function)(void* p));
+                   void (*function)(void* p),
+                   bool is_loop);
 
 
 /// @brief Start a registered job.
