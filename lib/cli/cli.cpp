@@ -77,6 +77,7 @@ void cli_server(void *pvParameters)
                     }
                 }
             }
+            memset((void*)raw_str, 0, __MAX_JOB_NAME_LEN_BYTE * 2);
             __job_notify(__job_get_job_by_name(CORE_JOB_NAME), pj_to_do, false);
         }
     }
