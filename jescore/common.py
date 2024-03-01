@@ -1,0 +1,65 @@
+# -----------------------------------
+# Name: common.py
+# Author: jake-is-ESD-protected
+# Date: 2024-03-01
+# Description: Constants for serial comms used on both the client and the MCU with jes-core.
+# -----------------------------------
+
+
+"""
+General baseline constants
+--------------------------
+
+`KNOWN_HOSTS`:                  Types of known MCUs and their HWIDs
+`CLI_PREFIX_CLIENT`:            Prefix for messages coming from jes-core. Visual only.
+`CLI_PREFIX_MCU`                Prefix for the headless CLI (e.g. via putty). Acts as
+                                termination of transaction when this CLI is used.
+`CLI_CLIENT_IDENTIFIER`:        Prefix for the transmitted message to distinguish
+                                between this CLI and the headless CLI.
+"""
+KNOWN_HOSTS =  {"Electrosmith Daisy Seed": "VID:PID=0483:5740",
+                "Generic board with CH340 USB-to-UART converter": "VID:PID=1A86:7523",
+                "USB enhanced serial CH343": "VID:PID=1A86:55D3"}
+CLI_PREFIX_CLIENT = "[jes-core]:\t"
+CLI_PREFIX_MCU = "jes-core $"
+CLI_CLIENT_IDENTIFIER = "@py" # unused
+
+
+"""
+Client side flags
+-----------------
+
+`CMD_CLIENT_CONNECT_FLAG_PORT`: Flag only used on client side; won't be sent to jes-core.
+                                Used to let the user choose a COM/tty port:
+                                `jescore <command> -p COM<x>`. If not used, the first
+                                available port with a known host is used.
+`CMD_CLIENT_FLAGS`:             List of known flags.
+"""
+CMD_CLIENT_CONNECT_FLAG_PORT = "-p"
+CMD_CLIENT_DEBUG_FLAG_VERBOSE = "--verbose"
+CMD_CLIENT_FLAGS = [CMD_CLIENT_CONNECT_FLAG_PORT,
+                    CMD_CLIENT_DEBUG_FLAG_VERBOSE]
+
+"""
+Known responses from jescore
+----------------------------
+
+`RESPONSE_ERR`:                 Standard response from jes-core in case of an error during transactions
+`RESPONSE_WARN`:                Standard response from jes-core in case of a warning during transactions
+`RESPONSE_RDY`:                 jes-core is ready to receive some form of data or command
+`RESPONSE_FNSH`:                jes-core finished some sort of data transfer or job
+`RESPONSE_TRX_OVER`:            jes-core terminates the connection to this CLI
+"""
+RESPONSE_ERR = "ERR"
+RESPONSE_WARN = "WARN"
+RESPONSE_RDY = "RDY"
+RESPONSE_FNSH = "FNSH"
+RESPONSE_TRX_OVER = CLI_PREFIX_MCU
+
+"""
+Misc stuff
+----------
+
+`CLI_VERBOSE_DEBUG_PREFIX`:     Prefix for print statements if the CLI is set to verbose.
+"""
+CLI_VERBOSE_DEBUG_PREFIX = "[DEBUG]:\t"
