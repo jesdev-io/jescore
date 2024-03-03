@@ -7,6 +7,8 @@
 #define INIT_CLI_JOB_NAME   "initcli"
 #define SERIAL_READ_NAME    "cliserver"
 #define HEADER_PRINTER_NAME "headerprint"
+#define HELP_NAME           "help"
+#define STATS_NAME          "stats"
 #endif
 
 #endif
