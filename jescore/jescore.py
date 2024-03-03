@@ -59,7 +59,7 @@ class CjescoreCli:
                         return None, None
                     else:
                         client_args[f"{args.pop(idx)}"] = args.pop(idx+1)
-        return "".join(args), client_args
+        return " ".join(args), client_args
 
     def __uartTransceive(self, msg: str, waitTime: float = 0.01) -> str:
         self.__vPrint(f"Sending raw string '{msg}' to jes-core")
@@ -67,10 +67,11 @@ class CjescoreCli:
         ser.write(msg.encode())
         stat = ""
         returns = []
+        print(CLI_PREFIX_CLIENT, end="")
         while RESPONSE_TRX_OVER not in stat:
-            stat = ser.readline().decode('utf-8').strip()
+            stat = ser.readline().decode('utf-8', errors="ignore").strip("\n\r")
             if(stat != "" and RESPONSE_TRX_OVER not in stat):
-                print(CLI_PREFIX_CLIENT + stat)
+                print(stat)
                 returns.append(stat)
         return returns
 
@@ -88,8 +89,12 @@ class CjescoreCli:
 
 
 if __name__ == "__main__":
-    from unittest import mock
-    onTerminal = "jescore help --verbose -p COM13"
-    with mock.patch('sys.argv', onTerminal.split(" ")):
+    if len(sys.argv) == 1:
+        from unittest import mock
+        onTerminal = "jescore echo hello"
+        with mock.patch('sys.argv', onTerminal.split(" ")):
+            cli = CjescoreCli(verbose=False)
+            cli.run()
+    else:
         cli = CjescoreCli(verbose=False)
         cli.run()
