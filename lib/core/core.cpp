@@ -8,17 +8,19 @@ static core_t core;
 jes_err_t __core_init(){
     core.state = e_state_init;
     jes_err_t stat;
-    stat = __job_register_job(CORE_JOB_NAME, 2048, 1, __core_job, true);
+    stat = __job_register_job(CORE_JOB_NAME, 2048, 1, __core_job, true, e_role_core);
     if(stat != e_err_no_err){ return stat; }
-    stat = __job_register_job(ERROR_HANDLER_NAME, 1024, 1, __core_job_err_handler, false);
+    stat = __job_register_job(ERROR_HANDLER_NAME, 1024, 1, __core_job_err_handler, false, e_role_core);
     if(stat != e_err_no_err){ return stat; }
 
     #ifndef JES_DISABLE_CLI
-    stat = __job_register_job(PRINT_JOB_NAME, 4096, 1, __base_job_echo, false);
+    stat = __job_register_job(INIT_CLI_JOB_NAME, 2048, 1, init_cli, false, e_role_core);
     if(stat != e_err_no_err){ return stat; }
-    stat = __job_register_job(INIT_CLI_JOB_NAME, 2048, 1, init_cli, false);
+    stat = __job_register_job(HEADER_PRINTER_NAME, 1024, 1, reprint_header, false, e_role_core);
     if(stat != e_err_no_err){ return stat; }
-    stat = __job_register_job(HEADER_PRINTER_NAME, 1024, 1, reprint_header, false);
+    stat = __job_register_job(HELP_NAME, 2048, 1, __base_job_help, false, e_role_base);
+    if(stat != e_err_no_err){ return stat; }
+    stat = __job_register_job(STATS_NAME, 4096, 1, __base_job_stats, false, e_role_base);
     if(stat != e_err_no_err){ return stat; }
     #endif
     

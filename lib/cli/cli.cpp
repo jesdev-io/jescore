@@ -14,8 +14,8 @@ static QueueHandle_t queue_uart;
 void init_cli(void* p){
     job_list = (job_struct_t**)p;
     uart_unif_init(BAUDRATE, CLI_BUF_SIZE, CLI_BUF_SIZE, (void*)&queue_uart);
-    __job_register_job(SERIAL_READ_NAME, 4096, 1, cli_server, true);
-    __job_register_job(PRINT_JOB_NAME, 4096, 1, __base_job_echo, false);
+    __job_register_job(SERIAL_READ_NAME, 4096, 1, cli_server, true, e_role_core);
+    __job_register_job(PRINT_JOB_NAME, 4096, 1, __base_job_echo, false, e_role_base);
     job_struct_t* pj_to_do = __job_get_job_by_name(SERIAL_READ_NAME);
     pj_to_do->caller = e_origin_cli;
     pj_to_do->is_loop = true;

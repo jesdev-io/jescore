@@ -2,6 +2,7 @@
 #include "core.h"
 #include "job_driver.h"
 #include "job_names.h"
+#include "base_jobs.h"
 
 
 jes_err_t jes_init(){
@@ -18,7 +19,8 @@ jes_err_t register_job(const char* name,
                                mem_size,
                                priority,
                                function,
-                               is_loop);
+                               is_loop,
+                               e_role_user);
     }
 
 
@@ -28,11 +30,5 @@ jes_err_t launch_job(const char* name){
 
 
 jes_err_t to_printer(const char* s){
-    job_struct_t* printer = __job_get_job_by_name(PRINT_JOB_NAME);
-    job_struct_t* core_job = __job_get_job_by_name(CORE_JOB_NAME);
-    jes_err_t stat = __job_copy_name(printer->args, (char*)s);
-    if(stat != e_err_no_err){ return stat; }
-    printer->caller = e_origin_api;
-    __job_notify(core_job, printer, false);
-    return e_err_no_err;
+    return __base_job_echo_wrapper(s, e_origin_api);
 }
