@@ -6,7 +6,8 @@ jes_err_t __job_register_job(const char* n,
                          uint32_t m,
                          uint8_t p, 
                          void (*f)(void* p),
-                         bool is_loop){
+                         bool is_loop,
+                         e_role_t role){
     if(n == NULL || f == NULL){
         return e_err_is_zero;
     }
@@ -14,14 +15,23 @@ jes_err_t __job_register_job(const char* n,
         return e_err_is_zero;
     }
     job_struct_t** job_list = __core_get_job_list();
+    if(__job_get_job_by_name(n) != NULL){
+        return e_err_duplicate;
+    }
     job_struct_t* pj = (job_struct_t*)malloc(sizeof(job_struct_t));
-    jes_err_t stat = __job_copy_name(pj->name, (char*)n);
+    jes_err_t stat = __job_copy_str(pj->name, (char*)n, __MAX_JOB_NAME_LEN_BYTE);
     if(stat != e_err_no_err){ return stat; }
     pj->handle = NULL;
     pj->mem_size = m;
     pj->priority = p;
     pj->function = f;
+    memset(pj->args, 0, __MAX_JOB_ARGS_LEN_BYTE);
     pj->is_loop = is_loop;
+    pj->instances = 0;
+    pj->role = role;
+    pj->caller = e_origin_undefined;
+    pj->optional = NULL;
+    pj->error = e_err_no_err;
     pj->pn = *job_list;
     *job_list = pj;
     return e_err_no_err;
@@ -80,37 +90,49 @@ jes_err_t __job_launch_job_by_name(const char* n){
 
 
 void __job_runtime_env(void* p){
-    job_struct_t* pj = (job_struct_t*)p;
+    volatile job_struct_t* pj = (job_struct_t*)p;
 
     #ifndef JES_DISABLE_CLI
-    job_struct_t* pj_to_do = __job_get_job_by_name(HEADER_PRINTER_NAME);
-    if(pj->is_loop && pj_to_do != pj){
-        __job_notify(__job_get_job_by_name(CORE_JOB_NAME), pj_to_do, false);
+    /* This section reprints the CLI prefix in case the started job is a loop.
+     * This is useful when an infinite job is triggered once by the CLI, otherwise
+     * the prefix would never return.
+    */
+    job_struct_t* pj_print = __job_get_job_by_name(HEADER_PRINTER_NAME);
+    if(pj->is_loop && pj_print != pj){
+        __job_notify(__job_get_job_by_name(CORE_JOB_NAME), pj_print, false);
+        vTaskDelay(10 / portTICK_PERIOD_MS); // TODO: fix this!
     }
-    delay(10);
     #endif
+
+    pj->instances++;
     
     /// This runs the user function
     pj->function((void*)pj);
     /// ---------------------------
 
+    pj->instances--;
+
     #ifndef JES_DISABLE_CLI
-    delay(10);
-    if(!pj->is_loop && pj_to_do != pj){ // This is bad, fix it
-        __job_notify(__job_get_job_by_name(CORE_JOB_NAME), pj_to_do, false);
+    /* This section reprints the CLI prefix in case the started job is done.
+     * This is the opposite of the similar looking statement above.
+    */
+    if(!pj->is_loop && pj_print != pj){ // This is bad, fix it
+        vTaskDelay(10 / portTICK_PERIOD_MS); // TODO: fix this!
+        __job_notify(__job_get_job_by_name(CORE_JOB_NAME), pj_print, false);
     }
     #endif
+    pj->handle = NULL;
     vTaskDelete(NULL);
 }
 
 
-jes_err_t __job_copy_name(char* buf, char* n){
-    if(buf == NULL || n == NULL){ return e_err_is_zero; }
+jes_err_t __job_copy_str(char* buf, char* str, uint16_t max_len){
+    if(buf == NULL || str == NULL){ return e_err_is_zero; }
     uint8_t i = 0;
-    while(n[i] != '\0'){
-        if(++i == __MAX_JOB_NAME_LEN_BYTE){ return e_err_too_long; }
+    while(str[i] != '\0'){
+        if(++i == max_len){ return e_err_too_long; }
     }
-    strcpy(buf, n);
+    strcpy(buf, str);
     return e_err_no_err;
 }
 
