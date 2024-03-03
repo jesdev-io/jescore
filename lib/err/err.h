@@ -11,6 +11,7 @@ typedef enum jes_err{
     e_err_param,
     e_err_peripheral_block,
     e_err_core_fail,
+    e_err_duplicate,
     e_err_too_long,
     e_err_unknown_job,
     e_err_leading_whitespace,
