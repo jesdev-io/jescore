@@ -34,6 +34,6 @@ jes_err_t launch_job(const char* name);
 /// @brief Send string to printing job.
 /// @param s: string to print.
 /// @return Status. Returns `e_no_err` in case of successful launch.
-jes_err_t to_printer(const char* s);
+jes_err_t jesprint(const char* s);
 
 #endif

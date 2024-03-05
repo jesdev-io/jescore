@@ -74,9 +74,9 @@ job_struct_t* __job_get_job_by_handle(TaskHandle_t t){
 }
 
 
-jes_err_t __job_launch_job_by_name(const char* n){
+jes_err_t __job_launch_job(job_struct_t* pj, origin_t o){
     BaseType_t stat;
-    job_struct_t* pj = __job_get_job_by_name(n);
+    pj->caller = o;
     if(pj == NULL){ return e_err_unknown_job; }
     stat = xTaskCreate(__job_runtime_env,
                 pj->name,
@@ -86,6 +86,12 @@ jes_err_t __job_launch_job_by_name(const char* n){
                 &pj->handle);
     if(stat != pdPASS){ return e_err_mem_null; }
     return e_err_no_err;
+}
+
+
+jes_err_t __job_launch_job_by_name(const char* n, origin_t o){
+    job_struct_t* pj = __job_get_job_by_name(n);
+    return __job_launch_job(pj, o);
 }
 
 
@@ -99,6 +105,7 @@ void __job_runtime_env(void* p){
     */
     job_struct_t* pj_print = __job_get_job_by_name(HEADER_PRINTER_NAME);
     if(pj->is_loop && pj_print != pj){
+        pj_print->caller = e_origin_cli;
         __job_notify(__job_get_job_by_name(CORE_JOB_NAME), pj_print, false);
         vTaskDelay(10 / portTICK_PERIOD_MS); // TODO: fix this!
     }
@@ -118,6 +125,7 @@ void __job_runtime_env(void* p){
     */
     if(!pj->is_loop && pj_print != pj){ // This is bad, fix it
         vTaskDelay(10 / portTICK_PERIOD_MS); // TODO: fix this!
+        pj_print->caller = e_origin_cli;
         __job_notify(__job_get_job_by_name(CORE_JOB_NAME), pj_print, false);
     }
     #endif

@@ -56,7 +56,7 @@ void test_job_core(void){
     TEST_ASSERT_EQUAL_UINT8(1, pj->is_loop);
     TEST_ASSERT_EQUAL_UINT8(1, pj->instances);
     TEST_ASSERT_EQUAL_INT(e_role_core, pj->role);
-    TEST_ASSERT_EQUAL_INT(e_origin_undefined, pj->caller);
+    TEST_ASSERT_EQUAL_INT(e_origin_core, pj->caller);
     TEST_ASSERT_EQUAL_HEX32(NULL, pj->optional);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, pj->error);
 }
@@ -92,7 +92,7 @@ void test_job_init_cli(void){
     TEST_ASSERT_EQUAL_UINT8(0, pj->is_loop);
     TEST_ASSERT_EQUAL_UINT8(0, pj->instances);
     TEST_ASSERT_EQUAL_INT(e_role_core, pj->role);
-    TEST_ASSERT_EQUAL_INT(e_origin_undefined, pj->caller);
+    TEST_ASSERT_EQUAL_INT(e_origin_core, pj->caller);
     TEST_ASSERT_EQUAL_HEX32(NULL, pj->optional);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, pj->error);
 }
@@ -110,7 +110,7 @@ void test_job_reprint_header(void){
     TEST_ASSERT_EQUAL_UINT8(0, pj->is_loop);
     TEST_ASSERT_EQUAL_UINT8(0, pj->instances);
     TEST_ASSERT_EQUAL_INT(e_role_core, pj->role);
-    TEST_ASSERT_EQUAL_INT(e_origin_undefined, pj->caller);
+    TEST_ASSERT_EQUAL_INT(e_origin_cli, pj->caller);
     TEST_ASSERT_EQUAL_HEX32(NULL, pj->optional);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, pj->error);
 }

@@ -24,11 +24,11 @@ jes_err_t __core_init(){
     if(stat != e_err_no_err){ return stat; }
     #endif
     
-    stat = __job_launch_job_by_name(CORE_JOB_NAME);
+    stat = __job_launch_job_by_name(CORE_JOB_NAME, e_origin_core);
     if(stat != e_err_no_err){ return stat; }
 
     #ifndef JES_DISABLE_CLI
-    stat = __job_launch_job_by_name(INIT_CLI_JOB_NAME);
+    stat = __job_launch_job_by_name(INIT_CLI_JOB_NAME, e_origin_core);
     if(stat != e_err_no_err){ return stat; }
     #endif
 
@@ -72,14 +72,13 @@ static void __core_err_handler_inline(jes_err_t e, void* args){
         break;
     }
     strcpy(err_print_job->args, description);
-    __job_launch_job_by_name(PRINT_JOB_NAME);
+    __job_launch_job_by_name(PRINT_JOB_NAME, e_origin_core);
 }
 
 
 void __core_job_err_handler(void* p){
-    job_struct_t* pj = __job_get_job_by_func(__core_job_err_handler);
+    job_struct_t* pj = (job_struct_t*)p;
     __core_err_handler_inline(pj->error, NULL);
-    vTaskDelete(NULL);
 }
 
 
@@ -105,7 +104,7 @@ void __core_job(void* p){
         }
         else{
             core.state = e_state_spawning;
-            jes_err_t e = __job_launch_job_by_name(pj->name);
+            jes_err_t e = __job_launch_job_by_name(pj->name, pj->caller);
         }
         core.state = e_state_idle;
     }

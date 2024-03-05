@@ -93,14 +93,24 @@ job_struct_t* __job_get_job_by_func(void (*f)(void* p));
 /// @brief Job getter based on task handle.
 /// @param t: handle to task within job (FreeRTOS).
 /// @returns job handle.
+/// @attention  This will only work if the targeted job
+///             is running, otherwise its handle will
+///             be set to NULL.
 job_struct_t* __job_get_job_by_handle(TaskHandle_t t);
 
 
 /// @brief Job creation wrapper.
+/// @param pj: Pointer to job to do.
+/// @param o: Origin of activation.
+/// @returns status, `e_no_err` if OK.
+jes_err_t __job_launch_job(job_struct_t* pj, origin_t o);
+
+/// @brief Job creation wrapper.
 /// @param n: job name (callable by CLI).
+/// @param o: Origin of activation.
 /// @returns status, `e_no_err` if OK.
 /// @note Checks if task memory could be allocated.
-jes_err_t __job_launch_job_by_name(const char* n);
+jes_err_t __job_launch_job_by_name(const char* n, origin_t o);
 
 
 /// @brief 

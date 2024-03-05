@@ -25,10 +25,10 @@ jes_err_t register_job(const char* name,
 
 
 jes_err_t launch_job(const char* name){
-    return __job_launch_job_by_name(name);
+    return __job_launch_job_by_name(name, e_origin_api);
 }
 
 
-jes_err_t to_printer(const char* s){
+jes_err_t jesprint(const char* s){
     return __base_job_echo_wrapper(s, e_origin_api);
 }

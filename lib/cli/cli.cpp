@@ -17,7 +17,7 @@ void init_cli(void* p){
     __job_register_job(SERIAL_READ_NAME, 4096, 1, cli_server, true, e_role_core);
     __job_register_job(PRINT_JOB_NAME, 4096, 1, __base_job_echo, false, e_role_base);
     job_struct_t* pj_to_do = __job_get_job_by_name(SERIAL_READ_NAME);
-    pj_to_do->caller = e_origin_cli;
+    pj_to_do->caller = e_origin_core;
     pj_to_do->is_loop = true;
     __job_notify(__job_get_job_by_name(CORE_JOB_NAME), pj_to_do, false);
 }
@@ -78,6 +78,7 @@ void cli_server(void *pvParameters)
                 }
             }
             memset((void*)raw_str, 0, __MAX_JOB_NAME_LEN_BYTE * 2);
+            pj_to_do->caller = e_origin_cli;
             __job_notify(__job_get_job_by_name(CORE_JOB_NAME), pj_to_do, false);
         }
     }
