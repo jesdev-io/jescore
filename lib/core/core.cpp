@@ -72,7 +72,7 @@ static void __core_err_handler_inline(jes_err_t e, void* args){
         break;
     }
     strcpy(err_print_job->args, description);
-    __job_launch_job_by_name(PRINT_JOB_NAME, e_origin_core);
+    __job_launch_job(err_print_job, e_origin_core);
 }
 
 
