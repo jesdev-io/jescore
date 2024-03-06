@@ -25,9 +25,4 @@ jobs:
         run: pip install --upgrade platformio
 
       - name: Build program for supported boards
-        run: |
-          pio ci --lib="lib" --board=az-delivery-devkit-v4 ${{ matrix.example }}
-          pio ci --lib="lib" --board=esp32-c3-devkitm-1 ${{ matrix.example }}
-          pio ci --lib="lib" --board=esp32-s3-devkitc-1 ${{ matrix.example }}
-        env:
-          PLATFORMIO_CI_SRC: ${{ matrix.example }}
+        run: pio run
