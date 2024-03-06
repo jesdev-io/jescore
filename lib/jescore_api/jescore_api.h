@@ -1,5 +1,5 @@
-#ifndef _JESCORE_H_
-#define _JESCORE_H_
+#ifndef _JESCORE_API_H_
+#define _JESCORE_API_H_
 
 /// @file Top API layer for user access.
 
