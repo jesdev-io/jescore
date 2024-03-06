@@ -1,6 +1,8 @@
 # jes-core
 J's Embedded Systems Core: a convenient, dynamic and portable wrapper for FreeRTOS running on embedded systems with a central core unit that makes adding, debugging and abstracting new features easy.
 
+[![PlatformIO CI](https://github.com/jake-is-ESD-protected/jes-core/actions/workflows/workflow.yml/badge.svg?branch=main)](https://github.com/jake-is-ESD-protected/jes-core/actions/workflows/workflow.yml)
+
 ##### **[About](#about)** | **[Key-concepts](#key-concepts)** | **[Use-cases](#use-cases)** | **[Known issues](#known-issues)** | **[Disclaimer](#disclaimer)**
 
 ## About
