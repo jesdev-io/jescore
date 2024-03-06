@@ -26,3 +26,5 @@ jobs:
 
       - name: Build program for supported boards
         run: pio run
+      - name: Run Unit Tests
+        run: pio test
