@@ -24,7 +24,7 @@ void init_cli(void* p){
 
 void cli_server(void *pvParameters)
 {
-    char raw_str[__MAX_JOB_NAME_LEN_BYTE * 2] = {0};
+    char raw_str[__MAX_JOB_ARGS_LEN_BYTE] = {0};
     char* cmd_str = &raw_str[0];
     char* arg_str = NULL;
     job_struct_t* pj_to_do = NULL;
@@ -62,6 +62,7 @@ void cli_server(void *pvParameters)
             int16_t ws_i = __get_ws_index(raw_str, __MAX_JOB_NAME_LEN_BYTE);
             if(ws_i == 0){
                 pj_to_do = __job_get_job_by_name(ERROR_HANDLER_NAME);
+                pj_to_do->caller = e_origin_cli;
                 pj_to_do->error = e_err_leading_whitespace;
             }
             else{
