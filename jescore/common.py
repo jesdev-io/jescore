@@ -44,12 +44,14 @@ CMD_CLIENT_FLAGS = [CMD_CLIENT_CONNECT_FLAG_PORT,
 Known responses from jescore
 ----------------------------
 
+`RESPONSE_OK`:                  Standard response from jes-core in case of successful transaction with no return string
 `RESPONSE_ERR`:                 Standard response from jes-core in case of an error during transactions
 `RESPONSE_WARN`:                Standard response from jes-core in case of a warning during transactions
 `RESPONSE_RDY`:                 jes-core is ready to receive some form of data or command
 `RESPONSE_FNSH`:                jes-core finished some sort of data transfer or job
 `RESPONSE_TRX_OVER`:            jes-core terminates the connection to this CLI
 """
+RESPONSE_OK = "OK"
 RESPONSE_ERR = "ERR"
 RESPONSE_WARN = "WARN"
 RESPONSE_RDY = "RDY"
