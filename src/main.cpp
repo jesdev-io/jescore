@@ -38,9 +38,9 @@ void blink(void* p){
 
 void setup() {
     jes_init();
-    register_job("ledinit", 2048, 1, led_init, false);
+    register_and_launch_job("ledinit", 2048, 1, led_init, false);
     register_job("leddeinit", 1024, 1, led_deinit, false);
-    register_job("blink", 2048, 1, blink, true);
+    register_and_launch_job("blink", 2048, 1, blink, true);
 }
 
 void loop() {

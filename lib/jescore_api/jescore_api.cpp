@@ -11,20 +11,36 @@ jes_err_t jes_init(){
 
 
 jes_err_t register_job(const char* name,
-                   uint32_t mem_size,
-                   uint8_t priority,
-                   void (*function)(void* p),
-                   bool is_loop){
+                       uint32_t mem_size,
+                       uint8_t priority,
+                       void (*function)(void* p),
+                       bool is_loop){
     return __job_register_job(name,
-                               mem_size,
-                               priority,
-                               function,
-                               is_loop,
-                               e_role_user);
+                              mem_size,
+                              priority,
+                              function,
+                              is_loop,
+                              e_role_user);
     }
 
 
 jes_err_t launch_job(const char* name){
+    return __job_launch_job_by_name(name, e_origin_api);
+}
+
+
+jes_err_t register_and_launch_job(const char* name,
+                                  uint32_t mem_size,
+                                  uint8_t priority,
+                                  void (*function)(void* p),
+                                  bool is_loop){
+    jes_err_t stat = __job_register_job(name,
+                                        mem_size,
+                                        priority,
+                                        function,
+                                        is_loop,
+                                        e_role_user);
+    if(stat != e_err_no_err){ return stat; }
     return __job_launch_job_by_name(name, e_origin_api);
 }
 
