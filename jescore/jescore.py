@@ -69,9 +69,12 @@ class CjescoreCli:
         returns = []
         print(CLI_PREFIX_CLIENT, end="")
         while RESPONSE_TRX_OVER not in stat:
-            stat = ser.readline().decode('utf-8', errors="ignore").strip("\n\r")
-            if(stat != "" and RESPONSE_TRX_OVER not in stat):
-                print(stat)
+            stat = ser.readline().decode('utf-8', errors="ignore").strip("\n\r\x00")
+            if stat != "":
+                if RESPONSE_TRX_OVER in stat:
+                    print(RESPONSE_OK)
+                else:
+                    print(stat)
                 returns.append(stat)
         return returns
 
@@ -91,7 +94,7 @@ class CjescoreCli:
 if __name__ == "__main__":
     if len(sys.argv) == 1:
         from unittest import mock
-        onTerminal = "jescore echo hello"
+        onTerminal = "jescore blink"
         with mock.patch('sys.argv', onTerminal.split(" ")):
             cli = CjescoreCli(verbose=False)
             cli.run()
