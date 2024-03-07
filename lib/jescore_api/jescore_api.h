@@ -50,4 +50,35 @@ jes_err_t register_and_launch_job(const char* name,
 /// @return Status. Returns `e_no_err` in case of successful launch.
 jes_err_t jesprint(const char* s);
 
+
+/// @brief Set the field `args` of the job.
+/// @param s: String to insert into `args` field.
+/// @param pj: Pointer to job.
+/// @return status, `e_no_err` if OK.
+jes_err_t set_args(char* s, job_struct_t* pj);
+
+
+/// @brief Get the field `args` of the job.
+/// @param pj: Pointer to job. 
+/// @return Pointer to `args` field of the job.
+/// @attention  This function returns a pointer to the args buffer of the
+///             job struct. Since this function is intended to be called from
+///             within a job, the memory of the job struct persists, which 
+///             makes a copy of the arg string redundant. If however something
+///             goes wrong, this function will return NULL.
+char* get_args(job_struct_t* pj);
+
+
+/// @brief Set the field `optional` of the job.
+/// @param p: Arbitrary reference to parameter.
+/// @param pj: Pointer to job. 
+/// @return status, `e_no_err` if OK.
+jes_err_t set_param(void* p, job_struct_t* pj);
+
+
+/// @brief Get the field `optional` of the job.
+/// @param pj: Pointer to job. 
+/// @return Pointer to `optional` field of the job.
+/// @attention Will return NULL on error.
+void* get_param(job_struct_t* pj);
 #endif

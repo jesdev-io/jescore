@@ -48,3 +48,23 @@ jes_err_t register_and_launch_job(const char* name,
 jes_err_t jesprint(const char* s){
     return __base_job_echo_wrapper(s, e_origin_api);
 }
+
+
+jes_err_t set_args(char* s, job_struct_t* pj){
+    return __job_set_args(s, pj);
+}
+
+
+char* get_args(job_struct_t* pj){
+    return __job_get_args(pj);
+}
+
+
+jes_err_t set_param(void* p, job_struct_t* pj){
+    return __job_set_param(p, pj);
+}
+
+
+void* get_param(job_struct_t* pj){
+    return __job_get_param(pj);
+}

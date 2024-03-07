@@ -104,10 +104,10 @@ void __job_runtime_env(void* p){
      * the prefix would never return.
     */
     job_struct_t* pj_print = __job_get_job_by_name(HEADER_PRINTER_NAME);
-    if(pj->is_loop && pj_print != pj){
+    if(pj->is_loop && pj_print != pj && pj->caller == e_origin_cli){
         pj_print->caller = e_origin_cli;
         __job_notify(__job_get_job_by_name(CORE_JOB_NAME), pj_print, false);
-        vTaskDelay(10 / portTICK_PERIOD_MS); // TODO: fix this!
+        // vTaskDelay(10 / portTICK_PERIOD_MS); // TODO: fix this!
     }
     #endif
 
@@ -123,8 +123,8 @@ void __job_runtime_env(void* p){
     /* This section reprints the CLI prefix in case the started job is done.
      * This is the opposite of the similar looking statement above.
     */
-    if(!pj->is_loop && pj_print != pj){ // This is bad, fix it
-        vTaskDelay(10 / portTICK_PERIOD_MS); // TODO: fix this!
+    if(!pj->is_loop && pj_print != pj && pj->caller == e_origin_cli){ // This is bad, fix it
+        // vTaskDelay(10 / portTICK_PERIOD_MS); // TODO: fix this!
         pj_print->caller = e_origin_cli;
         __job_notify(__job_get_job_by_name(CORE_JOB_NAME), pj_print, false);
     }
@@ -174,4 +174,28 @@ job_struct_t* __job_notify_take(TickType_t ticks_to_wait){
 job_struct_t* __job_sleep_until_notified(){
     job_struct_t* pjob_to_run = __job_notify_take(portMAX_DELAY);
     return pjob_to_run;
+}
+
+
+jes_err_t __job_set_args(char* s, job_struct_t* pj){
+    return __job_copy_str(pj->args, s, __MAX_JOB_ARGS_LEN_BYTE);
+}
+
+
+char* __job_get_args(job_struct_t* pj){
+    if(pj == NULL){ return NULL; }
+    return pj->args;
+}
+
+
+jes_err_t __job_set_param(void* p, job_struct_t* pj){
+    if(pj == NULL){ return e_err_is_zero; }
+    pj->optional = p;
+    return e_err_no_err;
+}
+
+
+void* __job_get_param(job_struct_t* pj){
+    if(pj == NULL){ return NULL; }
+    return pj->optional;
 }
