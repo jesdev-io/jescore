@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include "jescore_api.h"
+#include "jescore.h"
 
 #define MAX_JOB_ARGS_LEN_BYTE 64
 #define LED_PIN 4
