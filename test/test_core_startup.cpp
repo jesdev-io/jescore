@@ -93,7 +93,7 @@ void test_job_reprint_header(void){
     job_struct_t* pj = __job_get_job_by_name(HEADER_PRINTER_NAME);
     TEST_ASSERT_EQUAL_STRING(HEADER_PRINTER_NAME, pj->name);
     TEST_ASSERT_EQUAL_HEX32(NULL, pj->handle);
-    TEST_ASSERT_EQUAL_UINT32(1024, pj->mem_size);
+    TEST_ASSERT_EQUAL_UINT32(2048, pj->mem_size);
     TEST_ASSERT_EQUAL_UINT8(1, pj->priority);
     TEST_ASSERT_EQUAL_HEX32(reprint_header, pj->function);
     TEST_ASSERT_EQUAL_INT8_ARRAY(dummy, pj->args, __MAX_JOB_ARGS_LEN_BYTE);
