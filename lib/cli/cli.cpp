@@ -19,7 +19,7 @@ void init_cli(void* p){
     job_struct_t* pj_to_do = __job_get_job_by_name(SERIAL_READ_NAME);
     pj_to_do->caller = e_origin_core;
     pj_to_do->is_loop = true;
-    __job_notify(__job_get_job_by_name(CORE_JOB_NAME), pj_to_do, false);
+    __job_notify_with_job(__job_get_job_by_name(CORE_JOB_NAME), pj_to_do, false);
 }
 
 void cli_server(void *pvParameters)
@@ -44,7 +44,7 @@ void cli_server(void *pvParameters)
                 uart_unif_flush();
                 pj_to_do = __job_get_job_by_name(ERROR_HANDLER_NAME);
                 pj_to_do->error = e_err_too_long;
-                __job_notify(__job_get_job_by_name(CORE_JOB_NAME), pj_to_do, false);
+                __job_notify_with_job(__job_get_job_by_name(CORE_JOB_NAME), pj_to_do, false);
                 xQueueReset(queue_uart);
                 break;
             case UART_BREAK:
@@ -79,7 +79,7 @@ void cli_server(void *pvParameters)
                 }
             }
             memset((void*)raw_str, 0, __MAX_JOB_NAME_LEN_BYTE * 2);
-            __job_notify(__job_get_job_by_name(CORE_JOB_NAME), pj_to_do, false);
+            __job_notify_with_job(__job_get_job_by_name(CORE_JOB_NAME), pj_to_do, false);
         }
     }
 }

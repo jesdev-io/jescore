@@ -128,23 +128,44 @@ jes_err_t __job_copy_str(char* buf, char* str, uint16_t max_len);
 
 /// @brief Task notification wrapper for FreeRTOS "xTaskNotify()".
 /// @param pjob_to_notify: handle to job to be notified.
+/// @param notif: Arbitrary 32 bit notification.
+/// @param from_isr: specifies ISR or non-ISR origin.
+void __job_notify_generic(job_struct_t* pjob_to_notify, 
+                          void* notif,
+                          bool from_isr);
+
+
+/// @brief Task notification wrapper for FreeRTOS "xTaskNotify()".
+/// @param pjob_to_notify: handle to job to be notified.
 /// @param pjob_to_run: job that should be launched by the notified job.
 /// @param from_isr: specifies ISR or non-ISR origin.
-void __job_notify(job_struct_t* pjob_to_notify, 
-                job_struct_t* pjob_to_run, 
-                bool from_isr);
+void __job_notify_with_job(job_struct_t* pjob_to_notify, 
+                           job_struct_t* pjob_to_run, 
+                           bool from_isr);
+
+
+/// @brief Task notification wrapper for FreeRTOS "ulTaskNotifyTake".
+/// @param ticks_to_wait: timeout time, use "portMAX_DELAY" for blocking.
+/// @returns Arbitrary 32 bit notification sent in `__job_notify_generic()`
+void* __job_notify_generic_take(TickType_t ticks_to_wait);
 
 
 /// @brief Task notification wrapper for FreeRTOS "ulTaskNotifyTake".
 /// @param ticks_to_wait: timeout time, use "portMAX_DELAY" for blocking.
 /// @returns received job to launch.
-job_struct_t* __job_notify_take(TickType_t ticks_to_wait);
+job_struct_t* __job_notify_with_job_take(TickType_t ticks_to_wait);
+
+
+/// @brief Task notification wrapper for FreeRTOS "ulTaskNotifyTake".
+/// @returns: Arbitrary 32 bit notification sent in `__job_notify_generic()`
+/// @note calls job_notify_take() with portMAX_DELAY.
+void* __job_sleep_until_notified_generic(void);
 
 
 /// @brief Task notification wrapper for FreeRTOS "ulTaskNotifyTake".
 /// @returns: received job to launch.
 /// @note calls job_notify_take() with portMAX_DELAY.
-job_struct_t* __job_sleep_until_notified();
+job_struct_t* __job_sleep_until_notified_with_job(void);
 
 
 /// @brief Set the field `args` of the job.

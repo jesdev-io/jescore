@@ -5,6 +5,7 @@
 
 #include "core.h"
 #include "err.h"
+#include "job_driver.h"
 
 /// @brief Start the core and all of its abilities.
 /// @return Status. Returns `e_no_err` in case of successful launch.
@@ -81,4 +82,21 @@ jes_err_t set_param(void* p, job_struct_t* pj);
 /// @return Pointer to `optional` field of the job.
 /// @attention Will return NULL on error.
 void* get_param(job_struct_t* pj);
+
+
+/// @brief Notify a job with an optional message.
+/// @param name Name of job which should be notified.
+/// @param notification Optional pointer to notification value.
+void notify_job(const char* name, void* notification);
+
+
+/// @brief Notify a job with an optional message from within an interrupt.
+/// @param name Name of job which should be notified.
+/// @param notification Optional pointer to notification value. 
+void notify_job_ISR(const char* name, void* notification);
+
+
+/// @brief Pause the calling job until a notification arrives.
+/// @return The optional notification value.
+void* wait_for_notification(void);
 #endif

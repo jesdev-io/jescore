@@ -16,6 +16,9 @@
 
 #define DUMMY_JOB_SINGLE_NAME "dummysingle"
 #define DUMMY_JOB_LOOP_NAME "dummyloop"
+#define DUMMY_JOB_NOTIFY "dummynotify"
+#define DUMMY_JOB_NOTIFY_TAKE "dummynotifytake"
+#define DUMMY_NOTIFICATION_VALUE 1234
 #define DUMMY_PRINT "hello world!"
 #define DUMMY_JOB_MEM 2048
 #define DUMMY_JOB_PRIO 1
@@ -34,6 +37,19 @@ void dummy_job_loop(void* p){
             vTaskDelay(250 / portTICK_PERIOD_MS);
         }
     }
+}
+
+
+void dummy_job_notify(void* p){
+    uint32_t val = DUMMY_NOTIFICATION_VALUE;
+    notify_job(DUMMY_JOB_NOTIFY_TAKE, &val);
+}
+
+
+void dummy_job_notify_take(void* p){
+    uint32_t* pval;
+    pval = (uint32_t*)wait_for_notification();
+    set_param(pval, (job_struct_t*)p);
 }
 
 
@@ -185,4 +201,26 @@ void test_core_job_launch_prohibited(void){
     TEST_ASSERT_EQUAL_INT(e_err_prohibited, stat);
     stat = launch_job(HEADER_PRINTER_NAME);
     TEST_ASSERT_EQUAL_INT(e_err_prohibited, stat);
+}
+
+
+void test_notify_job_and_wait(void){
+    jes_err_t stat = register_and_launch_job(DUMMY_JOB_NOTIFY_TAKE,
+                                             DUMMY_JOB_MEM,
+                                             DUMMY_JOB_PRIO,
+                                             dummy_job_notify_take,
+                                             false);
+    TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
+    vTaskDelay(100 / portTICK_PERIOD_MS);
+    stat = register_and_launch_job(DUMMY_JOB_NOTIFY,
+                                   DUMMY_JOB_MEM,
+                                   DUMMY_JOB_PRIO,
+                                   dummy_job_notify,
+                                   false);
+    TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
+    vTaskDelay(100 / portTICK_PERIOD_MS);
+
+    uint32_t* pval;
+    pval = (uint32_t*)get_param(__job_get_job_by_name(DUMMY_JOB_NOTIFY_TAKE));
+    TEST_ASSERT_EQUAL_INT32(DUMMY_NOTIFICATION_VALUE, *pval);
 }

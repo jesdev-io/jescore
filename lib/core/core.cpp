@@ -89,14 +89,14 @@ job_struct_t** __core_get_job_list(void){
 
 void __core_notify(job_struct_t* pjob_to_run, 
                     bool from_isr){
-__job_notify(__job_get_job_by_name(CORE_JOB_NAME),
+__job_notify_with_job(__job_get_job_by_name(CORE_JOB_NAME),
              pjob_to_run, from_isr);
 }
 
 
 void __core_job(void* p){
     while(true){
-        job_struct_t* pj = __job_sleep_until_notified();
+        job_struct_t* pj = __job_sleep_until_notified_with_job();
         if(pj == NULL){
             core.state = e_state_fault;
             jes_err_t e = e_err_unknown_job;

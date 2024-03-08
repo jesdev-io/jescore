@@ -21,7 +21,7 @@ jes_err_t __base_job_echo_wrapper(const char* s, origin_t o){
     jes_err_t stat = __job_copy_str(printer->args, (char*)s, __MAX_JOB_ARGS_LEN_BYTE);
     if(stat != e_err_no_err){ return stat; }
     printer->caller = o;
-    __job_notify(core_job, printer, false);
+    __job_notify_with_job(core_job, printer, false);
     return e_err_no_err;
 }
 

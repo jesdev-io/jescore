@@ -68,3 +68,18 @@ jes_err_t set_param(void* p, job_struct_t* pj){
 void* get_param(job_struct_t* pj){
     return __job_get_param(pj);
 }
+
+
+void notify_job(const char* name, void* notification){
+    __job_notify_generic(__job_get_job_by_name(name), notification, false);
+}
+
+
+void notify_job_ISR(const char* name, void* notification){
+    __job_notify_generic(__job_get_job_by_name(name), notification, true);
+}
+
+
+void* wait_for_notification(void){
+    return __job_sleep_until_notified_generic();
+}
