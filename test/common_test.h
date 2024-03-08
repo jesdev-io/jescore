@@ -23,5 +23,6 @@ void test_launch_job(void);
 void test_jesprint(void);
 void test_set_get_args(void);
 void test_set_get_params(void);
+void test_core_job_launch_prohibited(void);
 
 #endif // _COMMON_TEST_H_

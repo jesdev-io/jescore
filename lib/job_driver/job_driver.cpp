@@ -78,6 +78,10 @@ jes_err_t __job_launch_job(job_struct_t* pj, origin_t o){
     BaseType_t stat;
     pj->caller = o;
     if(pj == NULL){ return e_err_unknown_job; }
+    if((o == e_origin_cli || o == e_origin_api) && pj->role == e_role_core){
+        // Prohibit the calling of core jobs from API and CLI
+        return e_err_prohibited;
+    }
     stat = xTaskCreate(__job_runtime_env,
                 pj->name,
                 pj->mem_size,
