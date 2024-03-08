@@ -16,7 +16,7 @@ jes_err_t __core_init(){
     #ifndef JES_DISABLE_CLI
     stat = __job_register_job(INIT_CLI_JOB_NAME, 2048, 1, init_cli, false, e_role_core);
     if(stat != e_err_no_err){ return stat; }
-    stat = __job_register_job(HEADER_PRINTER_NAME, 1024, 1, reprint_header, false, e_role_core);
+    stat = __job_register_job(HEADER_PRINTER_NAME, 2048, 1, reprint_header, false, e_role_core);
     if(stat != e_err_no_err){ return stat; }
     stat = __job_register_job(HELP_NAME, 2048, 1, __base_job_help, false, e_role_base);
     if(stat != e_err_no_err){ return stat; }
