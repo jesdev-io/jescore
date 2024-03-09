@@ -58,6 +58,9 @@ static void __core_err_handler_inline(jes_err_t e, void* args){
     case e_err_core_fail:
         description = "Core failure!";
         break;
+    case e_err_duplicate:
+        description = "Entry already exists!";
+        break;
     case e_err_too_long:
         description = "Given string is too long!";
         break;
@@ -66,6 +69,9 @@ static void __core_err_handler_inline(jes_err_t e, void* args){
         break;
     case e_err_leading_whitespace:
         description = "Leading whitespace error!";
+        break;
+    case e_err_prohibited:
+        description = "Access denied!";
         break;
     default:
         description = "Unknown error.";
@@ -105,6 +111,10 @@ void __core_job(void* p){
         else{
             core.state = e_state_spawning;
             jes_err_t e = __job_launch_job_by_name(pj->name, pj->caller);
+            if(e != e_err_no_err){
+                core.state = e_state_fault;
+                __core_err_handler_inline(e, NULL);
+            }
         }
         core.state = e_state_idle;
     }

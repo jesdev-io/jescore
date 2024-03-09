@@ -109,7 +109,7 @@ void __job_runtime_env(void* p){
     */
     job_struct_t* pj_print = __job_get_job_by_name(HEADER_PRINTER_NAME);
     if(pj->is_loop && pj_print != pj && pj->caller == e_origin_cli){
-        pj_print->caller = e_origin_cli;
+        pj_print->caller = e_origin_core;
         __job_notify_with_job(__job_get_job_by_name(CORE_JOB_NAME), pj_print, false);
         // vTaskDelay(10 / portTICK_PERIOD_MS); // TODO: fix this!
     }
@@ -128,8 +128,8 @@ void __job_runtime_env(void* p){
      * This is the opposite of the similar looking statement above.
     */
     if(!pj->is_loop && pj_print != pj && pj->caller == e_origin_cli){ // This is bad, fix it
-        // vTaskDelay(10 / portTICK_PERIOD_MS); // TODO: fix this!
-        pj_print->caller = e_origin_cli;
+        vTaskDelay(10 / portTICK_PERIOD_MS); // TODO: fix this!
+        pj_print->caller = e_origin_core;
         __job_notify_with_job(__job_get_job_by_name(CORE_JOB_NAME), pj_print, false);
     }
     #endif
