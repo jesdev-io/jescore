@@ -20,6 +20,8 @@
 #define DUMMY_JOB_NOTIFY_TAKE "dummynotifytake"
 #define DUMMY_NOTIFICATION_VALUE 1234
 #define DUMMY_PRINT "hello world!"
+#define DUMMY_FAIL_MSG "Assert failed"
+#define DUMMY_SUCCESS_MSG "Assert succeeded"
 #define DUMMY_JOB_MEM 2048
 #define DUMMY_JOB_PRIO 1
 
@@ -49,7 +51,14 @@ void dummy_job_notify(void* p){
 void dummy_job_notify_take(void* p){
     uint32_t* pval;
     pval = (uint32_t*)wait_for_notification();
-    set_param(pval, (job_struct_t*)p);
+    set_param(pval);
+    uint32_t* pval_equal = (uint32_t*)get_param();
+    if(*pval != *pval_equal){
+        set_args((char*)DUMMY_FAIL_MSG);
+    }
+    else{
+        set_args((char*)DUMMY_SUCCESS_MSG);
+    }
 }
 
 
@@ -167,11 +176,11 @@ void test_set_get_args(void){
     strcpy(dummy, DUMMY_PRINT);
     job_struct_t* pj = __job_get_job_by_name(DUMMY_JOB_SINGLE_NAME);
 
-    jes_err_t stat = set_args((char*)DUMMY_PRINT, pj);
+    jes_err_t stat = __job_set_args((char*)DUMMY_PRINT, pj);    // API call only works within jobs
     TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
     TEST_ASSERT_EQUAL_INT8_ARRAY(dummy, pj->args, __MAX_JOB_ARGS_LEN_BYTE);
 
-    char* args = get_args(pj);
+    char* args = __job_get_args(pj);    // API call only works within jobs
     TEST_ASSERT_EQUAL_INT8_ARRAY(dummy, args, __MAX_JOB_ARGS_LEN_BYTE);
 }
 
@@ -180,12 +189,12 @@ void test_set_get_params(void){
     uint32_t value = 1000;
     job_struct_t* pj = __job_get_job_by_name(DUMMY_JOB_SINGLE_NAME);
 
-    jes_err_t stat = set_param(&value, pj);
+    jes_err_t stat = __job_set_param(&value, pj);   // API call only works within jobs
     TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
     uint32_t* internal_val = (uint32_t*)pj->optional;
     TEST_ASSERT_EQUAL_INT(value, *internal_val);
 
-    uint32_t ret = *(uint32_t*)get_param(pj);
+    uint32_t ret = *(uint32_t*)__job_get_param(pj); // API call only works within jobs
     TEST_ASSERT_EQUAL_INT(value, ret);
 }
 
@@ -221,6 +230,8 @@ void test_notify_job_and_wait(void){
     vTaskDelay(100 / portTICK_PERIOD_MS);
 
     uint32_t* pval;
-    pval = (uint32_t*)get_param(__job_get_job_by_name(DUMMY_JOB_NOTIFY_TAKE));
+    pval = (uint32_t*)__job_get_param(__job_get_job_by_name(DUMMY_JOB_NOTIFY_TAKE));
+    char* msg = __job_get_args(__job_get_job_by_name(DUMMY_JOB_NOTIFY_TAKE));
     TEST_ASSERT_EQUAL_INT32(DUMMY_NOTIFICATION_VALUE, *pval);
+    TEST_ASSERT_EQUAL_STRING(DUMMY_SUCCESS_MSG, msg);
 }

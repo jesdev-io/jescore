@@ -50,22 +50,34 @@ jes_err_t jesprint(const char* s){
 }
 
 
-jes_err_t set_args(char* s, job_struct_t* pj){
+jes_err_t set_args(char* s){
+    TaskHandle_t caller = xTaskGetCurrentTaskHandle();
+    job_struct_t* pj = __job_get_job_by_handle(caller);
+    if (pj == NULL) { return e_err_is_zero; }
     return __job_set_args(s, pj);
 }
 
 
-char* get_args(job_struct_t* pj){
+char* get_args(void){
+    TaskHandle_t caller = xTaskGetCurrentTaskHandle();
+    job_struct_t* pj = __job_get_job_by_handle(caller);
+    if (pj == NULL) { return NULL; }
     return __job_get_args(pj);
 }
 
 
-jes_err_t set_param(void* p, job_struct_t* pj){
+jes_err_t set_param(void* p){
+    TaskHandle_t caller = xTaskGetCurrentTaskHandle();
+    job_struct_t* pj = __job_get_job_by_handle(caller);
+    if (pj == NULL) { return e_err_is_zero; }
     return __job_set_param(p, pj);
 }
 
 
-void* get_param(job_struct_t* pj){
+void* get_param(void){
+    TaskHandle_t caller = xTaskGetCurrentTaskHandle();
+    job_struct_t* pj = __job_get_job_by_handle(caller);
+    if (pj == NULL) { return NULL; }
     return __job_get_param(pj);
 }
 
