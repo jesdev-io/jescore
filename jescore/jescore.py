@@ -63,7 +63,8 @@ class CjescoreCli:
 
     def __uartTransceive(self, msg: str, waitTime: float = 0.01) -> str:
         self.__vPrint(f"Sending raw string '{msg}' to jes-core")
-        ser = serial.Serial(self.__getPort(), baudrate=self.baudrate, timeout=0.01)
+        ser = serial.Serial(self.__getPort(), baudrate=self.baudrate, timeout=waitTime)
+        ser.setRTS(False)
         ser.write(msg.encode())
         stat = ""
         returns = []
@@ -94,7 +95,7 @@ class CjescoreCli:
 if __name__ == "__main__":
     if len(sys.argv) == 1:
         from unittest import mock
-        onTerminal = "jescore blink"
+        onTerminal = "jescore button release -p COM12"
         with mock.patch('sys.argv', onTerminal.split(" ")):
             cli = CjescoreCli(verbose=False)
             cli.run()
