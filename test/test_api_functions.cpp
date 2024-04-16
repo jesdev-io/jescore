@@ -149,6 +149,7 @@ void test_launch_job(void){
 void test_jesprint(void){
     jes_err_t stat = jesprint(DUMMY_PRINT);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
+    vTaskDelay(10 / portTICK_PERIOD_MS);
     
     char dummy[__MAX_JOB_ARGS_LEN_BYTE] = {0};
     strcpy(dummy, DUMMY_PRINT);

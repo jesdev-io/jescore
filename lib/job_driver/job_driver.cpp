@@ -32,6 +32,8 @@ jes_err_t __job_register_job(const char* n,
     pj->caller = e_origin_undefined;
     pj->optional = NULL;
     pj->error = e_err_no_err;
+    pj->notif_queue = xQueueCreate(MAX_JOB_NOTIF_QUEUE_SIZE, sizeof(void*));
+    if(pj->notif_queue == NULL) { return e_err_mem_null; }
     pj->pn = *job_list;
     *job_list = pj;
     return e_err_no_err;
@@ -154,15 +156,14 @@ void __job_notify_generic(job_struct_t* pjob_to_notify,
                           bool from_isr){
     if(from_isr){
         BaseType_t dummy = pdFALSE;
-        xTaskNotifyFromISR(pjob_to_notify->handle, 
-                           (uint32_t)notif, 
-                           eSetValueWithOverwrite, 
-                           &dummy);
+        xQueueSendToBackFromISR(pjob_to_notify->notif_queue,
+                                &notif,
+                                &dummy);
     }
     else{
-        xTaskNotify(pjob_to_notify->handle,
-                    (uint32_t)notif,
-                    eSetValueWithOverwrite);
+        xQueueSendToBack(pjob_to_notify->notif_queue,
+                                &notif,
+                                portMAX_DELAY);
     }
 }
 
@@ -175,15 +176,19 @@ void __job_notify_with_job(job_struct_t* pjob_to_notify,
 
 
 void* __job_notify_generic_take(TickType_t ticks_to_wait){
-    uint32_t raw = ulTaskNotifyTake(pdTRUE, ticks_to_wait);
+    void* raw;
+    TaskHandle_t caller = xTaskGetCurrentTaskHandle();
+    job_struct_t* pj = __job_get_job_by_handle(caller);
+    xQueueReceive(pj->notif_queue,
+                  &raw,
+                  ticks_to_wait);
     return (void*)raw;
 }
 
 
 job_struct_t* __job_notify_with_job_take(TickType_t ticks_to_wait){
-    uint32_t raw = ulTaskNotifyTake(pdTRUE, ticks_to_wait);
-    job_struct_t* pjob_to_run = (job_struct_t*)raw;
-    return pjob_to_run;
+    void* raw = __job_notify_generic_take(ticks_to_wait);
+    return (job_struct_t*)raw;
 }
 
 
