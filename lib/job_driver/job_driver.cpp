@@ -163,7 +163,7 @@ void __job_notify_generic(job_struct_t* pjob_to_notify,
     else{
         xQueueSendToBack(pjob_to_notify->notif_queue,
                                 &notif,
-                                portMAX_DELAY);
+                                1); // rethink this
     }
 }
 
