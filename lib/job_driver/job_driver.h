@@ -22,6 +22,8 @@
 #define __MAX_JOB_ARGS_LEN_BYTE __GET_SAFE_SIZE(MAX_JOB_ARGS_LEN_BYTE, MAX_JOB_ARGS_LEN_LIMIT)
 #endif
 
+#define MAX_JOB_NOTIF_QUEUE_SIZE    10
+
 typedef enum{
     e_role_core,
     e_role_base,
@@ -41,6 +43,7 @@ typedef enum{
 /// @param caller (origin_t): Requesting entity of job.
 /// @param optional (void*): Optional information.
 /// @param error (jes_err_t): Error associated with fault from/in job. Gets used by the error handler
+/// @param notif_queue (QueueHandle_t): Job's notification queue handle.
 /// @param pn (job_struct_t*): Pointer to next job (llist).
 typedef struct job_struct_t{
     char name[__MAX_JOB_NAME_LEN_BYTE] = {0};
@@ -55,6 +58,7 @@ typedef struct job_struct_t{
     origin_t caller = e_origin_undefined;
     void* optional = NULL;
     jes_err_t error = e_err_no_err;
+    QueueHandle_t notif_queue = NULL;
     struct job_struct_t* pn = NULL;
 }job_struct_t;
 
