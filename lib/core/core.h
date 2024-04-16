@@ -8,7 +8,6 @@
 #include "commands.h"
 #include "job_driver.h"
 
-#define CORE_NOTIF_QUEUE_SIZE   10
 
 /// @brief Types of states.
 /// @note Always prefixed with "e_state".
@@ -23,11 +22,10 @@ typedef enum state_t{
 
 /// @brief Main core object, has one instance.
 /// @param state (state_t): current state of core (fsm).
-/// @param task_list (task_struct_t*): pointers to task functions in array format.
+/// @param job_list (job_struct_t*): pointers to job functions in array format.
 typedef struct core_t{
     state_t state;
     job_struct_t* job_list;
-    QueueHandle_t notif_queue;
 }core_t;
 
 
