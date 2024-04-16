@@ -22,7 +22,7 @@
 #define __MAX_JOB_ARGS_LEN_BYTE __GET_SAFE_SIZE(MAX_JOB_ARGS_LEN_BYTE, MAX_JOB_ARGS_LEN_LIMIT)
 #endif
 
-#define MAX_JOB_NOTIF_QUEUE_SIZE    10
+#define MAX_JOB_NOTIF_QUEUE_SIZE    4
 
 typedef enum{
     e_role_core,
