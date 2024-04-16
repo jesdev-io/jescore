@@ -154,15 +154,15 @@ void __job_notify_generic(job_struct_t* pjob_to_notify,
                           bool from_isr){
     if(from_isr){
         BaseType_t dummy = pdFALSE;
-        xQueueSendToBackFromISR(__core_get_notif_queue(),
-                                &notif,
-                                &dummy);
+        xTaskNotifyFromISR(pjob_to_notify->handle, 
+                           (uint32_t)notif, 
+                           eSetValueWithOverwrite, 
+                           &dummy);
     }
     else{
-        BaseType_t dummy = pdFALSE;
-        xQueueSendToBackFromISR(__core_get_notif_queue(),
-                                &notif,
-                                &dummy);
+        xTaskNotify(pjob_to_notify->handle,
+                    (uint32_t)notif,
+                    eSetValueWithOverwrite);
     }
 }
 
@@ -175,19 +175,13 @@ void __job_notify_with_job(job_struct_t* pjob_to_notify,
 
 
 void* __job_notify_generic_take(TickType_t ticks_to_wait){
-    void* raw;
-    xQueueReceive(__core_get_notif_queue(),
-                  &raw,
-                  ticks_to_wait);
+    uint32_t raw = ulTaskNotifyTake(pdTRUE, ticks_to_wait);
     return (void*)raw;
 }
 
 
 job_struct_t* __job_notify_with_job_take(TickType_t ticks_to_wait){
-    void* raw;
-    xQueueReceive(__core_get_notif_queue(),
-                  &raw,
-                  ticks_to_wait);
+    uint32_t raw = ulTaskNotifyTake(pdTRUE, ticks_to_wait);
     job_struct_t* pjob_to_run = (job_struct_t*)raw;
     return pjob_to_run;
 }

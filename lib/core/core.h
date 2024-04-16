@@ -8,7 +8,6 @@
 #include "commands.h"
 #include "job_driver.h"
 
-#define CORE_NOTIF_QUEUE_SIZE   10
 
 /// @brief Types of states.
 /// @note Always prefixed with "e_state".
@@ -27,7 +26,6 @@ typedef enum state_t{
 typedef struct core_t{
     state_t state;
     job_struct_t* job_list;
-    QueueHandle_t notif_queue;
 }core_t;
 
 
@@ -51,11 +49,6 @@ void __core_job_err_handler(void* p);
 /// @brief Get the main job list.
 /// @return job list.
 job_struct_t** __core_get_job_list();
-
-
-/// @brief Get the queue handle for notifications.
-/// @return queue handle.
-QueueHandle_t __core_get_notif_queue(void);
 
 
 /// @brief Notify the core with a job to do.
