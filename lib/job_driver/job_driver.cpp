@@ -112,7 +112,7 @@ void __job_runtime_env(void* p){
     job_struct_t* pj_print = __job_get_job_by_name(HEADER_PRINTER_NAME);
     if(pj->is_loop && pj_print != pj && pj->caller == e_origin_cli){
         pj_print->caller = e_origin_core;
-        __job_notify_with_job(__job_get_job_by_name(CORE_JOB_NAME), pj_print, false);
+        __job_notify_with_job(__job_get_job_by_name(CORE_JOB_NAME), pj_print, e_notif_overwrite, false);
         // vTaskDelay(10 / portTICK_PERIOD_MS); // TODO: fix this!
     }
     #endif
@@ -132,7 +132,7 @@ void __job_runtime_env(void* p){
     if(!pj->is_loop && pj_print != pj && pj->caller == e_origin_cli){ // This is bad, fix it
         vTaskDelay(10 / portTICK_PERIOD_MS); // TODO: fix this!
         pj_print->caller = e_origin_core;
-        __job_notify_with_job(__job_get_job_by_name(CORE_JOB_NAME), pj_print, false);
+        __job_notify_with_job(__job_get_job_by_name(CORE_JOB_NAME), pj_print, e_notif_overwrite, false);
     }
     #endif
     pj->handle = NULL;
@@ -153,25 +153,50 @@ jes_err_t __job_copy_str(char* buf, char* str, uint16_t max_len){
 
 void __job_notify_generic(job_struct_t* pjob_to_notify, 
                           void* notif, 
+                          e_notif_t notif_method,
                           bool from_isr){
-    if(from_isr){
-        BaseType_t dummy = pdFALSE;
-        xQueueSendToBackFromISR(pjob_to_notify->notif_queue,
-                                &notif,
-                                &dummy);
-    }
-    else{
-        xQueueSendToBack(pjob_to_notify->notif_queue,
-                                &notif,
-                                0); // rethink this
+    BaseType_t dummy = pdFALSE;
+    switch(notif_method){
+        case e_notif_overwrite:
+            if(from_isr) {  xTaskNotifyFromISR( pjob_to_notify->handle, 
+                                                (uint32_t)notif, 
+                                                eSetValueWithOverwrite, 
+                                                &dummy);}
+            else {  xTaskNotify(pjob_to_notify->handle,
+                                (uint32_t)notif,
+                                eSetValueWithOverwrite);}
+                
+            break;
+        case e_notif_keep:
+            if(from_isr) {  xTaskNotifyFromISR( pjob_to_notify->handle, 
+                                                (uint32_t)notif, 
+                                                eSetValueWithoutOverwrite, 
+                                                &dummy);}
+            else {  xTaskNotify(pjob_to_notify->handle,
+                                (uint32_t)notif,
+                                eSetValueWithoutOverwrite);}
+                
+            break;
+        case e_notif_queue:
+            if(from_isr) {  xQueueSendToBackFromISR(pjob_to_notify->notif_queue,
+                                                    &notif,
+                                                    &dummy);}
+            else {xQueueSendToBack(pjob_to_notify->notif_queue,
+                                   &notif,
+                                   0);} // rethink this)
+                
+            break;
+        default:
+        break;
     }
 }
 
 
 void __job_notify_with_job(job_struct_t* pjob_to_notify, 
                 job_struct_t* pjob_to_run, 
+                e_notif_t notif_method,
                 bool from_isr){
-    __job_notify_generic(pjob_to_notify, pjob_to_run, from_isr);
+    __job_notify_generic(pjob_to_notify, pjob_to_run, notif_method, from_isr);
 }
 
 

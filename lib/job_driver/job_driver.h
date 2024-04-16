@@ -30,6 +30,12 @@ typedef enum{
     e_role_user
 }e_role_t;
 
+typedef enum{
+    e_notif_overwrite,  // Notification with overwrite.
+    e_notif_keep,       // Notification witout overwrite.
+    e_notif_queue       // Notifications in queue.
+}e_notif_t;
+
 /// @brief Abstraction struct for jobs to do.
 /// @param name (char*): job name (callable by CLI).
 /// @param handle (TaskHandle_t): handle to task (FreeRTOS).
@@ -133,18 +139,22 @@ jes_err_t __job_copy_str(char* buf, char* str, uint16_t max_len);
 /// @brief Task notification wrapper for FreeRTOS "xTaskNotify()".
 /// @param pjob_to_notify: handle to job to be notified.
 /// @param notif: Arbitrary 32 bit notification.
+/// @param notif_method: Method of sending. See e_notif_t.
 /// @param from_isr: specifies ISR or non-ISR origin.
 void __job_notify_generic(job_struct_t* pjob_to_notify, 
                           void* notif,
+                          e_notif_t notif_method,
                           bool from_isr);
 
 
 /// @brief Task notification wrapper for FreeRTOS "xTaskNotify()".
 /// @param pjob_to_notify: handle to job to be notified.
 /// @param pjob_to_run: job that should be launched by the notified job.
+/// @param notif_method: Method of sending. See e_notif_t.
 /// @param from_isr: specifies ISR or non-ISR origin.
 void __job_notify_with_job(job_struct_t* pjob_to_notify, 
                            job_struct_t* pjob_to_run, 
+                           e_notif_t notif_method,
                            bool from_isr);
 
 
