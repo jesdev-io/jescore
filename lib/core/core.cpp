@@ -7,6 +7,10 @@ static core_t core;
 
 jes_err_t __core_init(){
     core.state = e_state_init;
+    core.notif_queue = xQueueCreate(CORE_NOTIF_QUEUE_SIZE, sizeof(void*));
+    if(core.notif_queue == NULL){
+        return e_err_core_fail;
+    }
     jes_err_t stat;
     stat = __job_register_job(CORE_JOB_NAME, 2048, 1, __core_job, true, e_role_core);
     if(stat != e_err_no_err){ return stat; }
@@ -90,6 +94,11 @@ void __core_job_err_handler(void* p){
 
 job_struct_t** __core_get_job_list(void){
     return &core.job_list;
+}
+
+
+QueueHandle_t __core_get_notif_queue(void){
+    return core.notif_queue;    // is a pointer
 }
 
 
