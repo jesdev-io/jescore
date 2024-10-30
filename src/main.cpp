@@ -5,11 +5,6 @@
 #define LED_PIN 4
 
 
-void led_init(void* p){
-    pinMode(LED_PIN, OUTPUT);
-}
-
-
 void blink(void* p){
     static bool act = false;
     act = !act;
@@ -24,7 +19,7 @@ void blink(void* p){
 
 void setup() {
     jes_init();
-    register_and_launch_job("ledinit", 2048, 1, led_init, false);
+    pinMode(LED_PIN, OUTPUT);
     register_and_launch_job("blink", 2048, 1, blink, true);
 }
 
