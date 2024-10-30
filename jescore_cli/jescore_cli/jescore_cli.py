@@ -76,16 +76,21 @@ class CjescoreCli:
 
 def main():
     parser = argparse.ArgumentParser(description="CLI for jes-core serial communication.")
-    parser.add_argument("command", type=str, help="Command to send to jes-core")
+    parser.add_argument("command", type=str, nargs='?', help="Command to send to jes-core")
     parser.add_argument("-p", "--port", type=str, help="Specify the port for connection")
     parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose output")
     parser.add_argument("-b", "--baudrate", type=int, default=115200, help="Baud rate for communication (default: 115200)")
-    
-    args = parser.parse_args()
+
+    # Capture both known and unknown arguments
+    args, unknown_args = parser.parse_known_args()
 
     cli = CjescoreCli(baudrate=args.baudrate, verbose=args.verbose, port=args.port)
     cli.applyArgs(args)
-    cli.run(args.command)
+
+    # Join all command parts (including unknown arguments) into a single command string
+    command_to_send = ' '.join([args.command] + unknown_args) if args.command else ' '.join(unknown_args)
+    
+    cli.run(command_to_send)
 
 
 if __name__ == "__main__":
