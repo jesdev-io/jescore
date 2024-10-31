@@ -1,6 +1,7 @@
 #include "job_driver.h"
 #include "core.h"
 #include "core_job_names.h"
+#include "cli.h"
 
 jes_err_t __job_register_job(const char* n, 
                          uint32_t m,
@@ -110,7 +111,8 @@ void __job_runtime_env(void* p){
      * the prefix would never return.
     */
     job_struct_t* pj_print = __job_get_job_by_name(HEADER_PRINTER_NAME);
-    if(pj->is_loop && pj_print != pj && pj->caller == e_origin_cli){
+    if(pj->is_loop && pj_print != pj && cli_get_sess_state() == 1){
+        cli_set_sess_state(0);
         pj_print->caller = e_origin_core;
         __job_notify_with_job(__job_get_job_by_name(CORE_JOB_NAME), pj_print, false);
         // vTaskDelay(10 / portTICK_PERIOD_MS); // TODO: fix this!
@@ -129,7 +131,8 @@ void __job_runtime_env(void* p){
     /* This section reprints the CLI prefix in case the started job is done.
      * This is the opposite of the similar looking statement above.
     */
-    if(!pj->is_loop && pj_print != pj && pj->caller == e_origin_cli){ // This is bad, fix it
+    if(!pj->is_loop && pj_print != pj && cli_get_sess_state() == 1){
+        cli_set_sess_state(0);
         vTaskDelay(10 / portTICK_PERIOD_MS); // TODO: fix this!
         pj_print->caller = e_origin_core;
         __job_notify_with_job(__job_get_job_by_name(CORE_JOB_NAME), pj_print, false);

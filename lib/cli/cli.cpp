@@ -9,7 +9,16 @@
 
 static job_struct_t** job_list = NULL;
 static QueueHandle_t queue_uart;
+static uint8_t open_sess = 0;
 
+
+uint8_t cli_get_sess_state(void){
+    return open_sess;
+}
+
+void cli_set_sess_state(uint8_t sess_state){
+    open_sess = sess_state;
+}
 
 void init_cli(void* p){
     job_list = (job_struct_t**)p;
@@ -32,6 +41,7 @@ void cli_server(void *pvParameters)
 
     while(1) {
         if (xQueueReceive(queue_uart, (void *)&event, (TickType_t)portMAX_DELAY)) {
+            open_sess = 1;
             switch (event.type) {
             case UART_DATA:
                 uart_unif_read((uint8_t*)raw_str, event.size, portMAX_DELAY);

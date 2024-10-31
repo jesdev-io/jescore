@@ -14,6 +14,8 @@
 #define CLI_HEADER      "\rjes-core $ "
 #endif
 
+uint8_t cli_get_sess_state(void);
+void cli_set_sess_state(uint8_t sess_state);
 void init_cli(void* p);
 void serialISR(void);
 void cli_server(void* p);
