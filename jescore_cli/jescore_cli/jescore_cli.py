@@ -12,10 +12,9 @@ class CjescoreCli:
         self.port = port
         self.os_type = platform.system()
 
-    def __vPrint(self, printable):
+    def __vPrint(self, printable, end='\n'):
         if self.verbose:
-            print(CLI_VERBOSE_DEBUG_PREFIX, end="")
-            print(printable)
+            print(CLI_VERBOSE_DEBUG_PREFIX, printable, end=end)
     
     def __getPort(self):
         if not self.port:
@@ -55,21 +54,22 @@ class CjescoreCli:
         ser.write(msg.encode())
         stat = ""
         returns = []
-        print(CLI_PREFIX_CLIENT, end="")
         while RESPONSE_TRX_OVER not in stat:
             stat = ser.readline().decode('utf-8', errors="ignore").strip("\n\r\x00")
             if stat != "":
                 if RESPONSE_TRX_OVER in stat:
-                    print(RESPONSE_OK)
-                else:
-                    print(stat)
+                    self.__vPrint(RESPONSE_OK)
                 returns.append(stat)
+        print(CLI_PREFIX_CLIENT, end='')
+        for s in returns:
+            if CLI_PREFIX_MCU not in s:
+                print(s)
         return returns
 
     def run(self, command):
         if command:
             stat = self.__uartTransceive(command)
-            self.__vPrint(stat)
+            self.__vPrint(f"Received raw string {stat}")
         else:
             print("Error: Command not specified.")
 
