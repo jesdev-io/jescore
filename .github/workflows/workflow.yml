@@ -8,7 +8,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        example: [test, src/main.cpp]
+        example: [test, examples/main.cpp]
 
     steps:
       - uses: actions/checkout@v3
