@@ -8,7 +8,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        example: [test, examples/main.cpp]
+        example: [test, src/example_blink.cpp]
 
     steps:
       - uses: actions/checkout@v3
