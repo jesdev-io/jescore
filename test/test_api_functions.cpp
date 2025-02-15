@@ -82,7 +82,7 @@ void test_register_job(void){
     TEST_ASSERT_EQUAL_UINT8(0, pj->instances);
     TEST_ASSERT_EQUAL_INT(e_role_user, pj->role);
     TEST_ASSERT_EQUAL_INT(e_origin_undefined, pj->caller);
-    TEST_ASSERT_EQUAL_HEX32(NULL, pj->optional);
+    TEST_ASSERT_EQUAL_HEX32(NULL, pj->param);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, pj->error);
 
     stat = register_job(DUMMY_JOB_LOOP_NAME,
@@ -103,7 +103,7 @@ void test_register_job(void){
     TEST_ASSERT_EQUAL_UINT8(0, pj->instances);
     TEST_ASSERT_EQUAL_INT(e_role_user, pj->role);
     TEST_ASSERT_EQUAL_INT(e_origin_undefined, pj->caller);
-    TEST_ASSERT_EQUAL_HEX32(NULL, pj->optional);
+    TEST_ASSERT_EQUAL_HEX32(NULL, pj->param);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, pj->error);
 }
 
@@ -124,7 +124,7 @@ void test_launch_job(void){
     TEST_ASSERT_EQUAL_UINT8(1, pj->instances);
     TEST_ASSERT_EQUAL_INT(e_role_user, pj->role);
     TEST_ASSERT_EQUAL_INT(e_origin_api, pj->caller);
-    TEST_ASSERT_EQUAL_HEX32(NULL, pj->optional);
+    TEST_ASSERT_EQUAL_HEX32(NULL, pj->param);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, pj->error);
 
     stat = launch_job(DUMMY_JOB_LOOP_NAME);
@@ -141,7 +141,7 @@ void test_launch_job(void){
     TEST_ASSERT_EQUAL_UINT8(1, pj->instances);
     TEST_ASSERT_EQUAL_INT(e_role_user, pj->role);
     TEST_ASSERT_EQUAL_INT(e_origin_api, pj->caller);
-    TEST_ASSERT_EQUAL_HEX32(NULL, pj->optional);
+    TEST_ASSERT_EQUAL_HEX32(NULL, pj->param);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, pj->error);
 }
 
@@ -164,7 +164,7 @@ void test_jesprint(void){
     TEST_ASSERT_EQUAL_UINT8(0, pj->instances);
     TEST_ASSERT_EQUAL_INT(e_role_base, pj->role);
     TEST_ASSERT_EQUAL_INT(e_origin_api, pj->caller);
-    TEST_ASSERT_EQUAL_HEX32(NULL, pj->optional);
+    TEST_ASSERT_EQUAL_HEX32(NULL, pj->param);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, pj->error);
 
     stat = jesprint("This string is too long and should therefore not be printable in the current state of jesprint!");
@@ -192,7 +192,7 @@ void test_set_get_params(void){
 
     jes_err_t stat = __job_set_param(&value, pj);   // API call only works within jobs
     TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
-    uint32_t* internal_val = (uint32_t*)pj->optional;
+    uint32_t* internal_val = (uint32_t*)pj->param;
     TEST_ASSERT_EQUAL_INT(value, *internal_val);
 
     uint32_t ret = *(uint32_t*)__job_get_param(pj); // API call only works within jobs

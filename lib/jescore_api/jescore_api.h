@@ -68,14 +68,14 @@ jes_err_t set_args(char* s);
 char* get_args(void);
 
 
-/// @brief Set the field `optional` of the job.
+/// @brief Set the field `param` of the job.
 /// @param p: Arbitrary reference to parameter.
 /// @return status, `e_no_err` if OK.
 jes_err_t set_param(void* p);
 
 
-/// @brief Get the field `optional` of the job.
-/// @return Pointer to `optional` field of the job.
+/// @brief Get the field `param` of the job.
+/// @return Pointer to `param` field of the job.
 /// @attention Will return NULL on error.
 void* get_param(void);
 
