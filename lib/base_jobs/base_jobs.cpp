@@ -15,17 +15,6 @@ void __base_job_echo(void* p){
 }
 
 
-jes_err_t __base_job_echo_wrapper(const char* s, origin_t o){
-    job_struct_t* printer = __job_get_job_by_name(PRINT_JOB_NAME);
-    job_struct_t* core_job = __job_get_job_by_name(CORE_JOB_NAME);
-    jes_err_t stat = __job_copy_str(printer->args, (char*)s, __MAX_JOB_ARGS_LEN_BYTE);
-    if(stat != e_err_no_err){ return stat; }
-    printer->caller = o;
-    __job_notify_with_job(core_job, printer, false);
-    return e_err_no_err;
-}
-
-
 void __base_job_help(void* p){
     char desc[__MAX_JOB_ARGS_LEN_BYTE*2] = {0};
 

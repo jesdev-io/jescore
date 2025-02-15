@@ -45,11 +45,6 @@ jes_err_t register_and_launch_job(const char* name,
 }
 
 
-jes_err_t jesprint(const char* s){
-    return __base_job_echo_wrapper(s, e_origin_api);
-}
-
-
 jes_err_t set_args(char* s){
     TaskHandle_t caller = xTaskGetCurrentTaskHandle();
     job_struct_t* pj = __job_get_job_by_handle(caller);

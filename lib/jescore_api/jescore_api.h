@@ -46,12 +46,6 @@ jes_err_t register_and_launch_job(const char* name,
                                   bool is_loop);
 
 
-/// @brief Send string to printing job.
-/// @param s: string to print.
-/// @return Status. Returns `e_no_err` in case of successful launch.
-jes_err_t jesprint(const char* s);
-
-
 /// @brief Set the field `args` of the job.
 /// @param s: String to insert into `args` field.
 /// @return status, `e_no_err` if OK.
