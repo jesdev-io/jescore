@@ -12,7 +12,7 @@ void __base_job_echo(void* p){
     uint8_t* msg = (uint8_t*)(pj->args);
     char buf[64] = {0};
     sprintf(buf, "%s\n", pj->args);
-    uart_unif_write((uint8_t*)buf, strlen(buf));
+    uart_unif_write((uint8_t*)buf);
 }
 
 
@@ -23,15 +23,15 @@ void __base_job_help(void* p){
     job_struct_t* cur = *job_list;
 
     sprintf(desc, "\x1b[1mAvailable jobs:\x1b[0m\n\r");
-    uart_unif_write((uint8_t*)desc, strlen(desc));
+    uart_unif_write((uint8_t*)desc);
     while(cur != NULL){
         if(cur->role == e_role_base){
             sprintf(desc, "\t\t(base) %s\n\r", cur->name);
-            uart_unif_write((uint8_t*)desc, strlen(desc));
+            uart_unif_write((uint8_t*)desc);
         }
         else if(cur->role == e_role_user){
             sprintf(desc, "\t\t(user) %s\n\r", cur->name);
-            uart_unif_write((uint8_t*)desc, strlen(desc));
+            uart_unif_write((uint8_t*)desc);
         }
         cur = cur->pn;
     }
@@ -47,7 +47,7 @@ void __base_job_stats(void* p){
     job_struct_t* cur = *job_list;
 
     sprintf(desc, "\x1b[1mname\t\thandle\t\tmemory\tprio\tloop\tinstances\terror\x1b[0m\n\r");
-    uart_unif_write((uint8_t*)desc, strlen(desc));
+    uart_unif_write((uint8_t*)desc);
     uint8_t* clr;
     while(cur != NULL){
         if(strlen(cur->name) < 8){
@@ -77,7 +77,7 @@ void __base_job_stats(void* p){
                 cur->instances,
                 cur->error,
                 CLR_X);
-        uart_unif_write((uint8_t*)desc, strlen(desc));
+        uart_unif_write((uint8_t*)desc);
         cur = cur->pn;
     }
 }
