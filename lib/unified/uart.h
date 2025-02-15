@@ -35,7 +35,8 @@ inline int32_t uart_unif_init(uint32_t baud, uint32_t rx_buf_len, uint32_t tx_bu
     return 0;
 }
 
-inline int32_t uart_unif_write(uint8_t* msg, uint32_t len){
+inline int32_t uart_unif_write(uint8_t* msg){
+    uint16_t len = strlen((const char*)msg);
     return uart_write_bytes(BASE_UART, (const char*) msg, len);
 }
 
