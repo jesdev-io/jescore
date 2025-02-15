@@ -47,7 +47,7 @@ void test_job_core(void){
     TEST_ASSERT_EQUAL_UINT8(1, pj->instances);
     TEST_ASSERT_EQUAL_INT(e_role_core, pj->role);
     TEST_ASSERT_EQUAL_INT(e_origin_core, pj->caller);
-    TEST_ASSERT_EQUAL_HEX32(NULL, pj->optional);
+    TEST_ASSERT_EQUAL_HEX32(NULL, pj->param);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, pj->error);
 }
 
@@ -65,7 +65,7 @@ void test_job_error_handler(void){
     TEST_ASSERT_EQUAL_UINT8(0, pj->instances);
     TEST_ASSERT_EQUAL_INT(e_role_core, pj->role);
     TEST_ASSERT_EQUAL_INT(e_origin_undefined, pj->caller);
-    TEST_ASSERT_EQUAL_HEX32(NULL, pj->optional);
+    TEST_ASSERT_EQUAL_HEX32(NULL, pj->param);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, pj->error);
 }
 
@@ -83,7 +83,7 @@ void test_job_init_cli(void){
     TEST_ASSERT_EQUAL_UINT8(0, pj->instances);
     TEST_ASSERT_EQUAL_INT(e_role_core, pj->role);
     TEST_ASSERT_EQUAL_INT(e_origin_core, pj->caller);
-    TEST_ASSERT_EQUAL_HEX32(NULL, pj->optional);
+    TEST_ASSERT_EQUAL_HEX32(NULL, pj->param);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, pj->error);
 }
 
@@ -101,7 +101,7 @@ void test_job_reprint_header(void){
     TEST_ASSERT_EQUAL_UINT8(0, pj->instances);
     TEST_ASSERT_EQUAL_INT(e_role_core, pj->role);
     TEST_ASSERT_EQUAL_INT(e_origin_undefined, pj->caller);
-    TEST_ASSERT_EQUAL_HEX32(NULL, pj->optional);
+    TEST_ASSERT_EQUAL_HEX32(NULL, pj->param);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, pj->error);
 }
 
@@ -119,7 +119,7 @@ void test_job_help(void){
     TEST_ASSERT_EQUAL_UINT8(0, pj->instances);
     TEST_ASSERT_EQUAL_INT(e_role_base, pj->role);
     TEST_ASSERT_EQUAL_INT(e_origin_undefined, pj->caller);
-    TEST_ASSERT_EQUAL_HEX32(NULL, pj->optional);
+    TEST_ASSERT_EQUAL_HEX32(NULL, pj->param);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, pj->error);
 }
 
@@ -137,6 +137,6 @@ void test_job_stats(void){
     TEST_ASSERT_EQUAL_UINT8(0, pj->instances);
     TEST_ASSERT_EQUAL_INT(e_role_base, pj->role);
     TEST_ASSERT_EQUAL_INT(e_origin_undefined, pj->caller);
-    TEST_ASSERT_EQUAL_HEX32(NULL, pj->optional);
+    TEST_ASSERT_EQUAL_HEX32(NULL, pj->param);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, pj->error);
 }

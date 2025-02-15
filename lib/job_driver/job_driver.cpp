@@ -31,7 +31,7 @@ jes_err_t __job_register_job(const char* n,
     pj->instances = 0;
     pj->role = role;
     pj->caller = e_origin_undefined;
-    pj->optional = NULL;
+    pj->param = NULL;
     pj->error = e_err_no_err;
     pj->notif_queue = xQueueCreate(MAX_JOB_NOTIF_QUEUE_SIZE, sizeof(void*));
     if(pj->notif_queue == NULL) { return e_err_mem_null; }
@@ -216,12 +216,12 @@ char* __job_get_args(job_struct_t* pj){
 
 jes_err_t __job_set_param(void* p, job_struct_t* pj){
     if(pj == NULL){ return e_err_is_zero; }
-    pj->optional = p;
+    pj->param = p;
     return e_err_no_err;
 }
 
 
 void* __job_get_param(job_struct_t* pj){
     if(pj == NULL){ return NULL; }
-    return pj->optional;
+    return pj->param;
 }

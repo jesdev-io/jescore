@@ -46,10 +46,11 @@ class CjescoreCli:
             return f"/dev/{port}"
         return port
     
-    def __uartTransceive(self, msg: str, waitTime: float = 0.01) -> str:
+    def uartTransceive(self, msg: str, waitTime: float = 0.01) -> str:
         port_name = self.__getPort()
         self.__vPrint(f"Sending raw string '{msg}' to jes-core on port {port_name}")
         ser = serial.Serial(port_name, baudrate=self.baudrate, timeout=waitTime)
+        ser.flush()
         ser.setRTS(False)
         ser.write(msg.encode())
         stat = ""
@@ -68,7 +69,7 @@ class CjescoreCli:
 
     def run(self, command):
         if command:
-            stat = self.__uartTransceive(command)
+            stat = self.uartTransceive(command)
             self.__vPrint(f"Received raw string {stat}")
         else:
             print("Error: Command not specified.")

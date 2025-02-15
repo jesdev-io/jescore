@@ -4,6 +4,7 @@
 #include "string.h"
 #include "job_names.h"
 #include "core.h"
+#include "cli.h"
 
 
 void __base_job_echo(void* p){
@@ -12,17 +13,6 @@ void __base_job_echo(void* p){
     char buf[64] = {0};
     sprintf(buf, "%s\n", pj->args);
     uart_unif_write((uint8_t*)buf, strlen(buf));
-}
-
-
-jes_err_t __base_job_echo_wrapper(const char* s, origin_t o){
-    job_struct_t* printer = __job_get_job_by_name(PRINT_JOB_NAME);
-    job_struct_t* core_job = __job_get_job_by_name(CORE_JOB_NAME);
-    jes_err_t stat = __job_copy_str(printer->args, (char*)s, __MAX_JOB_ARGS_LEN_BYTE);
-    if(stat != e_err_no_err){ return stat; }
-    printer->caller = o;
-    __job_notify_with_job(core_job, printer, false);
-    return e_err_no_err;
 }
 
 
@@ -56,8 +46,9 @@ void __base_job_stats(void* p){
     job_struct_t** job_list = __core_get_job_list();
     job_struct_t* cur = *job_list;
 
-    sprintf(desc, "\x1b[1mname\t\thandle\t\tmemory\tprio\tloop\tinstances\x1b[0m\n\r");
+    sprintf(desc, "\x1b[1mname\t\thandle\t\tmemory\tprio\tloop\tinstances\terror\x1b[0m\n\r");
     uart_unif_write((uint8_t*)desc, strlen(desc));
+    uint8_t* clr;
     while(cur != NULL){
         if(strlen(cur->name) < 8){
             spacing_name[1] = '\t';
@@ -71,7 +62,11 @@ void __base_job_stats(void* p){
         else{
             spacing_addr[1] = 0;
         }
-        sprintf(desc, "\t\t%s%s%x%s%d\t%d\t%d\t%d\n\r", 
+        if(cur->role == e_role_core) clr = CLR_Gr;
+        if(cur->role == e_role_base) clr = CLR_Y;
+        if(cur->role == e_role_user) clr = CLR_G;
+        sprintf(desc, "%s\t\t%s%s%x%s%d\t%d\t%d\t%d\t\t%d%s\n\r", 
+                clr,
                 cur->name, 
                 spacing_name,
                 cur->handle, 
@@ -79,7 +74,9 @@ void __base_job_stats(void* p){
                 cur->mem_size, 
                 cur->priority,
                 cur->is_loop,
-                cur->instances);
+                cur->instances,
+                cur->error,
+                CLR_X);
         uart_unif_write((uint8_t*)desc, strlen(desc));
         cur = cur->pn;
     }

@@ -1,3 +1,4 @@
+# IDE
 .pio
 .vscode/settings.json
 .vscode/extensions.json
@@ -6,7 +7,10 @@
 .vscode/launch.json
 .vscode/ipch
 
+# python
 *pyc
 *.dict
 
+# packages
 *.egg-info
+build

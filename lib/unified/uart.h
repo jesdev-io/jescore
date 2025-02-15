@@ -28,6 +28,10 @@ inline int32_t uart_unif_init(uint32_t baud, uint32_t rx_buf_len, uint32_t tx_bu
     if(stat != ESP_OK){
         return (int32_t)stat;
     }
+    stat = uart_flush(BASE_UART);
+    if(stat != ESP_OK){
+        return (int32_t)stat;
+    }
     return 0;
 }
 
@@ -39,8 +43,12 @@ inline int32_t uart_unif_read(uint8_t* buf, uint32_t len, uint32_t timeout){
     return uart_read_bytes(BASE_UART, buf, len, (TickType_t)timeout);
 }
 
-inline int32_t uart_unif_flush(void){
+inline int32_t uart_unif_flush_inp(void){
     return uart_flush_input(BASE_UART);
+}
+
+inline int32_t uart_unif_flush(void){
+    return uart_flush(BASE_UART);
 }
 
 #elif defined(__AVR__)

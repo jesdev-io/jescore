@@ -4,7 +4,7 @@
 /// @file Top API layer for user access.
 
 #include "core.h"
-#include "err.h"
+#include "jes_err.h"
 #include "job_driver.h"
 
 /// @brief Start the core and all of its abilities.
@@ -46,12 +46,6 @@ jes_err_t register_and_launch_job(const char* name,
                                   bool is_loop);
 
 
-/// @brief Send string to printing job.
-/// @param s: string to print.
-/// @return Status. Returns `e_no_err` in case of successful launch.
-jes_err_t jesprint(const char* s);
-
-
 /// @brief Set the field `args` of the job.
 /// @param s: String to insert into `args` field.
 /// @return status, `e_no_err` if OK.
@@ -68,14 +62,14 @@ jes_err_t set_args(char* s);
 char* get_args(void);
 
 
-/// @brief Set the field `optional` of the job.
+/// @brief Set the field `param` of the job.
 /// @param p: Arbitrary reference to parameter.
 /// @return status, `e_no_err` if OK.
 jes_err_t set_param(void* p);
 
 
-/// @brief Get the field `optional` of the job.
-/// @return Pointer to `optional` field of the job.
+/// @brief Get the field `param` of the job.
+/// @return Pointer to `param` field of the job.
 /// @attention Will return NULL on error.
 void* get_param(void);
 

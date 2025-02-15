@@ -4,7 +4,7 @@
 /// @file Driver for jobs. Handles job registration, launching and inter-job communication.
 
 #include <Arduino.h>
-#include "err.h"
+#include "jes_err.h"
 #include "commands.h"
 
 #define __GET_SAFE_SIZE(SIZE, LIMIT) ((SIZE)<=(LIMIT)?(SIZE):(LIMIT))
@@ -41,7 +41,7 @@ typedef enum{
 /// @param instances (uint8_t): number of active instances of same job type.
 /// @param role (e_role_t): Role of job in usage context.
 /// @param caller (origin_t): Requesting entity of job.
-/// @param optional (void*): Optional information.
+/// @param param (void*): Optional information.
 /// @param error (jes_err_t): Error associated with fault from/in job. Gets used by the error handler
 /// @param notif_queue (QueueHandle_t): Job's notification queue handle.
 /// @param pn (job_struct_t*): Pointer to next job (llist).
@@ -56,7 +56,7 @@ typedef struct job_struct_t{
     uint8_t instances = 0;
     e_role_t role = e_role_core;
     origin_t caller = e_origin_undefined;
-    void* optional = NULL;
+    void* param = NULL;
     jes_err_t error = e_err_no_err;
     QueueHandle_t notif_queue = NULL;
     struct job_struct_t* pn = NULL;
@@ -190,16 +190,16 @@ jes_err_t __job_set_args(char* s, job_struct_t* pj);
 char* __job_get_args(job_struct_t* pj);
 
 
-/// @brief Set the field `optional` of the job.
+/// @brief Set the field `param` of the job.
 /// @param p: Arbitrary reference to parameter.
 /// @param pj: Pointer to job. 
 /// @return status, `e_no_err` if OK.
 jes_err_t __job_set_param(void* p, job_struct_t* pj);
 
 
-/// @brief Get the field `optional` of the job.
+/// @brief Get the field `param` of the job.
 /// @param pj: Pointer to job. 
-/// @return Pointer to `optional` field of the job.
+/// @return Pointer to `param` field of the job.
 /// @attention Will return NULL on error.
 void* __job_get_param(job_struct_t* pj);
 
