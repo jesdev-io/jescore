@@ -4,7 +4,7 @@
 /// @file Driver for jobs. Handles job registration, launching and inter-job communication.
 
 #include <Arduino.h>
-#include "err.h"
+#include "jes_err.h"
 #include "commands.h"
 
 #define __GET_SAFE_SIZE(SIZE, LIMIT) ((SIZE)<=(LIMIT)?(SIZE):(LIMIT))

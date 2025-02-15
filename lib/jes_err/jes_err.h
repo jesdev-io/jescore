@@ -1,5 +1,5 @@
-#ifndef _ERR_H_
-#define _ERR_H_
+#ifndef _JES_ERR_H_
+#define _JES_ERR_H_
 
 /// @file Error types.
 

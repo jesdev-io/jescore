@@ -4,7 +4,7 @@
 /// @file Main core acting as finite state machine.
 
 #include "Arduino.h"
-#include "err.h"
+#include "jes_err.h"
 #include "commands.h"
 #include "job_driver.h"
 
