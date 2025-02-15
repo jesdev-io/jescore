@@ -50,6 +50,7 @@ class CjescoreCli:
         port_name = self.__getPort()
         self.__vPrint(f"Sending raw string '{msg}' to jes-core on port {port_name}")
         ser = serial.Serial(port_name, baudrate=self.baudrate, timeout=waitTime)
+        ser.flush()
         ser.setRTS(False)
         ser.write(msg.encode())
         stat = ""
