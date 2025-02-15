@@ -35,7 +35,6 @@ void init_cli(void* p){
 void cli_server(void *pvParameters)
 {
     char raw_str[__MAX_JOB_ARGS_LEN_BYTE] = {0};
-    char* cmd_str = &raw_str[0];
     char* arg_str = NULL;
     job_struct_t* pj_to_do = NULL;
     uart_event_t event;
@@ -80,7 +79,7 @@ void cli_server(void *pvParameters)
                 if(ws_i != -1){
                     raw_str[ws_i] = '\0';
                 }
-                pj_to_do = __job_get_job_by_name(cmd_str);
+                pj_to_do = __job_get_job_by_name(raw_str); // is only read to '\0'
                 if(pj_to_do){
                     pj_to_do->caller = e_origin_cli;
                     if((uint16_t)ws_i < (event.size-1)){

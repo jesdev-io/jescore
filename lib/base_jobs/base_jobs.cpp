@@ -4,6 +4,7 @@
 #include "string.h"
 #include "job_names.h"
 #include "core.h"
+#include "cli.h"
 
 
 void __base_job_echo(void* p){
@@ -47,6 +48,7 @@ void __base_job_stats(void* p){
 
     sprintf(desc, "\x1b[1mname\t\thandle\t\tmemory\tprio\tloop\tinstances\x1b[0m\n\r");
     uart_unif_write((uint8_t*)desc, strlen(desc));
+    uint8_t* clr;
     while(cur != NULL){
         if(strlen(cur->name) < 8){
             spacing_name[1] = '\t';
@@ -60,7 +62,11 @@ void __base_job_stats(void* p){
         else{
             spacing_addr[1] = 0;
         }
-        sprintf(desc, "\t\t%s%s%x%s%d\t%d\t%d\t%d\n\r", 
+        if(cur->role == e_role_core) clr = CLR_Gr;
+        if(cur->role == e_role_base) clr = CLR_Y;
+        if(cur->role == e_role_user) clr = CLR_G;
+        sprintf(desc, "%s\t\t%s%s%x%s%d\t%d\t%d\t%d%s\n\r", 
+                clr,
                 cur->name, 
                 spacing_name,
                 cur->handle, 
@@ -68,7 +74,8 @@ void __base_job_stats(void* p){
                 cur->mem_size, 
                 cur->priority,
                 cur->is_loop,
-                cur->instances);
+                cur->instances,
+                CLR_X);
         uart_unif_write((uint8_t*)desc, strlen(desc));
         cur = cur->pn;
     }
