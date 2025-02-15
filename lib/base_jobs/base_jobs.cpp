@@ -46,7 +46,7 @@ void __base_job_stats(void* p){
     job_struct_t** job_list = __core_get_job_list();
     job_struct_t* cur = *job_list;
 
-    sprintf(desc, "\x1b[1mname\t\thandle\t\tmemory\tprio\tloop\tinstances\x1b[0m\n\r");
+    sprintf(desc, "\x1b[1mname\t\thandle\t\tmemory\tprio\tloop\tinstances\terror\x1b[0m\n\r");
     uart_unif_write((uint8_t*)desc, strlen(desc));
     uint8_t* clr;
     while(cur != NULL){
@@ -65,7 +65,7 @@ void __base_job_stats(void* p){
         if(cur->role == e_role_core) clr = CLR_Gr;
         if(cur->role == e_role_base) clr = CLR_Y;
         if(cur->role == e_role_user) clr = CLR_G;
-        sprintf(desc, "%s\t\t%s%s%x%s%d\t%d\t%d\t%d%s\n\r", 
+        sprintf(desc, "%s\t\t%s%s%x%s%d\t%d\t%d\t%d\t\t%d%s\n\r", 
                 clr,
                 cur->name, 
                 spacing_name,
@@ -75,6 +75,7 @@ void __base_job_stats(void* p){
                 cur->priority,
                 cur->is_loop,
                 cur->instances,
+                cur->error,
                 CLR_X);
         uart_unif_write((uint8_t*)desc, strlen(desc));
         cur = cur->pn;
