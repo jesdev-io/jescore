@@ -28,7 +28,7 @@ def test_cli_help():
     assert "stats" in stat
 
 def test_cli_stats():
-    msg = "stats"
+    msg = "stats -aa"
     stat = cli.uartTransceive(msg)
     assert stat[-1] == CLI_PREFIX_MCU
     stat = ' '.join(stat)

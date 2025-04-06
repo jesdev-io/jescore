@@ -82,7 +82,10 @@ void cli_server(void *pvParameters)
                 pj_to_do = __job_get_job_by_name(raw_str); // is only read to '\0'
                 if(pj_to_do){
                     pj_to_do->caller = e_origin_cli;
-                    if((uint16_t)ws_i < (event.size-1)){
+                    if(ws_i == -1){
+                        memset(pj_to_do->args, 0, __MAX_JOB_ARGS_LEN_BYTE);
+                    }
+                    else{
                         arg_str = &raw_str[ws_i+1];
                         strcpy(pj_to_do->args, arg_str);
                     }

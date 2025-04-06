@@ -8,7 +8,6 @@
  */
 
 
-#include <Arduino.h>
 #include <unity.h>
 #include "jescore_api.h"
 #include "job_names.h"
@@ -129,6 +128,7 @@ void test_launch_job(void){
 
     stat = launch_job(DUMMY_JOB_LOOP_NAME);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
+    vTaskDelay(200 / portTICK_PERIOD_MS);   // let job start
 
     pj = __job_get_job_by_name(DUMMY_JOB_LOOP_NAME);
     TEST_ASSERT_EQUAL_STRING(DUMMY_JOB_LOOP_NAME, pj->name);

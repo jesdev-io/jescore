@@ -26,11 +26,11 @@ void __base_job_help(void* p){
     uart_unif_write((uint8_t*)desc);
     while(cur != NULL){
         if(cur->role == e_role_base){
-            sprintf(desc, "\t\t(base) %s\n\r", cur->name);
+            sprintf(desc, "\t- (base) %s\n\r", cur->name);
             uart_unif_write((uint8_t*)desc);
         }
         else if(cur->role == e_role_user){
-            sprintf(desc, "\t\t(user) %s\n\r", cur->name);
+            sprintf(desc, "\t- (user) %s\n\r", cur->name);
             uart_unif_write((uint8_t*)desc);
         }
         cur = cur->pn;
@@ -39,6 +39,23 @@ void __base_job_help(void* p){
 
 
 void __base_job_stats(void* p){
+    job_struct_t* pj = (job_struct_t*)p;
+
+    uint8_t flag_none = 0;  // just print user jobs
+    uint8_t flag_a = 0;     // print user and base jobs
+    uint8_t flag_aa = 0;    // print all jobs
+    
+    if(pj->args[0] == 0) flag_none = 1;
+    else if(strcmp(pj->args, "-a") == 0) flag_a = 1;
+    else if(strcmp(pj->args, "-aa") == 0) flag_aa = 1;
+    else{
+        char msg[__MAX_JOB_ARGS_LEN_BYTE*2];
+        sprintf(msg, "Unknown specifier <%s>.\n\r", pj->args);
+        uart_unif_write((uint8_t*)msg);
+        pj->error = e_err_param;
+        return;
+    }
+    
     char desc[__MAX_JOB_ARGS_LEN_BYTE*2] = {0};
     char spacing_name[] = {'\t', 0, 0};
     char spacing_addr[] = {'\t', 0, 0};
@@ -49,23 +66,24 @@ void __base_job_stats(void* p){
     sprintf(desc, "\x1b[1mname\t\thandle\t\tmemory\tprio\tloop\tinstances\terror\x1b[0m\n\r");
     uart_unif_write((uint8_t*)desc);
     uint8_t* clr;
+
     while(cur != NULL){
-        if(strlen(cur->name) < 8){
-            spacing_name[1] = '\t';
+        if ((flag_none && (cur->role == e_role_core || cur->role == e_role_base)) || 
+            (flag_a && cur->role == e_role_core)) {
+            cur = cur->pn;
+            continue;
         }
-        else{
-            spacing_name[1] = 0;
+
+        spacing_name[1] = (strlen(cur->name) < 8) ? '\t' : 0;
+        spacing_addr[1] = (cur->handle == NULL) ? '\t' : 0;
+
+        switch (cur->role) {
+            case e_role_core: clr = CLR_Gr; break;
+            case e_role_base: clr = CLR_Y;  break;
+            case e_role_user: clr = CLR_G;  break;
+            default:          clr = CLR_X;   break;
         }
-        if(cur->handle == NULL){
-            spacing_addr[1] = '\t';
-        }
-        else{
-            spacing_addr[1] = 0;
-        }
-        if(cur->role == e_role_core) clr = CLR_Gr;
-        if(cur->role == e_role_base) clr = CLR_Y;
-        if(cur->role == e_role_user) clr = CLR_G;
-        sprintf(desc, "%s\t\t%s%s%x%s%d\t%d\t%d\t%d\t\t%d%s\n\r", 
+        sprintf(desc, "%s%s%s%x%s%d\t%d\t%d\t%d\t\t%d%s\n\r", 
                 clr,
                 cur->name, 
                 spacing_name,

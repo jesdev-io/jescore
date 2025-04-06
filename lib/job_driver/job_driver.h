@@ -3,7 +3,11 @@
 
 /// @file Driver for jobs. Handles job registration, launching and inter-job communication.
 
-#include <Arduino.h>
+#include <stdint.h>
+#include <string.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/semphr.h"
 #include "jes_err.h"
 #include "commands.h"
 

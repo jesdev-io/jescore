@@ -8,10 +8,10 @@
 #define BAUDRATE        115200
 
 #ifndef BOOT_MSG
-#define BOOT_MSG        "\n************\n\rjes-core CLI\n\r************\n\r"
+#define BOOT_MSG        "\n************\n\rjescore CLI\n\r************\n\r"
 #endif
 #ifndef CLI_HEADER
-#define CLI_HEADER      "\rjes-core $ "
+#define CLI_HEADER      "\rjescore $ "
 #endif
 
 #define CLR_R   (uint8_t*)"\x1b[31m"
