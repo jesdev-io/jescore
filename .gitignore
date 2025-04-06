@@ -10,6 +10,7 @@
 # python
 *pyc
 *.dict
+*.venv*
 
 # packages
 *.egg-info
