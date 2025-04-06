@@ -3,8 +3,6 @@
 
 /// @file Enums and structs for notification commands.
 
-#include <Arduino.h>
-
 /// @brief Enum for types of places where a command can
 /// originate from. Used in command_struct_t.
 typedef enum origin_t{
