@@ -1,12 +1,12 @@
 {
-    "name": "jes-core",
-    "version": "1.1.1",
+    "name": "jescore",
+    "version": "1.1.2",
     "description": "FreeRTOS attached core for easier multitasking and native CLI support",
     "keywords": "core, FreeRTOS",
     "repository":
     {
       "type": "git",
-      "url": "https://github.com/jake-is-ESD-protected/jes-core"
+      "url": "https://github.com/jake-is-ESD-protected/jescore"
     },
     "authors":
     [

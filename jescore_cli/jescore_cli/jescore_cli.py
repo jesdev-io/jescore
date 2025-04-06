@@ -48,7 +48,7 @@ class CjescoreCli:
     
     def uartTransceive(self, msg: str, waitTime: float = 0.01) -> str:
         port_name = self.__getPort()
-        self.__vPrint(f"Sending raw string '{msg}' to jes-core on port {port_name}")
+        self.__vPrint(f"Sending raw string '{msg}' to jescore on port {port_name}")
         ser = serial.Serial(port_name, baudrate=self.baudrate, timeout=waitTime)
         ser.flush()
         ser.setRTS(False)
@@ -77,8 +77,8 @@ class CjescoreCli:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="CLI for jes-core serial communication.")
-    parser.add_argument("command", type=str, nargs='?', help="Command to send to jes-core")
+    parser = argparse.ArgumentParser(description="CLI for jescore serial communication.")
+    parser.add_argument("command", type=str, nargs='?', help="Command to send to jescore")
     parser.add_argument("-p", "--port", type=str, help="Specify the port for connection")
     parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose output")
     parser.add_argument("-b", "--baudrate", type=int, default=115200, help="Baud rate for communication (default: 115200)")

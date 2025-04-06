@@ -2,9 +2,9 @@
  * @file test_core_startup.cpp
  * @author jake-is-ESD-protected
  * @date 2024-03-04
- * @brief Tests for the initialization of jes-core.
+ * @brief Tests for the initialization of jescore.
  *
- * @attention   This code tests jes-core as a packaged system,
+ * @attention   This code tests jescore as a packaged system,
  *              meaning that it is present in the background of
  *              all tests as a static variable until all tests
  *              in this file are finished. Since the core

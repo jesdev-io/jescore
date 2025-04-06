@@ -1,4 +1,4 @@
-# Client side python script for `jes-core` CLI
+# Client side python script for `jescore` CLI
 
 ## Usage
 
