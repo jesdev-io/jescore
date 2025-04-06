@@ -61,7 +61,8 @@ class CjescoreCli:
                 if RESPONSE_TRX_OVER in stat:
                     self.__vPrint(RESPONSE_OK)
                 returns.append(stat)
-        print(CLI_PREFIX_CLIENT, end='')
+        if len(returns) != 1:
+            print(CLI_PREFIX_CLIENT)
         for s in returns:
             if CLI_PREFIX_MCU not in s:
                 print(s)
