@@ -25,4 +25,6 @@ void test_set_get_params(void);
 void test_core_job_launch_prohibited(void);
 void test_notify_job_and_wait(void);
 
+void test_all(void);
+
 #endif // _COMMON_TEST_H_

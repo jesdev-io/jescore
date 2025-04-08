@@ -20,7 +20,6 @@
  */
 
 
-#include <Arduino.h>
 #include <unity.h>
 #include "jescore.h"
 #include "job_names.h"
