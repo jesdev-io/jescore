@@ -1,6 +1,16 @@
 #pragma once
 
 #include <inttypes.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <string.h>
+#include "job_driver.h"
+
+#ifdef UNIF_UART_WRITE_BUF_SIZE
+#define __UNIF_UART_WRITE_BUF_SIZE UNIF_UART_WRITE_BUF_SIZE
+#else
+#define __UNIF_UART_WRITE_BUF_SIZE __MAX_JOB_ARGS_LEN_BYTE
+#endif
 
 #if defined(ESP32)
 #include "driver/uart.h"
@@ -35,9 +45,20 @@ inline int32_t uart_unif_init(uint32_t baud, uint32_t rx_buf_len, uint32_t tx_bu
     return 0;
 }
 
-inline int32_t uart_unif_write(uint8_t* msg){
-    uint16_t len = strlen((const char*)msg);
-    return uart_write_bytes(BASE_UART, (const char*) msg, len);
+inline int32_t uart_unif_write(const char *msg) {
+    uint16_t len = strlen(msg);
+    return uart_write_bytes(BASE_UART, msg, len);
+}
+
+inline int32_t uart_unif_writef(const char *format, ...) {
+    char buffer[__UNIF_UART_WRITE_BUF_SIZE];
+    va_list args;
+    va_start(args, format);
+    int len = vsnprintf(buffer, sizeof(buffer), format, args);
+    va_end(args);
+    if (len < 0) return -1;
+    len = (len < sizeof(buffer)) ? len : sizeof(buffer) - 1;
+    return uart_write_bytes(BASE_UART, buffer, len);
 }
 
 inline int32_t uart_unif_read(uint8_t* buf, uint32_t len, uint32_t timeout){

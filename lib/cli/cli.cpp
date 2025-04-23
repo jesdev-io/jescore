@@ -23,7 +23,7 @@ void cli_set_sess_state(uint8_t sess_state){
 void init_cli(void* p){
     job_list = (job_struct_t**)p;
     uart_unif_init(BAUDRATE, CLI_BUF_SIZE, CLI_BUF_SIZE, (void*)&queue_uart);
-    uart_unif_write((uint8_t*)BOOT_MSG);
+    uart_unif_write(BOOT_MSG);
     __job_register_job(SERIAL_READ_NAME, 4096, 1, cli_server, true, e_role_core);
     __job_register_job(PRINT_JOB_NAME, 4096, 1, __base_job_echo, false, e_role_base);
     job_struct_t* pj_to_do = __job_get_job_by_name(SERIAL_READ_NAME);
@@ -99,7 +99,7 @@ void cli_server(void *pvParameters)
 
 
 void reprint_header(void* p){
-    uart_unif_write((uint8_t*)CLI_HEADER);
+    uart_unif_write(CLI_HEADER);
 }
 
 
