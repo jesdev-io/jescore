@@ -102,6 +102,16 @@ jes_err_t __job_launch_job_by_name(const char* n, origin_t o){
 }
 
 
+jes_err_t __job_launch_job_by_name_args(const char* n, origin_t o, const char* args){
+    if (args == NULL) { return e_err_is_zero; }
+    job_struct_t* pj = __job_get_job_by_name(n);
+    if (pj == NULL) { return e_err_is_zero; }
+    jes_err_t e = __job_set_args((char*)args, pj);
+    if (e != e_err_no_err) { return e; }
+    return __job_launch_job(pj, o);
+}
+
+
 void __job_runtime_env(void* p){
     volatile job_struct_t* pj = (job_struct_t*)p;
 

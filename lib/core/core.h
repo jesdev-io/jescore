@@ -30,7 +30,7 @@ typedef struct core_t{
 
 
 /// @brief Core initializer.
-/// @return status, `e_no_err` if OK.
+/// @return status, `e_err_no_err` if OK.
 /// @note Registers/launches itself and CLI if `JES_DISABLE_CLI` is not defined
 jes_err_t __core_init();
 

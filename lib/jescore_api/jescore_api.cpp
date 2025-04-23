@@ -29,6 +29,11 @@ jes_err_t launch_job(const char* name){
 }
 
 
+jes_err_t launch_job_args(const char* name, const char* args){
+    return __job_launch_job_by_name_args(name, e_origin_api, args);
+}
+
+
 jes_err_t register_and_launch_job(const char* name,
                                   uint32_t mem_size,
                                   uint8_t priority,

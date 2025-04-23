@@ -43,6 +43,7 @@ void test_all(void) {
     RUN_TEST(test_launch_job);
     RUN_TEST(test_set_get_args);
     RUN_TEST(test_set_get_params);
+    RUN_TEST(test_launch_job_args);
     RUN_TEST(test_core_job_launch_prohibited);
     RUN_TEST(test_notify_job_and_wait);
     
