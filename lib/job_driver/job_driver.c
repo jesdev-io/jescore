@@ -7,7 +7,7 @@ jes_err_t __job_register_job(const char* n,
                          uint32_t m,
                          uint8_t p, 
                          void (*f)(void* p),
-                         bool is_loop,
+                         uint8_t is_loop,
                          e_role_t role){
     if(n == NULL || f == NULL){
         return e_err_is_zero;
@@ -124,7 +124,7 @@ void __job_runtime_env(void* p){
     if(pj->is_loop && pj_print != pj && cli_get_sess_state() == 1){
         cli_set_sess_state(0);
         pj_print->caller = e_origin_core;
-        __job_notify_with_job(__job_get_job_by_name(CORE_JOB_NAME), pj_print, false);
+        __job_notify_with_job(__job_get_job_by_name(CORE_JOB_NAME), pj_print, 0);
         // vTaskDelay(10 / portTICK_PERIOD_MS); // TODO: fix this!
     }
     #endif
@@ -145,7 +145,7 @@ void __job_runtime_env(void* p){
         cli_set_sess_state(0);
         vTaskDelay(10 / portTICK_PERIOD_MS); // TODO: fix this!
         pj_print->caller = e_origin_core;
-        __job_notify_with_job(__job_get_job_by_name(CORE_JOB_NAME), pj_print, false);
+        __job_notify_with_job(__job_get_job_by_name(CORE_JOB_NAME), pj_print, 0);
     }
     #endif
     pj->handle = NULL;
@@ -166,7 +166,7 @@ jes_err_t __job_copy_str(char* buf, char* str, uint16_t max_len){
 
 void __job_notify_generic(job_struct_t* pjob_to_notify, 
                           void* notif, 
-                          bool from_isr){
+                          uint8_t from_isr){
     if(from_isr){
         BaseType_t dummy = pdFALSE;
         xTaskNotifyFromISR(pjob_to_notify->handle, 
@@ -184,7 +184,7 @@ void __job_notify_generic(job_struct_t* pjob_to_notify,
 
 void __job_notify_with_job(job_struct_t* pjob_to_notify, 
                 job_struct_t* pjob_to_run, 
-                bool from_isr){
+                uint8_t from_isr){
     __job_notify_generic(pjob_to_notify, pjob_to_run, from_isr);
 }
 

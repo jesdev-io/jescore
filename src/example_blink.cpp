@@ -6,7 +6,7 @@
 
 
 void blink(void* p){
-    static bool act = false;
+    static uint8_t act = 0;
     act = !act;
     while(act){
         digitalWrite(LED_PIN, HIGH);
@@ -20,7 +20,7 @@ void blink(void* p){
 void setup() {
     jes_init();
     pinMode(LED_PIN, OUTPUT);
-    register_and_launch_job("blink", 2048, 1, blink, true);
+    register_and_launch_job("blink", 2048, 1, blink, 1);
 }
 
 void loop() {

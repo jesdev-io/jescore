@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef _JOB_DRIVER_H_
 #define _JOB_DRIVER_H_
 
@@ -41,7 +45,7 @@ typedef enum{
 /// @param priority (uint8_t): priority of task.
 /// @param function void(*)(void* p): function itself, function pointer.
 /// @param args (char*): optional args obtained from CLI.
-/// @param is_loop (bool): defines if job runs forever or terminates
+/// @param is_loop (uint8_t): defines if job runs forever or terminates
 /// @param instances (uint8_t): number of active instances of same job type.
 /// @param role (e_role_t): Role of job in usage context.
 /// @param caller (origin_t): Requesting entity of job.
@@ -50,20 +54,20 @@ typedef enum{
 /// @param notif_queue (QueueHandle_t): Job's notification queue handle.
 /// @param pn (job_struct_t*): Pointer to next job (llist).
 typedef struct job_struct_t{
-    char name[__MAX_JOB_NAME_LEN_BYTE] = {0};
-    TaskHandle_t handle = NULL;
-    uint32_t mem_size = 0;
-    uint8_t priority = 0;
-    void (*function) (void* p) = NULL;
-    char args[__MAX_JOB_ARGS_LEN_BYTE] = {0};
-    bool is_loop = false;
-    uint8_t instances = 0;
-    e_role_t role = e_role_core;
-    origin_t caller = e_origin_undefined;
-    void* param = NULL;
-    jes_err_t error = e_err_no_err;
-    QueueHandle_t notif_queue = NULL;
-    struct job_struct_t* pn = NULL;
+    char name[__MAX_JOB_NAME_LEN_BYTE];
+    TaskHandle_t handle;
+    uint32_t mem_size;
+    uint8_t priority;
+    void (*function) (void* p);
+    char args[__MAX_JOB_ARGS_LEN_BYTE];
+    uint8_t is_loop;
+    uint8_t instances;
+    e_role_t role;
+    origin_t caller;
+    void* param;
+    jes_err_t error;
+    QueueHandle_t notif_queue;
+    struct job_struct_t* pn;
 }job_struct_t;
 
 
@@ -82,7 +86,7 @@ jes_err_t __job_register_job(const char* n,
                          uint32_t m,
                          uint8_t p, 
                          void (*f)(void* p),
-                         bool is_loop,
+                         uint8_t is_loop,
                          e_role_t role);
 
 
@@ -153,7 +157,7 @@ jes_err_t __job_copy_str(char* buf, char* str, uint16_t max_len);
 /// @param from_isr: specifies ISR or non-ISR origin.
 void __job_notify_generic(job_struct_t* pjob_to_notify, 
                           void* notif,
-                          bool from_isr);
+                          uint8_t from_isr);
 
 
 /// @brief Task notification wrapper for FreeRTOS "xTaskNotify()".
@@ -162,7 +166,7 @@ void __job_notify_generic(job_struct_t* pjob_to_notify,
 /// @param from_isr: specifies ISR or non-ISR origin.
 void __job_notify_with_job(job_struct_t* pjob_to_notify, 
                            job_struct_t* pjob_to_run, 
-                           bool from_isr);
+                           uint8_t from_isr);
 
 
 /// @brief Task notification wrapper for FreeRTOS "ulTaskNotifyTake".
@@ -220,4 +224,8 @@ jes_err_t __job_set_param(void* p, job_struct_t* pj);
 /// @attention Will return NULL on error.
 void* __job_get_param(job_struct_t* pj);
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif

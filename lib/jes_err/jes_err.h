@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef _JES_ERR_H_
 #define _JES_ERR_H_
 
@@ -18,4 +22,8 @@ typedef enum jes_err{
     e_err_prohibited
 }jes_err_t;
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif

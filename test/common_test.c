@@ -1,5 +1,5 @@
 /**
- * @file common_test.cpp
+ * @file common_test.c
  * @author jake-is-ESD-protected
  * @date 2025-03-06
  * @brief Common main test routine for all platforms/frameworks.
@@ -42,7 +42,7 @@ void test_all(void) {
     RUN_TEST(test_register_job);
     RUN_TEST(test_launch_job);
     RUN_TEST(test_set_get_args);
-    RUN_TEST(test_set_get_params);
+    RUN_TEST(test_set_job_get_params);
     RUN_TEST(test_launch_job_args);
     RUN_TEST(test_core_job_launch_prohibited);
     RUN_TEST(test_notify_job_and_wait);

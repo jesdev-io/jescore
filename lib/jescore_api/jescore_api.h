@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef _JESCORE_API_H_
 #define _JESCORE_API_H_
 
@@ -23,7 +27,7 @@ jes_err_t register_job(const char* name,
                        uint32_t mem_size,
                        uint8_t priority,
                        void (*function)(void* p),
-                       bool is_loop);
+                       uint8_t is_loop);
 
 
 /// @brief Start a registered job.
@@ -53,7 +57,7 @@ jes_err_t register_and_launch_job(const char* name,
                                   uint32_t mem_size,
                                   uint8_t priority,
                                   void (*function)(void* p),
-                                  bool is_loop);
+                                  uint8_t is_loop);
 
 
 /// @brief Set the field `args` of the calling job.
@@ -81,7 +85,7 @@ jes_err_t set_param(void* p);
 /// @brief Get the field `param` of the calling job.
 /// @return Pointer to `param` field of the job.
 /// @attention Will return NULL on error.
-void* get_param(void);
+void* job_get_param(void);
 
 
 /// @brief Notify a job with an optional message.
@@ -99,4 +103,8 @@ void notify_job_ISR(const char* name, void* notification);
 /// @brief Pause the calling job until a notification arrives.
 /// @return The optional notification value.
 void* wait_for_notification(void);
+#endif
+
+#ifdef __cplusplus
+}
 #endif

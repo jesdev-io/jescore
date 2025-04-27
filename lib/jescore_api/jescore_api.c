@@ -14,7 +14,7 @@ jes_err_t register_job(const char* name,
                        uint32_t mem_size,
                        uint8_t priority,
                        void (*function)(void* p),
-                       bool is_loop){
+                       uint8_t is_loop){
     return __job_register_job(name,
                               mem_size,
                               priority,
@@ -38,7 +38,7 @@ jes_err_t register_and_launch_job(const char* name,
                                   uint32_t mem_size,
                                   uint8_t priority,
                                   void (*function)(void* p),
-                                  bool is_loop){
+                                  uint8_t is_loop){
     jes_err_t stat = __job_register_job(name,
                                         mem_size,
                                         priority,
@@ -74,7 +74,7 @@ jes_err_t set_param(void* p){
 }
 
 
-void* get_param(void){
+void* job_get_param(void){
     TaskHandle_t caller = xTaskGetCurrentTaskHandle();
     job_struct_t* pj = __job_get_job_by_handle(caller);
     if (pj == NULL) { return NULL; }
@@ -83,12 +83,12 @@ void* get_param(void){
 
 
 void notify_job(const char* name, void* notification){
-    __job_notify_generic(__job_get_job_by_name(name), notification, false);
+    __job_notify_generic(__job_get_job_by_name(name), notification, 0);
 }
 
 
 void notify_job_ISR(const char* name, void* notification){
-    __job_notify_generic(__job_get_job_by_name(name), notification, true);
+    __job_notify_generic(__job_get_job_by_name(name), notification, 1);
 }
 
 

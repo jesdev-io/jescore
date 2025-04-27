@@ -1,10 +1,10 @@
 /**
- * @file test_api_functions.cpp
+ * @file test_api_functions.c
  * @author jake-is-ESD-protected
  * @date 2024-03-07
- * @brief Test of all API functions located in `jescore_api.cpp`
+ * @brief Test of all API functions located in `jescore_api.c`
  *
- * @attention The function `jes_init()` is already tested in `test_core_startup.cpp`
+ * @attention The function `jes_init()` is already tested in `test_core_startup.c`
  */
 
 
@@ -65,7 +65,7 @@ void dummy_job_notify_take(void* p){
     uint32_t* pval;
     pval = (uint32_t*)wait_for_notification();
     set_param(pval);
-    uint32_t* pval_equal = (uint32_t*)get_param();
+    uint32_t* pval_equal = (uint32_t*)job_get_param();
     if(*pval != *pval_equal){
         set_args((char*)DUMMY_FAIL_MSG);
     }
@@ -80,7 +80,7 @@ void test_register_job(void){
                                   DUMMY_JOB_MEM,
                                   DUMMY_JOB_PRIO,
                                   dummy_job_single,
-                                  false);
+                                  0);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
 
     char dummy[__MAX_JOB_ARGS_LEN_BYTE] = {0};
@@ -102,7 +102,7 @@ void test_register_job(void){
                         DUMMY_JOB_MEM,
                         DUMMY_JOB_PRIO,
                         dummy_job_loop,
-                        true);
+                        1);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
 
     pj = __job_get_job_by_name(DUMMY_JOB_LOOP_NAME);
@@ -123,7 +123,7 @@ void test_register_job(void){
                         DUMMY_JOB_MEM,
                         DUMMY_JOB_PRIO,
                         dummy_job_args_holder,
-                        false);
+                        0);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
 
     pj = __job_get_job_by_name(DUMMY_JOB_ARGS_HOLDER_NAME);
@@ -195,7 +195,7 @@ void test_set_get_args(void){
 }
 
 
-void test_set_get_params(void){
+void test_set_job_get_params(void){
     uint32_t value = 1000;
     job_struct_t* pj = __job_get_job_by_name(DUMMY_JOB_SINGLE_NAME);
 
@@ -237,14 +237,14 @@ void test_notify_job_and_wait(void){
                                              DUMMY_JOB_MEM,
                                              DUMMY_JOB_PRIO,
                                              dummy_job_notify_take,
-                                             false);
+                                             0);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
     vTaskDelay(100 / portTICK_PERIOD_MS);
     stat = register_and_launch_job(DUMMY_JOB_NOTIFY,
                                    DUMMY_JOB_MEM,
                                    DUMMY_JOB_PRIO,
                                    dummy_job_notify,
-                                   false);
+                                   0);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
     vTaskDelay(100 / portTICK_PERIOD_MS);
 
