@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef _COMMANDS_H_
 #define _COMMANDS_H_
 
@@ -25,8 +29,12 @@ typedef enum cmd_t{
 /// @param origin (origin_t): Place of command creation.
 /// @param content (cmd_t): The job to do.
 typedef struct cmd_struct_t{
-    origin_t origin = e_origin_undefined;
-    cmd_t content = e_cmd_undefined;
+    origin_t origin;
+    cmd_t content;
 }cmd_struct_t;
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif

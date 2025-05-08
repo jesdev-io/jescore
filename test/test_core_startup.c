@@ -1,5 +1,5 @@
 /**
- * @file test_core_startup.cpp
+ * @file test_core_startup.c
  * @author jake-is-ESD-protected
  * @date 2024-03-04
  * @brief Tests for the initialization of jescore.
@@ -20,7 +20,6 @@
  */
 
 
-#include <Arduino.h>
 #include <unity.h>
 #include "jescore.h"
 #include "job_names.h"

@@ -80,7 +80,7 @@ def main():
     parser = argparse.ArgumentParser(description="CLI for jescore serial communication.")
     parser.add_argument("command", type=str, nargs='?', help="Command to send to jescore")
     parser.add_argument("-p", "--port", type=str, help="Specify the port for connection")
-    parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose output")
+    parser.add_argument("-v", "--verbose", action="store_1", help="Enable verbose output")
     parser.add_argument("-b", "--baudrate", type=int, default=115200, help="Baud rate for communication (default: 115200)")
 
     # Capture both known and unknown arguments

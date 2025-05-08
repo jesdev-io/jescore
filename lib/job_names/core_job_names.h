@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef _CORE_JOB_NAMES_H_
 #define _CORE_JOB_NAMES_H_
 
@@ -11,4 +15,8 @@
 #define STATS_NAME          "stats"
 #endif
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif

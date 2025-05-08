@@ -4,7 +4,7 @@
 #include "base_jobs.h"
 #include "job_names.h"
 #include "driver/uart.h"
-#include "uart.h"
+#include "uart_unif.h"
 
 
 static job_struct_t** job_list = NULL;
@@ -23,13 +23,13 @@ void cli_set_sess_state(uint8_t sess_state){
 void init_cli(void* p){
     job_list = (job_struct_t**)p;
     uart_unif_init(BAUDRATE, CLI_BUF_SIZE, CLI_BUF_SIZE, (void*)&queue_uart);
-    uart_unif_write((uint8_t*)BOOT_MSG);
-    __job_register_job(SERIAL_READ_NAME, 4096, 1, cli_server, true, e_role_core);
-    __job_register_job(PRINT_JOB_NAME, 4096, 1, __base_job_echo, false, e_role_base);
+    uart_unif_write(BOOT_MSG);
+    __job_register_job(SERIAL_READ_NAME, 4096, 1, cli_server, 1, e_role_core);
+    __job_register_job(PRINT_JOB_NAME, 4096, 1, __base_job_echo, 0, e_role_base);
     job_struct_t* pj_to_do = __job_get_job_by_name(SERIAL_READ_NAME);
     pj_to_do->caller = e_origin_core;
-    pj_to_do->is_loop = true;
-    __job_notify_with_job(__job_get_job_by_name(CORE_JOB_NAME), pj_to_do, false);
+    pj_to_do->is_loop = 1;
+    __job_notify_with_job(__job_get_job_by_name(CORE_JOB_NAME), pj_to_do, 0);
 }
 
 void cli_server(void *pvParameters)
@@ -54,7 +54,7 @@ void cli_server(void *pvParameters)
                 uart_unif_flush();
                 pj_to_do = __job_get_job_by_name(ERROR_HANDLER_NAME);
                 pj_to_do->error = e_err_too_long;
-                __job_notify_with_job(__job_get_job_by_name(CORE_JOB_NAME), pj_to_do, false);
+                __job_notify_with_job(__job_get_job_by_name(CORE_JOB_NAME), pj_to_do, 0);
                 xQueueReset(queue_uart);
                 break;
             case UART_BREAK:
@@ -92,14 +92,14 @@ void cli_server(void *pvParameters)
                 }
             }
             memset((void*)raw_str, 0, __MAX_JOB_NAME_LEN_BYTE);
-            __job_notify_with_job(__job_get_job_by_name(CORE_JOB_NAME), pj_to_do, false);
+            __job_notify_with_job(__job_get_job_by_name(CORE_JOB_NAME), pj_to_do, 0);
         }
     }
 }
 
 
 void reprint_header(void* p){
-    uart_unif_write((uint8_t*)CLI_HEADER);
+    uart_unif_write(CLI_HEADER);
 }
 
 

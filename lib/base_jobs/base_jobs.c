@@ -1,6 +1,6 @@
 #include "base_jobs.h"
 #include "job_driver.h"
-#include "uart.h"
+#include "uart_unif.h"
 #include "string.h"
 #include "job_names.h"
 #include "core.h"
@@ -9,10 +9,7 @@
 
 void __base_job_echo(void* p){
     job_struct_t* pj = (job_struct_t*)p;
-    uint8_t* msg = (uint8_t*)(pj->args);
-    char buf[64] = {0};
-    sprintf(buf, "%s\n", pj->args);
-    uart_unif_write((uint8_t*)buf);
+    uart_unif_writef("%s\n", pj->args);
 }
 
 
@@ -23,15 +20,15 @@ void __base_job_help(void* p){
     job_struct_t* cur = *job_list;
 
     sprintf(desc, "\x1b[1mAvailable jobs:\x1b[0m\n\r");
-    uart_unif_write((uint8_t*)desc);
+    uart_unif_write(desc);
     while(cur != NULL){
         if(cur->role == e_role_base){
             sprintf(desc, "\t- (base) %s\n\r", cur->name);
-            uart_unif_write((uint8_t*)desc);
+            uart_unif_write(desc);
         }
         else if(cur->role == e_role_user){
             sprintf(desc, "\t- (user) %s\n\r", cur->name);
-            uart_unif_write((uint8_t*)desc);
+            uart_unif_write(desc);
         }
         cur = cur->pn;
     }
@@ -51,7 +48,7 @@ void __base_job_stats(void* p){
     else{
         char msg[__MAX_JOB_ARGS_LEN_BYTE*2];
         sprintf(msg, "Unknown specifier <%s>.\n\r", pj->args);
-        uart_unif_write((uint8_t*)msg);
+        uart_unif_write(msg);
         pj->error = e_err_param;
         return;
     }
@@ -64,7 +61,7 @@ void __base_job_stats(void* p){
     job_struct_t* cur = *job_list;
 
     sprintf(desc, "\x1b[1mname\t\thandle\t\tmemory\tprio\tloop\tinstances\terror\x1b[0m\n\r");
-    uart_unif_write((uint8_t*)desc);
+    uart_unif_write(desc);
     uint8_t* clr;
 
     while(cur != NULL){
@@ -95,7 +92,7 @@ void __base_job_stats(void* p){
                 cur->instances,
                 cur->error,
                 CLR_X);
-        uart_unif_write((uint8_t*)desc);
+        uart_unif_write(desc);
         cur = cur->pn;
     }
 }

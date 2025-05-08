@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef _CORE_H_
 #define _CORE_H_
 
@@ -30,7 +34,7 @@ typedef struct core_t{
 
 
 /// @brief Core initializer.
-/// @return status, `e_no_err` if OK.
+/// @return status, `e_err_no_err` if OK.
 /// @note Registers/launches itself and CLI if `JES_DISABLE_CLI` is not defined
 jes_err_t __core_init();
 
@@ -55,11 +59,15 @@ job_struct_t** __core_get_job_list();
 /// @param pjob_to_run: job to run.
 /// @param from_isr: originating from an interrupt.
 void __core_notify(job_struct_t* pjob_to_run, 
-                    bool from_isr);
+                    uint8_t from_isr);
 
 
 /// @brief Main core job. Handles calls and runs jobs.
 /// @param p: Mandatory args pointer.
 void __core_job(void* p);
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif

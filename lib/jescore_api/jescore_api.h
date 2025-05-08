@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef _JESCORE_API_H_
 #define _JESCORE_API_H_
 
@@ -8,7 +12,7 @@
 #include "job_driver.h"
 
 /// @brief Start the core and all of its abilities.
-/// @return Status. Returns `e_no_err` in case of successful launch.
+/// @return Status. Returns `e_err_no_err` in case of successful launch.
 jes_err_t jes_init();
 
 
@@ -18,18 +22,28 @@ jes_err_t jes_init();
 /// @param priority: Priority of the job (1 is highest).
 /// @param function: Function to run when the job is called. has to be of signature `void my_func(void* p)`.
 /// @param is_loop: flag which describes the lifetime of the job.
-/// @return Status. Returns `e_no_err` in case of successful registration.
+/// @return Status. Returns `e_err_no_err` in case of successful registration.
 jes_err_t register_job(const char* name,
                        uint32_t mem_size,
                        uint8_t priority,
                        void (*function)(void* p),
-                       bool is_loop);
+                       uint8_t is_loop);
 
 
 /// @brief Start a registered job.
-/// @param name: String name of job as set in `register_job()` @
-/// @return Status. Returns `e_no_err` in case of successful launch.
+/// @param name: String name of job as set in `register_job()`
+/// @return Status. Returns `e_err_no_err` in case of successful launch.
 jes_err_t launch_job(const char* name);
+
+
+/// @brief Start a registered job with arguments.
+/// @param name: String name of job as set in `register_job()`
+/// @param args: String of args (whitespace delimited string).
+/// @return Status. Returns `e_err_no_err` in case of successful launch.
+/// @note Arguments are expected to be whitespace delimited substrings
+///       in a string. They should not exceed `MAX_JOB_ARGS_LEN_BYTE`.
+///       A copy is stored in the `args` field of the job.
+jes_err_t launch_job_args(const char* name, const char* args);
 
 
 /// @brief Add a job (function block) to the list of all known jobs.
@@ -38,21 +52,21 @@ jes_err_t launch_job(const char* name);
 /// @param priority: Priority of the job (1 is highest).
 /// @param function: Function to run when the job is called. has to be of signature `void my_func(void* p)`.
 /// @param is_loop: flag which describes the lifetime of the job.
-/// @return Status. Returns `e_no_err` in case of successful launch.
+/// @return Status. Returns `e_err_no_err` in case of successful launch.
 jes_err_t register_and_launch_job(const char* name,
                                   uint32_t mem_size,
                                   uint8_t priority,
                                   void (*function)(void* p),
-                                  bool is_loop);
+                                  uint8_t is_loop);
 
 
-/// @brief Set the field `args` of the job.
+/// @brief Set the field `args` of the calling job.
 /// @param s: String to insert into `args` field.
-/// @return status, `e_no_err` if OK.
+/// @return status, `e_err_no_err` if OK.
 jes_err_t set_args(char* s);
 
 
-/// @brief Get the field `args` of the job.
+/// @brief Get the field `args` of the calling job.
 /// @return Pointer to `args` field of the job.
 /// @attention  This function returns a pointer to the args buffer of the
 ///             job struct. Since this function is intended to be called from
@@ -62,16 +76,16 @@ jes_err_t set_args(char* s);
 char* get_args(void);
 
 
-/// @brief Set the field `param` of the job.
+/// @brief Set the field `param` of the calling job.
 /// @param p: Arbitrary reference to parameter.
-/// @return status, `e_no_err` if OK.
+/// @return status, `e_err_no_err` if OK.
 jes_err_t set_param(void* p);
 
 
-/// @brief Get the field `param` of the job.
+/// @brief Get the field `param` of the calling job.
 /// @return Pointer to `param` field of the job.
 /// @attention Will return NULL on error.
-void* get_param(void);
+void* job_get_param(void);
 
 
 /// @brief Notify a job with an optional message.
@@ -89,4 +103,8 @@ void notify_job_ISR(const char* name, void* notification);
 /// @brief Pause the calling job until a notification arrives.
 /// @return The optional notification value.
 void* wait_for_notification(void);
+#endif
+
+#ifdef __cplusplus
+}
 #endif

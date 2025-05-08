@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef _CLI_H_
 #define _CLI_H_
 
@@ -31,4 +35,8 @@ void cli_server(void* p);
 void reprint_header(void* p);
 static inline int16_t __get_ws_index(char* buf, uint16_t len);
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif
