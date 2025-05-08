@@ -5,7 +5,7 @@ extern "C" {
 #ifndef _CLI_H_
 #define _CLI_H_
 
-#include "Arduino.h"
+#include <inttypes.h>
 
 #define RX_PIN          3
 #define CLI_BUF_SIZE    256
