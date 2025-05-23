@@ -10,6 +10,7 @@ extern "C" {
 #include "core.h"
 #include "jes_err.h"
 #include "job_driver.h"
+#include "uart_unif.h"
 
 /// @brief Start the core and all of its abilities.
 /// @return Status. Returns `e_err_no_err` in case of successful launch.
