@@ -1,6 +1,3 @@
-#include "example_selector.h"
-#ifdef EXAMPLE_FSM_CLI
-
 #include <Arduino.h>
 #include "jescore.h"
 #include <string.h>
@@ -67,5 +64,3 @@ void loop() {
     // call `jescore lights status` to get a print
     // of the current status of the LED FSM
 }
-
-#endif

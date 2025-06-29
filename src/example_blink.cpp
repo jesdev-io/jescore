@@ -1,6 +1,3 @@
-#include "example_selector.h"
-#ifdef EXAMPLE_BLINK
-
 #include <Arduino.h>
 #include "jescore.h"
 
@@ -29,5 +26,3 @@ void setup() {
 void loop() {
 
 }
-
-#endif
