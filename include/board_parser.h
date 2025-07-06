@@ -9,6 +9,9 @@
 #include "freertos/semphr.h"
 #include "freertos/queue.h"
 #include "driver/uart.h"
+
+#define BOARD_MIN_JOB_HEAP_MEM 2048
+
 #endif
 
 // --- STM32 --- //
@@ -140,6 +143,9 @@
 
 #ifdef BUILD_FOR_STM32
 #include "FreeRTOS.h"
+
+#define BOARD_MIN_JOB_HEAP_MEM 512
+
 #endif
 
 #endif
