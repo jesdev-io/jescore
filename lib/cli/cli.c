@@ -1,35 +1,39 @@
 #include "string.h"
+#include "jes_err.h"
 #include "cli.h"
 #include "job_driver.h"
 #include "base_jobs.h"
 #include "job_names.h"
-#include "driver/uart.h"
 #include "uart_unif.h"
 
 
-static job_struct_t** job_list = NULL;
 static QueueHandle_t queue_uart;
 static uint8_t open_sess = 0;
+static uint8_t is_init = 0;
 
 
-uint8_t cli_get_sess_state(void){
+uint8_t __cli_get_sess_state(void){
     return open_sess;
 }
 
-void cli_set_sess_state(uint8_t sess_state){
+void __cli_set_sess_state(uint8_t sess_state){
     open_sess = sess_state;
 }
 
-void init_cli(void* p){
-    job_list = (job_struct_t**)p;
-    uart_unif_init(BAUDRATE, CLI_BUF_SIZE, CLI_BUF_SIZE, (void*)&queue_uart);
-    uart_unif_write(BOOT_MSG);
-    __job_register_job(SERIAL_READ_NAME, 4096, 1, cli_server, 1, e_role_core);
-    __job_register_job(PRINT_JOB_NAME, 4096, 1, __base_job_echo, 0, e_role_base);
-    job_struct_t* pj_to_do = __job_get_job_by_name(SERIAL_READ_NAME);
-    pj_to_do->caller = e_origin_core;
-    pj_to_do->is_loop = 1;
-    __job_notify_with_job(__job_get_job_by_name(CORE_JOB_NAME), pj_to_do, 0);
+jes_err_t __cli_init(void){
+    if(is_init) return 0;
+    int32_t stat;
+    stat = uart_unif_init(CLI_BAUDRATE, CLI_BUF_SIZE, CLI_BUF_SIZE, (void*)&queue_uart);
+    if(stat != 0) return e_err_driver_fail;
+    uart_unif_write(CLI_BOOT_MSG);
+    jes_err_t e = __job_register_job(CLI_SERVER_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, cli_server, 1, e_role_core);
+    if(e != e_err_no_err) return e;
+    e = __job_register_job(PRINT_JOB_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __base_job_echo, 0, e_role_base);
+    if(e != e_err_no_err) return e;
+    e = __job_launch_job_by_name(CLI_SERVER_NAME, e_origin_core);
+    if(e != e_err_no_err) return e;
+    is_init = 1;
+    return e_err_no_err;
 }
 
 void cli_server(void *pvParameters)
@@ -44,7 +48,7 @@ void cli_server(void *pvParameters)
             open_sess = 1;
             switch (event.type) {
             case UART_DATA:
-                uart_unif_read((uint8_t*)raw_str, event.size, portMAX_DELAY);
+                uart_unif_read(raw_str, event.size, portMAX_DELAY);
                 break;
             case UART_FIFO_OVF:
                 uart_unif_flush();
@@ -98,12 +102,13 @@ void cli_server(void *pvParameters)
 }
 
 
-void reprint_header(void* p){
-    uart_unif_write(CLI_HEADER);
+jes_err_t __cli_reprint_header(void){
+    if(uart_unif_write(CLI_HEADER) != 0) return e_err_driver_fail;
+    return e_err_no_err;
 }
 
 
-static inline int16_t __get_ws_index(char* buf, uint16_t len){
+int16_t __get_ws_index(char* buf, uint16_t len){
     int16_t i = 0;
     while(i < len){
         if(buf[i] == ' '){
