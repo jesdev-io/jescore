@@ -26,7 +26,7 @@ void tearDown(void) {
 }
 
 
-void test_all(void) {
+void test_all(void* p) {
     vTaskDelay(2000 / portTICK_PERIOD_MS);
     UNITY_BEGIN();
     vTaskDelay(1000 / portTICK_PERIOD_MS);
@@ -46,8 +46,8 @@ void test_all(void) {
     RUN_TEST(test_set_get_args);
     RUN_TEST(test_set_job_get_params);
     RUN_TEST(test_launch_job_args);
-    // RUN_TEST(test_core_job_launch_prohibited);
-    // RUN_TEST(test_notify_job_and_wait);
+    RUN_TEST(test_core_job_launch_prohibited);
+    RUN_TEST(test_notify_job_and_wait);
     
     UNITY_END();
 }
