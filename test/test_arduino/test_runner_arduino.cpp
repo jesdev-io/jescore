@@ -12,7 +12,7 @@
 
 
 void setup(){
-    test_all();
+    test_all(__null);
 }
 
 
