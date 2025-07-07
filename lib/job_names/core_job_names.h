@@ -8,7 +8,7 @@ extern "C" {
 #define CORE_JOB_NAME       "core"
 #define ERROR_HANDLER_NAME  "errorhandler"
 #ifndef JES_DISABLE_CLI
-#define SERIAL_READ_NAME    "cliserver"
+#define CLI_SERVER_NAME    "cliserver"
 #define HELP_NAME           "help"
 #define STATS_NAME          "stats"
 #endif

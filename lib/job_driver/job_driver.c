@@ -121,9 +121,9 @@ void __job_runtime_env(void* p){
      * This is useful when an infinite job is triggered once by the CLI, otherwise
      * the prefix would never return.
     */
-    if(pj->is_loop && cli_get_sess_state() == 1){
-        cli_set_sess_state(0);
-        cli_reprint_header();
+    if(pj->is_loop && __cli_get_sess_state() == 1){
+        __cli_set_sess_state(0);
+        __cli_reprint_header();
     }
     #endif
 
@@ -139,9 +139,9 @@ void __job_runtime_env(void* p){
     /* This section reprints the CLI prefix in case the started job is done.
      * This is the opposite of the similar looking statement above.
     */
-    if(!pj->is_loop && cli_get_sess_state() == 1){
-        cli_set_sess_state(0);
-        cli_reprint_header();
+    if(!pj->is_loop && __cli_get_sess_state() == 1){
+        __cli_set_sess_state(0);
+        __cli_reprint_header();
     }
     #endif
     pj->handle = NULL;

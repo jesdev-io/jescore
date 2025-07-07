@@ -70,7 +70,7 @@ void test_job_error_handler(void){
 
 
 void test_cli_init(void){
-    jes_err_t e = cli_init();
+    jes_err_t e = __cli_init();
     TEST_ASSERT_EQUAL(e_err_no_err, e);
 }
 

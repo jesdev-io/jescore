@@ -14,7 +14,7 @@ jes_err_t __core_init(){
     if(e != e_err_no_err){ return e; }
 
     #ifndef JES_DISABLE_CLI
-    e = cli_init();
+    e = __cli_init();
     if(e != e_err_no_err){ return e; }
     e = __job_register_job(HELP_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __base_job_help, 0, e_role_base);
     if(e != e_err_no_err){ return e; }
