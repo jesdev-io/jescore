@@ -18,8 +18,11 @@ void blink(void* p){
 
 
 void setup() {
-    jes_init();
+    jes_err_t e = jes_init();
     pinMode(LED_PIN, OUTPUT);
+    if(e != e_err_no_err){
+        digitalWrite(LED_PIN, HIGH);
+    }
     register_and_launch_job("blink", 2048, 1, blink, 1);
 }
 

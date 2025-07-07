@@ -7,19 +7,13 @@ void Error_Handler();
 void blink(void* p){
     static uint8_t act = 0;
     act = !act;
-    const char msg[] = "Hello from STM32L476RG!\r\n";
     while(act){
         HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
-        int32_t e = uart_unif_write(msg);
-        if (e != HAL_OK){
-          HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
-        }
-        vTaskDelay(pdMS_TO_TICKS(500));
+        vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
 
-int main(void)
-{
+int main(void){
   HAL_Init();
   SystemClock_Config();
   MX_GPIO_Init();
@@ -38,8 +32,7 @@ int main(void)
   while (1) { } // Should never reach here
 }
 
-void SystemClock_Config(void)
-{
+void SystemClock_Config(void){
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
@@ -74,8 +67,7 @@ void SystemClock_Config(void)
   }
 }
 
-static void MX_GPIO_Init(void)
-{
+static void MX_GPIO_Init(void){
   GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   __HAL_RCC_GPIOA_CLK_ENABLE(); // Enable GPIOA clock (LED is on PB13)
@@ -89,7 +81,6 @@ static void MX_GPIO_Init(void)
 
   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
 }
-
 void Error_Handler(void)
 {
   __disable_irq();
