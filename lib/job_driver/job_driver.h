@@ -9,11 +9,13 @@ extern "C" {
 
 #include <stdint.h>
 #include <string.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/semphr.h"
+#include "board_parser.h"
 #include "jes_err.h"
 #include "commands.h"
+
+#ifdef BUILD_FOR_STM32
+#include "queue.h"
+#endif
 
 #define __GET_SAFE_SIZE(SIZE, LIMIT) ((SIZE)<=(LIMIT)?(SIZE):(LIMIT))
 #ifndef MAX_JOB_NAME_LEN_BYTE
