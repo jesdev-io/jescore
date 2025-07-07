@@ -9,8 +9,14 @@
 
 
 #include "../common_test.h"
+#include "board_parser.h"
+#include "FreeRTOSConfig.h"
+#include "task.h"
+
+static TaskHandle_t pdispatch;
 
 int main(void){
-    test_all();
+    xTaskCreate(test_all, "dispatch", 2048, NULL, 1, &pdispatch);
+    vTaskStartScheduler();
     return 0;
 }
