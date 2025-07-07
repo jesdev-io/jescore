@@ -78,13 +78,13 @@ void __base_job_stats(void* p){
             case e_role_core: clr = CLR_Gr; break;
             case e_role_base: clr = CLR_Y;  break;
             case e_role_user: clr = CLR_G;  break;
-            default:          clr = CLR_X;   break;
+            default:          clr = CLR_X;  break;
         }
-        sprintf(desc, "%s%s%s%x%s%d\t%d\t%d\t%d\t\t%d%s\n\r", 
+        sprintf(desc, "%s%s%s%lx%s%ld\t%d\t%d\t%d\t\t%d%s\n\r", 
                 clr,
                 cur->name, 
                 spacing_name,
-                cur->handle, 
+                (uint32_t)cur->handle, 
                 spacing_addr,
                 cur->mem_size, 
                 cur->priority,
