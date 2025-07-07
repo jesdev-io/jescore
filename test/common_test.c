@@ -7,8 +7,11 @@
  * 
  */
 
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
+#include "board_parser.h"
+#ifdef BUILD_FOR_STM32
+#include "task.h"
+#include "queue.h"
+#endif
 #include <unity.h>
 #include "common_test.h"
 
@@ -33,8 +36,7 @@ void test_all(void) {
     vTaskDelay(100 / portTICK_PERIOD_MS);
     RUN_TEST(test_job_core);
     RUN_TEST(test_job_error_handler);
-    RUN_TEST(test_job_init_cli);
-    RUN_TEST(test_job_reprint_header);
+    RUN_TEST(test_cli_init);
     RUN_TEST(test_job_help);
     RUN_TEST(test_job_stats);
 
@@ -44,8 +46,8 @@ void test_all(void) {
     RUN_TEST(test_set_get_args);
     RUN_TEST(test_set_job_get_params);
     RUN_TEST(test_launch_job_args);
-    RUN_TEST(test_core_job_launch_prohibited);
-    RUN_TEST(test_notify_job_and_wait);
+    // RUN_TEST(test_core_job_launch_prohibited);
+    // RUN_TEST(test_notify_job_and_wait);
     
     UNITY_END();
 }

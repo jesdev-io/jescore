@@ -223,11 +223,7 @@ void test_core_job_launch_prohibited(void){
     TEST_ASSERT_EQUAL_INT(e_err_prohibited, stat);
     stat = launch_job(ERROR_HANDLER_NAME);
     TEST_ASSERT_EQUAL_INT(e_err_prohibited, stat);
-    stat = launch_job(INIT_CLI_JOB_NAME);
-    TEST_ASSERT_EQUAL_INT(e_err_prohibited, stat);
     stat = launch_job(SERIAL_READ_NAME);
-    TEST_ASSERT_EQUAL_INT(e_err_prohibited, stat);
-    stat = launch_job(HEADER_PRINTER_NAME);
     TEST_ASSERT_EQUAL_INT(e_err_prohibited, stat);
 }
 

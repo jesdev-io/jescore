@@ -17,8 +17,7 @@ extern "C" {
 void test_core_init(void);
 void test_job_core(void);
 void test_job_error_handler(void);
-void test_job_init_cli(void);
-void test_job_reprint_header(void);
+void test_cli_init(void);
 void test_job_help(void);
 void test_job_stats(void);
 

@@ -7,37 +7,30 @@ static core_t core;
 
 jes_err_t __core_init(){
     core.state = e_state_init;
-    jes_err_t stat;
-    stat = __job_register_job(CORE_JOB_NAME, 2048, 1, __core_job, 1, e_role_core);
-    if(stat != e_err_no_err){ return stat; }
-    stat = __job_register_job(ERROR_HANDLER_NAME, 1024, 1, __core_job_err_handler, 0, e_role_core);
-    if(stat != e_err_no_err){ return stat; }
+    jes_err_t e;
+    e = __job_register_job(CORE_JOB_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __core_job, 1, e_role_core);
+    if(e != e_err_no_err){ return e; }
+    e = __job_register_job(ERROR_HANDLER_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __core_job_err_handler, 0, e_role_core);
+    if(e != e_err_no_err){ return e; }
 
     #ifndef JES_DISABLE_CLI
-    stat = __job_register_job(INIT_CLI_JOB_NAME, 2048, 1, init_cli, 0, e_role_core);
-    if(stat != e_err_no_err){ return stat; }
-    stat = __job_register_job(HEADER_PRINTER_NAME, 2048, 1, reprint_header, 0, e_role_core);
-    if(stat != e_err_no_err){ return stat; }
-    stat = __job_register_job(HELP_NAME, 2048, 1, __base_job_help, 0, e_role_base);
-    if(stat != e_err_no_err){ return stat; }
-    stat = __job_register_job(STATS_NAME, 4096, 1, __base_job_stats, 0, e_role_base);
-    if(stat != e_err_no_err){ return stat; }
+    e = cli_init();
+    if(e != e_err_no_err){ return e; }
+    e = __job_register_job(HELP_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __base_job_help, 0, e_role_base);
+    if(e != e_err_no_err){ return e; }
+    e = __job_register_job(STATS_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __base_job_stats, 0, e_role_base);
+    if(e != e_err_no_err){ return e; }
     #endif
     
-    stat = __job_launch_job_by_name(CORE_JOB_NAME, e_origin_core);
-    if(stat != e_err_no_err){ return stat; }
-
-    #ifndef JES_DISABLE_CLI
-    stat = __job_launch_job_by_name(INIT_CLI_JOB_NAME, e_origin_core);
-    if(stat != e_err_no_err){ return stat; }
-    #endif
+    e = __job_launch_job_by_name(CORE_JOB_NAME, e_origin_core);
+    if(e != e_err_no_err){ return e; }
 
     core.state = e_state_idle;
     return e_err_no_err;
 }
 
 
-static void __core_err_handler_inline(jes_err_t e, void* args){
+inline void __core_err_handler_inline(jes_err_t e, void* args){
 
     job_struct_t* err_print_job = __job_get_job_by_name(PRINT_JOB_NAME);
     const char* description = NULL;

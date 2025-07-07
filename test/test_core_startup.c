@@ -38,7 +38,7 @@ void test_job_core(void){
     job_struct_t* pj = __job_get_job_by_name(CORE_JOB_NAME);
     TEST_ASSERT_EQUAL_STRING(CORE_JOB_NAME, pj->name);
     TEST_ASSERT_NOT_EQUAL(NULL, pj->handle);
-    TEST_ASSERT_EQUAL_UINT32(2048, pj->mem_size);
+    TEST_ASSERT_EQUAL_UINT32(BOARD_MIN_JOB_HEAP_MEM, pj->mem_size);
     TEST_ASSERT_EQUAL_UINT8(1, pj->priority);
     TEST_ASSERT_EQUAL_HEX32(__core_job, pj->function);    
     TEST_ASSERT_EQUAL_INT8_ARRAY(dummy, pj->args, __MAX_JOB_ARGS_LEN_BYTE);
@@ -56,7 +56,7 @@ void test_job_error_handler(void){
     job_struct_t* pj = __job_get_job_by_name(ERROR_HANDLER_NAME);
     TEST_ASSERT_EQUAL_STRING(ERROR_HANDLER_NAME, pj->name);
     TEST_ASSERT_EQUAL_HEX32(NULL, pj->handle);
-    TEST_ASSERT_EQUAL_UINT32(1024, pj->mem_size);
+    TEST_ASSERT_EQUAL_UINT32(BOARD_MIN_JOB_HEAP_MEM, pj->mem_size);
     TEST_ASSERT_EQUAL_UINT8(1, pj->priority);
     TEST_ASSERT_EQUAL_HEX32(__core_job_err_handler, pj->function);    
     TEST_ASSERT_EQUAL_INT8_ARRAY(dummy, pj->args, __MAX_JOB_ARGS_LEN_BYTE);
@@ -69,39 +69,9 @@ void test_job_error_handler(void){
 }
 
 
-void test_job_init_cli(void){
-    char dummy[__MAX_JOB_ARGS_LEN_BYTE] = {0};
-    job_struct_t* pj = __job_get_job_by_name(INIT_CLI_JOB_NAME);
-    TEST_ASSERT_EQUAL_STRING(INIT_CLI_JOB_NAME, pj->name);
-    TEST_ASSERT_EQUAL_HEX32(NULL, pj->handle);
-    TEST_ASSERT_EQUAL_UINT32(2048, pj->mem_size);
-    TEST_ASSERT_EQUAL_UINT8(1, pj->priority);
-    TEST_ASSERT_EQUAL_HEX32(init_cli, pj->function);    
-    TEST_ASSERT_EQUAL_INT8_ARRAY(dummy, pj->args, __MAX_JOB_ARGS_LEN_BYTE);
-    TEST_ASSERT_EQUAL_UINT8(0, pj->is_loop);
-    TEST_ASSERT_EQUAL_UINT8(0, pj->instances);
-    TEST_ASSERT_EQUAL_INT(e_role_core, pj->role);
-    TEST_ASSERT_EQUAL_INT(e_origin_core, pj->caller);
-    TEST_ASSERT_EQUAL_HEX32(NULL, pj->param);
-    TEST_ASSERT_EQUAL_INT(e_err_no_err, pj->error);
-}
-
-
-void test_job_reprint_header(void){
-    char dummy[__MAX_JOB_ARGS_LEN_BYTE] = {0};
-    job_struct_t* pj = __job_get_job_by_name(HEADER_PRINTER_NAME);
-    TEST_ASSERT_EQUAL_STRING(HEADER_PRINTER_NAME, pj->name);
-    TEST_ASSERT_EQUAL_HEX32(NULL, pj->handle);
-    TEST_ASSERT_EQUAL_UINT32(2048, pj->mem_size);
-    TEST_ASSERT_EQUAL_UINT8(1, pj->priority);
-    TEST_ASSERT_EQUAL_HEX32(reprint_header, pj->function);
-    TEST_ASSERT_EQUAL_INT8_ARRAY(dummy, pj->args, __MAX_JOB_ARGS_LEN_BYTE);
-    TEST_ASSERT_EQUAL_UINT8(0, pj->is_loop);
-    TEST_ASSERT_EQUAL_UINT8(0, pj->instances);
-    TEST_ASSERT_EQUAL_INT(e_role_core, pj->role);
-    TEST_ASSERT_EQUAL_INT(e_origin_undefined, pj->caller);
-    TEST_ASSERT_EQUAL_HEX32(NULL, pj->param);
-    TEST_ASSERT_EQUAL_INT(e_err_no_err, pj->error);
+void test_cli_init(void){
+    jes_err_t e = cli_init();
+    TEST_ASSERT_EQUAL(e_err_no_err, e);
 }
 
 
@@ -110,7 +80,7 @@ void test_job_help(void){
     job_struct_t* pj = __job_get_job_by_name(HELP_NAME);
     TEST_ASSERT_EQUAL_STRING(HELP_NAME, pj->name);
     TEST_ASSERT_EQUAL_HEX32(NULL, pj->handle);
-    TEST_ASSERT_EQUAL_UINT32(2048, pj->mem_size);
+    TEST_ASSERT_EQUAL_UINT32(BOARD_MIN_JOB_HEAP_MEM, pj->mem_size);
     TEST_ASSERT_EQUAL_UINT8(1, pj->priority);
     TEST_ASSERT_EQUAL_HEX32(__base_job_help, pj->function);
     TEST_ASSERT_EQUAL_INT8_ARRAY(dummy, pj->args, __MAX_JOB_ARGS_LEN_BYTE);
@@ -128,7 +98,7 @@ void test_job_stats(void){
     job_struct_t* pj = __job_get_job_by_name(STATS_NAME);
     TEST_ASSERT_EQUAL_STRING(STATS_NAME, pj->name);
     TEST_ASSERT_EQUAL_HEX32(NULL, pj->handle);
-    TEST_ASSERT_EQUAL_UINT32(4096, pj->mem_size);
+    TEST_ASSERT_EQUAL_UINT32(BOARD_MIN_JOB_HEAP_MEM, pj->mem_size);
     TEST_ASSERT_EQUAL_UINT8(1, pj->priority);
     TEST_ASSERT_EQUAL_HEX32(__base_job_stats, pj->function);
     TEST_ASSERT_EQUAL_INT8_ARRAY(dummy, pj->args, __MAX_JOB_ARGS_LEN_BYTE);
