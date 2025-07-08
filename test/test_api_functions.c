@@ -146,6 +146,8 @@ void test_launch_job(void){
     jes_err_t stat = launch_job(DUMMY_JOB_SINGLE_NAME);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
 
+    // give job a moment to start
+    vTaskDelay(100 / portTICK_PERIOD_MS);
     char dummy[__MAX_JOB_ARGS_LEN_BYTE] = {0};
     job_struct_t* pj = __job_get_job_by_name(DUMMY_JOB_SINGLE_NAME);
     TEST_ASSERT_EQUAL_STRING(DUMMY_JOB_SINGLE_NAME, pj->name);
