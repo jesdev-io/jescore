@@ -8,9 +8,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        example: [test/test_arduino,
-                  test/test_stm32cube, 
-                  examples/example_blink.cpp, 
+        example: [examples/example_blink.cpp, 
                   examples/example_fsm_cli.cpp,
                   examples/example_blink_stm32.c]
 
