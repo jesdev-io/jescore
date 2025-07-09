@@ -56,8 +56,8 @@ void dummy_job_args_holder(void* p){
 
 
 void dummy_job_notify(void* p){
-    uint32_t val = DUMMY_NOTIFICATION_VALUE;
-    notify_job(DUMMY_JOB_NOTIFY_TAKE, &val);
+    uint32_t* val = (uint32_t*)DUMMY_NOTIFICATION_VALUE;
+    notify_job(DUMMY_JOB_NOTIFY_TAKE, val);
 }
 
 
@@ -66,7 +66,7 @@ void dummy_job_notify_take(void* p){
     pval = (uint32_t*)wait_for_notification();
     job_set_param(pval);
     uint32_t* pval_equal = (uint32_t*)job_get_param();
-    if(*pval != *pval_equal){
+    if(pval != pval_equal){
         job_set_args((char*)DUMMY_FAIL_MSG);
     }
     else{
@@ -246,9 +246,8 @@ void test_notify_job_and_wait(void){
     TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
     vTaskDelay(100 / portTICK_PERIOD_MS);
 
-    uint32_t* pval;
-    pval = (uint32_t*)__job_get_param(__job_get_job_by_name(DUMMY_JOB_NOTIFY_TAKE));
+    uint32_t* val = (uint32_t*)__job_get_param(__job_get_job_by_name(DUMMY_JOB_NOTIFY_TAKE));
     char* msg = __job_get_args(__job_get_job_by_name(DUMMY_JOB_NOTIFY_TAKE));
-    TEST_ASSERT_EQUAL_INT32(DUMMY_NOTIFICATION_VALUE, *pval);
+    TEST_ASSERT_EQUAL_UINT8(DUMMY_NOTIFICATION_VALUE, (uint32_t)val);
     TEST_ASSERT_EQUAL_STRING(DUMMY_SUCCESS_MSG, msg);
 }
