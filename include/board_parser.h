@@ -11,6 +11,7 @@
 #include "driver/uart.h"
 
 #define BOARD_MIN_JOB_HEAP_MEM 2048
+#define BUILD_PLATFORM_NAME "ESP32"
 
 #endif
 
@@ -145,6 +146,7 @@
 #include "FreeRTOS.h"
 
 #define BOARD_MIN_JOB_HEAP_MEM 512
+#define BUILD_PLATFORM_NAME "STM32"
 
 #endif
 
