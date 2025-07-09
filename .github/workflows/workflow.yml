@@ -26,10 +26,5 @@ jobs:
       - name: Install PlatformIO Core
         run: pip install --upgrade platformio
 
-      - name: Install Unity for unit testing
-        run: |
-          git clone https://github.com/ThrowTheSwitch/Unity.git
-          echo "UNITY_DIR=$(pwd)/Unity" >> $GITHUB_ENV
-
       - name: Build program for supported boards
         run: pio run
