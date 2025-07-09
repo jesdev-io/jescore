@@ -141,6 +141,7 @@ void __job_runtime_env(void* p){
     */
     if(!pj->is_loop && __cli_get_sess_state() == 1){
         __cli_set_sess_state(0);
+        vTaskDelay(50 / portTICK_PERIOD_MS);
         __cli_reprint_header();
     }
     #endif
