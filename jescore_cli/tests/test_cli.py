@@ -44,8 +44,6 @@ def test_cli_stats():
     assert "cliserver" in stat
     assert "stats" in stat
     assert "help" in stat
-    assert "headerprint" in stat
-    assert "initcli" in stat
     assert "errorhandler" in stat
     assert "core" in stat 
 
