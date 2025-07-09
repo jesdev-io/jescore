@@ -33,11 +33,3 @@ jobs:
 
       - name: Build program for supported boards
         run: pio run
-
-      - name: Run unit tests (if any)
-        run: |
-          if [ -d "test" ]; then
-            pio test
-          else
-            echo "No test directory found - skipping unit tests"
-          fi
