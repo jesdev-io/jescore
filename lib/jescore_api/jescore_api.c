@@ -50,7 +50,7 @@ jes_err_t register_and_launch_job(const char* name,
 }
 
 
-jes_err_t set_args(char* s){
+jes_err_t job_set_args(char* s){
     TaskHandle_t caller = xTaskGetCurrentTaskHandle();
     job_struct_t* pj = __job_get_job_by_handle(caller);
     if (pj == NULL) { return e_err_is_zero; }
@@ -58,7 +58,7 @@ jes_err_t set_args(char* s){
 }
 
 
-char* get_args(void){
+char* job_get_args(void){
     TaskHandle_t caller = xTaskGetCurrentTaskHandle();
     job_struct_t* pj = __job_get_job_by_handle(caller);
     if (pj == NULL) { return NULL; }
@@ -66,7 +66,7 @@ char* get_args(void){
 }
 
 
-jes_err_t set_param(void* p){
+jes_err_t job_set_param(void* p){
     TaskHandle_t caller = xTaskGetCurrentTaskHandle();
     job_struct_t* pj = __job_get_job_by_handle(caller);
     if (pj == NULL) { return e_err_is_zero; }

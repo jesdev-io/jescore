@@ -45,9 +45,9 @@ void dummy_job_loop(void* p){
 
 
 void dummy_job_args_holder(void* p){
-    char* args = get_args();
+    char* args = job_get_args();
     if(strcmp(DUMMY_ARGS, args) == 0){
-        set_args((char*)DUMMY_ARGS_MODIF);
+        job_set_args((char*)DUMMY_ARGS_MODIF);
     }
     for(uint8_t i = 0; i < 255; i++){
         vTaskDelay(250 / portTICK_PERIOD_MS);
@@ -64,13 +64,13 @@ void dummy_job_notify(void* p){
 void dummy_job_notify_take(void* p){
     uint32_t* pval;
     pval = (uint32_t*)wait_for_notification();
-    set_param(pval);
+    job_set_param(pval);
     uint32_t* pval_equal = (uint32_t*)job_get_param();
     if(*pval != *pval_equal){
-        set_args((char*)DUMMY_FAIL_MSG);
+        job_set_args((char*)DUMMY_FAIL_MSG);
     }
     else{
-        set_args((char*)DUMMY_SUCCESS_MSG);
+        job_set_args((char*)DUMMY_SUCCESS_MSG);
     }
 }
 

@@ -13,9 +13,9 @@ void lights(void* p){
     CLI command is "lights", as registered in line 60 below. All
     other words that follow, such as "on" or "off" will pe passed
     as args to this job and can be retrieved as full string with
-    get_args().
+    job_get_args().
     */
-    char* args = get_args();
+    char* args = job_get_args();
     char* arg = strtok(args, " ");
     if (!arg){
         uart_unif_write("No argument specified! Use <on> or <off>\n\r");

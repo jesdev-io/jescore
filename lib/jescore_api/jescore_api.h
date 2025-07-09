@@ -64,7 +64,7 @@ jes_err_t register_and_launch_job(const char* name,
 /// @brief Set the field `args` of the calling job.
 /// @param s: String to insert into `args` field.
 /// @return status, `e_err_no_err` if OK.
-jes_err_t set_args(char* s);
+jes_err_t job_set_args(char* s);
 
 
 /// @brief Get the field `args` of the calling job.
@@ -74,13 +74,13 @@ jes_err_t set_args(char* s);
 ///             within a job, the memory of the job struct persists, which 
 ///             makes a copy of the arg string redundant. If however something
 ///             goes wrong, this function will return NULL.
-char* get_args(void);
+char* job_get_args(void);
 
 
 /// @brief Set the field `param` of the calling job.
 /// @param p: Arbitrary reference to parameter.
 /// @return status, `e_err_no_err` if OK.
-jes_err_t set_param(void* p);
+jes_err_t job_set_param(void* p);
 
 
 /// @brief Get the field `param` of the calling job.
