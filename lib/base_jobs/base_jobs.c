@@ -40,11 +40,10 @@ void __base_job_stats(void* p){
 
     uint8_t flag_none = 0;  // just print user jobs
     uint8_t flag_a = 0;     // print user and base jobs
-    uint8_t flag_aa = 0;    // print all jobs
     
     if(pj->args[0] == 0) flag_none = 1;
     else if(strcmp(pj->args, "-a") == 0) flag_a = 1;
-    else if(strcmp(pj->args, "-aa") == 0) flag_aa = 1;
+    else if(strcmp(pj->args, "-aa") == 0); // no filtering; every iteration is printed.
     else{
         char msg[__MAX_JOB_ARGS_LEN_BYTE*2];
         sprintf(msg, "Unknown specifier <%s>.\n\r", pj->args);
