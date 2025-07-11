@@ -46,8 +46,11 @@ class CjescoreCli:
             return f"/dev/{port}"
         return port
     
-    def uartTransceive(self, msg: str, waitTime: float = 0.01) -> str:
-        port_name = self.__getPort()
+    def uartTransceive(self, msg: str, port: str = None, waitTime: float = 0.01) -> str:
+        if port:
+            port_name = port
+        else:
+            port_name = self.__getPort()
         self.__vPrint(f"Sending raw string '{msg}' to jescore on port {port_name}")
         ser = serial.Serial(port_name, baudrate=self.baudrate, timeout=waitTime)
         ser.flush()
