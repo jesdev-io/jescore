@@ -53,7 +53,7 @@ void __base_job_stats(void* p){
     }
     
     char desc[__MAX_JOB_ARGS_LEN_BYTE*2] = {0};
-    char header[__MAX_JOB_ARGS_LEN_BYTE*2] = {0};
+    char header[__MAX_JOB_ARGS_LEN_BYTE*3] = {0};
     char spacing_name[] = {'\t', 0, 0};
     char spacing_addr[] = {'\t', 0, 0};
 
@@ -61,8 +61,11 @@ void __base_job_stats(void* p){
     job_struct_t* cur = *job_list;
 
     sprintf(desc, "\x1b[1mname\t\thandle\t\tmemory\tprio\tloop\tinstances\terror\x1b[0m\n\r");
-    sprintf(header, "%sjescore%s running on %s%s%s\n\r", CLR_Y, CLR_X, CLR_B, BUILD_PLATFORM_NAME, CLR_X);
-    uart_unif_write(header);
+    if(!flag_none){
+        sprintf(header, "%sjescore%s running on %s%s%s (FW %s, %s)\n\r\n\r", 
+            CLR_Y, CLR_X, CLR_G, BUILD_PLATFORM_NAME, CLR_X, JES_FW_VER, JES_FW_BRANCH);
+        uart_unif_write(header);
+    }
     uart_unif_write(desc);
     uint8_t* clr;
 
