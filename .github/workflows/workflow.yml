@@ -27,4 +27,17 @@ jobs:
         run: pip install --upgrade platformio
 
       - name: Build program for supported boards
+        if: runner.os != 'Windows'
         run: pio run
+
+      - name: Build program for supported boards (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          # Move to C: drive to avoid cross-drive path issues
+          cd /d C:
+          mkdir build
+          cd build
+          # Clone the repo again to C: drive
+          git clone $GITHUB_SERVER_URL/$GITHUB_REPOSITORY
+          cd $GITHUB_REPOSITORY_NAME
+          pio run
