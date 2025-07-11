@@ -26,17 +26,11 @@ jobs:
       - name: Install PlatformIO Core
         run: pip install --upgrade platformio
 
-      - name: Build program for supported boards (Non-Windows)
-        if: runner.os != 'Windows'
-        run: pio run
-
-      - name: Build program for supported boards (Windows)
-        if: runner.os == 'Windows'
-        shell: cmd
+      - name: Build program for supported boards
         run: |
-          cd /d C:\
-          mkdir build
-          cd build
-          git clone %GITHUB_SERVER_URL%/%GITHUB_REPOSITORY%
-          cd %GITHUB_REPOSITORY_NAME%
-          pio run
+          # Only for Windows - prevent cross-drive path issues
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            pio run --project-dir .
+          else
+            pio run
+          fi
