@@ -26,11 +26,5 @@ jobs:
       - name: Install PlatformIO Core
         run: pip install --upgrade platformio
 
-      - name: Build program
-        shell: bash
-        run: |
-          if [ "$RUNNER_OS" = "Windows" ]; then
-            pio run --project-dir $(pwd)
-          else
-            pio run
-          fi
+      - name: Build program for supported boards
+        run: pio run
