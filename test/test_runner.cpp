@@ -1,21 +1,18 @@
 /**
- * @file test_runner.c
+ * @file test_runner.cpp
  * @author jake-is-ESD-protected
  * @date 2025-06-29
- * @brief Main test runner file.
+ * @brief Dual C/C++ compatible test runner.
  *
- *
+ * Works as both .cpp for Arduino and .c for STM32
  */
 
 #include "board_parser.h"
 
 #ifdef BUILD_FOR_STM32
 /* -----------------------------------------------------------------
-BEGIN: STM32 platform test runner.
-> Starts from the "true" main function and needs a FreeRTOS
-> dispatcher, since main() then never escapes vTaskStartScheduler().
+BEGIN: STM32 platform test runner (C-compatible)
 ----------------------------------------------------------------- */
-
 #include "common_test.h"
 #include "board_parser.h"
 #include "FreeRTOSConfig.h"
@@ -23,36 +20,32 @@ BEGIN: STM32 platform test runner.
 
 static TaskHandle_t pdispatch;
 
-int main(void){
+int main(void) {
     xTaskCreate(test_all, "dispatch", 2048, NULL, 1, &pdispatch);
     vTaskStartScheduler();
     return 0;
 }
 /* -----------------------------------------------------------------
-END: STM32 platform test runner.
+END: STM32 platform test runner
 ----------------------------------------------------------------- */
 
-#elif BUILD_FOR_ESP32
+#elif defined(BUILD_FOR_ESP32)
 /* -----------------------------------------------------------------
-BEGIN: ESP32 platform + Arduino test runner.
-> Already dispatched.
+BEGIN: ESP32 platform (C++ Arduino-compatible)
 ----------------------------------------------------------------- */
-
 #include "common_test.h"
 
-void setup(){
-    test_all(__null);
+void setup() {
+    test_all(NULL);  // nullptr instead of NULL for C++
 }
 
-void loop(){
-
+void loop() {
+    // Empty
 }
 /* -----------------------------------------------------------------
-END: ESP32 platform + Arduino test runner.
+END: ESP32 platform
 ----------------------------------------------------------------- */
 
 #else
-
 #error "UNSPECIFIED BUILD TYPE"
-
 #endif
