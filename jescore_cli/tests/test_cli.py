@@ -45,6 +45,9 @@ def test_cli_stats():
         stat = cli.uartTransceive(msg, port=port)
         assert stat[-1] == CLI_PREFIX_MCU
         stat = ' '.join(stat)
+
+        assert "FW" in stat
+
         assert "name" in stat
         assert "handle" in stat
         assert "memory" in stat
