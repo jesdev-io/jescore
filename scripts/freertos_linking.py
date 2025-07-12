@@ -51,18 +51,17 @@ else:
       print(Color.R + f"Warning: Unsupported core {core} for FreeRTOS" + Color.X)
       freertos_port_path = None
 
-   try:
+   if os.path.exists(os.path.join(env["PROJECT_LIBDEPS_DIR"], "jescore")):
       config_path = os.path.join(  
          env.PioPlatform().get_package_dir("jescore"),
-         "lib",
-         "core",  
+         "include", 
          "FreeRTOSConfig",  
          "FreeRTOSConfig.h"  
       )  
       env.Append(CPPPATH=[os.path.dirname(config_path)])  
       print(f"Added STM32 FreeRTOSConfig.h from: {config_path}")  
-   except:
-      env.Append(CPPPATH=["$PROJECT_DIR/lib/core/FreeRTOSConfig"]) 
+   else:
+      env.Append(CPPPATH=["$PROJECT_DIR/include/FreeRTOSConfig"]) 
       print("Local build of library...")
 
    env.Append(
