@@ -14,6 +14,7 @@
 #endif
 #include <unity.h>
 #include "common_test.h"
+#include "delay_unif.h"
 
 
 void setUp(void) {
@@ -27,13 +28,13 @@ void tearDown(void) {
 
 
 void test_all(void* p) {
-    vTaskDelay(2000 / portTICK_PERIOD_MS);
+    jes_delay_job_ms(2000);
     UNITY_BEGIN();
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    jes_delay_job_ms(1000);
 
     // Backend startup
     RUN_TEST(test_core_init);
-    vTaskDelay(100 / portTICK_PERIOD_MS);
+    jes_delay_job_ms(100);
     RUN_TEST(test_job_core);
     RUN_TEST(test_job_error_handler);
     RUN_TEST(test_cli_init);

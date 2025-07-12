@@ -35,8 +35,6 @@ typedef struct uart_event_t{
     uint16_t size;
 }uart_event_t;
 
-void MX_USART2_UART_Init(void);
-
 #endif
 
 /// @brief Unified UART initializer.

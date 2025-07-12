@@ -27,7 +27,7 @@ void lights(void* p){
         processing = true;
         for(uint8_t i = 0; i < 255; i++){
             analogWrite(LED_PIN, i);
-            vTaskDelay(5 / portTICK_PERIOD_MS);
+            jes_delay_job_ms(5);
         }
         is_on = true;
         processing = false;
@@ -38,7 +38,7 @@ void lights(void* p){
         processing = true;
         for(uint8_t i = 255; i > 0; i--){
             analogWrite(LED_PIN, i);
-            vTaskDelay(5 / portTICK_PERIOD_MS);
+            jes_delay_job_ms(5);
         }
         is_on = false;
         processing = false;

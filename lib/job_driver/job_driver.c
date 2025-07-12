@@ -2,6 +2,7 @@
 #include "core.h"
 #include "core_job_names.h"
 #include "cli.h"
+#include "delay_unif.h"
 #include <malloc.h>
 
 jes_err_t __job_register_job(const char* n, 
@@ -141,7 +142,7 @@ void __job_runtime_env(void* p){
     */
     if(!pj->is_loop && __cli_get_sess_state() == 1){
         __cli_set_sess_state(0);
-        vTaskDelay(50 / portTICK_PERIOD_MS);
+        jes_delay_job_ms(50);
         __cli_reprint_header();
     }
     #endif

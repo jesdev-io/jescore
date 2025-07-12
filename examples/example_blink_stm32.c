@@ -14,7 +14,7 @@ void blink(void* p){
     act = !act;
     while(act){
         HAL_GPIO_TogglePin(LED_PORT, LED_GPIO);
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        jes_delay_job_ms(1000);
     }
 }
 
