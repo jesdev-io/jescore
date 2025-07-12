@@ -3,7 +3,7 @@
 
 [![PlatformIO CI](https://github.com/jake-is-ESD-protected/jescore/actions/workflows/workflow.yml/badge.svg?branch=main)](https://github.com/jake-is-ESD-protected/jescore/actions/workflows/workflow.yml)
 
-![jescore_blink](https://github.com/jake-is-ESD-protected/jescore/assets/78532991/34d7dd16-9aee-44f9-be31-dd20fc3fbec2)
+![jescore_blink](https://github.com/user-attachments/assets/d180d1a6-2823-451f-9092-45aa2639c013)
 
 ## Key-concepts
 `jescore` is a dynamic abstraction library for commonly used FreeRTOS tasks written in C. Its goal is to make development of multitasking procedures easier with more focus on the actual application than the **boring** backend-stuff. `jescore` does that for you. A second goal is native CLI support: As huge fan of CLIs, I also want this functionality on my embedded systems, to better interact with the device and to test software without hardware. This way, graphical UI elements become naturally abstracted from the actual process. On a desktop OS, calling `cd folder` is exactly the same as double clicking on that folder with the cursor, but the second method provides a good looking UI, then calls `cd folder` by itself. `jescore` follows a similar philosophy.
