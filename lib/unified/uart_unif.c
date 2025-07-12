@@ -97,41 +97,49 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t len){
     evt.size = len;
     BaseType_t woke_task = pdFALSE;
     xQueueSendFromISR(*p_queue, (void*)&evt, &woke_task);
-    // uart_unif_write("jescore $ ");
-
     HAL_UARTEx_ReceiveToIdle_IT(huart, uart_buf, __JES_STM32_UART_BUF_LEN_BYTE);
 }
 
 void HAL_UART_MspInit(UART_HandleTypeDef* huart){
     GPIO_InitTypeDef GPIO_InitStruct = {0};
     RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
-    if(huart->Instance==USART2)
-    {
-        PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART2;
-        PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
-        if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK){
-            /// TODO: figure out how to return driver issues for this
-        }
-        __HAL_RCC_USART2_CLK_ENABLE();
-        __HAL_RCC_GPIOA_CLK_ENABLE();
-        /**USART2 GPIO Configuration
-        PA2     ------> USART2_TX
-        PA3     ------> USART2_RX */
-        GPIO_InitStruct.Pin = GPIO_PIN_2|GPIO_PIN_3;
-        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-        GPIO_InitStruct.Pull = GPIO_NOPULL;
-        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-        GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
-        HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-        __HAL_UART_ENABLE_IT(huart, UART_IT_RXNE);
-        HAL_NVIC_SetPriority(USART2_IRQn, 6, 0);
-        HAL_NVIC_EnableIRQ(USART2_IRQn);
+    if(huart->Instance==USART1){
+        PeriphClkInit.Usart1ClockSelection = USART_CLK_SRC;
     }
+    else if(huart->Instance==USART2){
+        PeriphClkInit.Usart2ClockSelection = USART_CLK_SRC;
+    }
+    else{
+        /// TODO: 
+    }
+    PeriphClkInit.PeriphClockSelection = USART_RCC_PERIPH;
+    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK){
+        /// TODO: figure out how to return driver issues for this
+    }
+    USART_CLK_ENABLE();
+    USART_CLK_GPIO_ENABLE();
+
+    GPIO_InitStruct.Pin = USART_GPIO_TX_NUM;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Alternate = USART_GPIO_TX_ALT;
+    HAL_GPIO_Init(USART_GPIO_TX_PORT, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = USART_GPIO_RX_NUM;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Alternate = USART_GPIO_RX_ALT;
+    HAL_GPIO_Init(USART_GPIO_RX_PORT, &GPIO_InitStruct);
+
+    __HAL_UART_ENABLE_IT(huart, UART_IT_RXNE);
+    HAL_NVIC_SetPriority(USART_IRQn_NUM, 6, 0);
+    HAL_NVIC_EnableIRQ(USART_IRQn_NUM);
 }
 
-void MX_USART2_UART_Init(void){
-  huart_num.Instance = USART2;
+void MX_USART_UART_Init(void){
+  huart_num.Instance = USART_NUM;
   huart_num.Init.BaudRate = 115200;
   huart_num.Init.WordLength = UART_WORDLENGTH_8B;
   huart_num.Init.StopBits = UART_STOPBITS_1;
@@ -146,6 +154,10 @@ void MX_USART2_UART_Init(void){
   }
 }
 
+void USART1_IRQHandler(void){
+    HAL_UART_IRQHandler(&huart_num);
+}
+
 void USART2_IRQHandler(void){
     HAL_UART_IRQHandler(&huart_num);
 }
@@ -153,7 +165,7 @@ void USART2_IRQHandler(void){
 int32_t uart_unif_init(uint32_t baud, uint32_t rx_buf_len, uint32_t tx_buf_len, void* args){
     *(QueueHandle_t*)args = xQueueCreate(5, sizeof(uart_event_t));
     p_queue = (QueueHandle_t*)args;
-    MX_USART2_UART_Init();
+    MX_USART_UART_Init();
     HAL_StatusTypeDef stat = HAL_UARTEx_ReceiveToIdle_IT(&huart_num, uart_buf, __JES_STM32_UART_BUF_LEN_BYTE);
     if(stat != HAL_OK) return -1;
     return 0;
@@ -194,7 +206,7 @@ int32_t uart_unif_flush(void){
 
 int32_t uart_unif_deinit(void){
     /// TODO: 
-    __USART2_CLK_DISABLE();
+    USART_CLK_GPIO_DISABLE();
     return 0;
 }
 
