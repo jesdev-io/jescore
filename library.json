@@ -1,6 +1,6 @@
 {
     "name": "jescore",
-    "version": "1.1.4",
+    "version": "2.0.0",
     "description": "FreeRTOS attached core for easier multitasking and native CLI support",
     "keywords": "core, FreeRTOS",
     "repository":
@@ -16,7 +16,7 @@
       }
     ],
     "license": "Apache 2.0",
-    "frameworks": "Arduino, esp-idf, stm32cube",
+    "frameworks": "Arduino, stm32cube",
     "platforms": "espressif32, ststm32",
     "build": {
         "srcDir": ".",
