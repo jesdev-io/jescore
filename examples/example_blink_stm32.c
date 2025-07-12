@@ -24,7 +24,7 @@ int main(void){
   MX_GPIO_Init();
 
   jes_init();
-  register_and_launch_job("blink", 256, 1, blink, 1);
+  jes_register_and_launch_job("blink", 256, 1, blink, 1);
   jes_dispatch();
 }
 

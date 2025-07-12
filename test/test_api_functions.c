@@ -45,9 +45,9 @@ void dummy_job_loop(void* p){
 
 
 void dummy_job_args_holder(void* p){
-    char* args = job_get_args();
+    char* args = jes_job_get_args();
     if(strcmp(DUMMY_ARGS, args) == 0){
-        job_set_args((char*)DUMMY_ARGS_MODIF);
+        jes_job_set_args((char*)DUMMY_ARGS_MODIF);
     }
     for(uint8_t i = 0; i < 255; i++){
         jes_delay_job_ms(250);
@@ -57,26 +57,26 @@ void dummy_job_args_holder(void* p){
 
 void dummy_job_notify(void* p){
     uint32_t* val = (uint32_t*)DUMMY_NOTIFICATION_VALUE;
-    notify_job(DUMMY_JOB_NOTIFY_TAKE, val);
+    jes_notify_job(DUMMY_JOB_NOTIFY_TAKE, val);
 }
 
 
 void dummy_job_notify_take(void* p){
     uint32_t* pval;
-    pval = (uint32_t*)wait_for_notification();
-    job_set_param(pval);
-    uint32_t* pval_equal = (uint32_t*)job_get_param();
+    pval = (uint32_t*)jes_wait_for_notification();
+    jes_job_set_param(pval);
+    uint32_t* pval_equal = (uint32_t*)jes_job_get_param();
     if(pval != pval_equal){
-        job_set_args((char*)DUMMY_FAIL_MSG);
+        jes_job_set_args((char*)DUMMY_FAIL_MSG);
     }
     else{
-        job_set_args((char*)DUMMY_SUCCESS_MSG);
+        jes_job_set_args((char*)DUMMY_SUCCESS_MSG);
     }
 }
 
 
 void test_register_job(void){
-    jes_err_t stat = register_job(DUMMY_JOB_SINGLE_NAME,
+    jes_err_t stat = jes_register_job(DUMMY_JOB_SINGLE_NAME,
                                   DUMMY_JOB_MEM,
                                   DUMMY_JOB_PRIO,
                                   dummy_job_single,
@@ -98,7 +98,7 @@ void test_register_job(void){
     TEST_ASSERT_EQUAL_HEX32(NULL, pj->param);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, pj->error);
 
-    stat = register_job(DUMMY_JOB_LOOP_NAME,
+    stat = jes_register_job(DUMMY_JOB_LOOP_NAME,
                         DUMMY_JOB_MEM,
                         DUMMY_JOB_PRIO,
                         dummy_job_loop,
@@ -119,7 +119,7 @@ void test_register_job(void){
     TEST_ASSERT_EQUAL_HEX32(NULL, pj->param);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, pj->error);
 
-    stat = register_job(DUMMY_JOB_ARGS_HOLDER_NAME,
+    stat = jes_register_job(DUMMY_JOB_ARGS_HOLDER_NAME,
                         DUMMY_JOB_MEM,
                         DUMMY_JOB_PRIO,
                         dummy_job_args_holder,
@@ -143,7 +143,7 @@ void test_register_job(void){
 
 
 void test_launch_job(void){
-    jes_err_t stat = launch_job(DUMMY_JOB_SINGLE_NAME);
+    jes_err_t stat = jes_launch_job(DUMMY_JOB_SINGLE_NAME);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
 
     // give job a moment to start
@@ -163,7 +163,7 @@ void test_launch_job(void){
     TEST_ASSERT_EQUAL_HEX32(NULL, pj->param);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, pj->error);
 
-    stat = launch_job(DUMMY_JOB_LOOP_NAME);
+    stat = jes_launch_job(DUMMY_JOB_LOOP_NAME);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
     jes_delay_job_ms(200);
 
@@ -212,7 +212,7 @@ void test_set_job_get_params(void){
 
 
 void test_launch_job_args(void){
-    jes_err_t stat = launch_job_args(DUMMY_JOB_ARGS_HOLDER_NAME,
+    jes_err_t stat = jes_launch_job_args(DUMMY_JOB_ARGS_HOLDER_NAME,
                                      DUMMY_ARGS);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
     jes_delay_job_ms(100);
@@ -221,24 +221,24 @@ void test_launch_job_args(void){
 }
 
 void test_core_job_launch_prohibited(void){
-    jes_err_t stat = launch_job(CORE_JOB_NAME);
+    jes_err_t stat = jes_launch_job(CORE_JOB_NAME);
     TEST_ASSERT_EQUAL_INT(e_err_prohibited, stat);
-    stat = launch_job(ERROR_HANDLER_NAME);
+    stat = jes_launch_job(ERROR_HANDLER_NAME);
     TEST_ASSERT_EQUAL_INT(e_err_prohibited, stat);
-    stat = launch_job(CLI_SERVER_NAME);
+    stat = jes_launch_job(CLI_SERVER_NAME);
     TEST_ASSERT_EQUAL_INT(e_err_prohibited, stat);
 }
 
 
 void test_notify_job_and_wait(void){
-    jes_err_t stat = register_and_launch_job(DUMMY_JOB_NOTIFY_TAKE,
+    jes_err_t stat = jes_register_and_launch_job(DUMMY_JOB_NOTIFY_TAKE,
                                              DUMMY_JOB_MEM,
                                              DUMMY_JOB_PRIO,
                                              dummy_job_notify_take,
                                              0);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
     jes_delay_job_ms(100);
-    stat = register_and_launch_job(DUMMY_JOB_NOTIFY,
+    stat = jes_register_and_launch_job(DUMMY_JOB_NOTIFY,
                                    DUMMY_JOB_MEM,
                                    DUMMY_JOB_PRIO,
                                    dummy_job_notify,
