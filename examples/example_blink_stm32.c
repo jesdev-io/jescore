@@ -4,11 +4,16 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 void Error_Handler();
 
+// definitions for a Nucleo-L476RG
+#define LED_PORT GPIOA
+#define LED_GPIO GPIO_PIN_5
+#define LED_ENABLE_PORT() __HAL_RCC_GPIOA_CLK_ENABLE()
+
 void blink(void* p){
     static uint8_t act = 0;
     act = !act;
     while(act){
-        HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+        HAL_GPIO_TogglePin(LED_PORT, LED_GPIO);
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
@@ -18,18 +23,11 @@ int main(void){
   SystemClock_Config();
   MX_GPIO_Init();
 
-  jes_err_t e = jes_init();
-  if(e != e_err_no_err){ 
-    HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
-    for(;;){}
-  }
-  e = register_and_launch_job("blink", 256, 1, blink, 1);
-  if(e != e_err_no_err){ 
-    HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
-    for(;;){}
-  }
+  jes_init();
+  register_and_launch_job("blink", 256, 1, blink, 1);
+
   vTaskStartScheduler();
-  while (1) { } // Should never reach here
+  while (1) { }
 }
 
 void SystemClock_Config(void){
@@ -70,16 +68,15 @@ void SystemClock_Config(void){
 static void MX_GPIO_Init(void){
   GPIO_InitTypeDef GPIO_InitStruct = {0};
 
-  __HAL_RCC_GPIOA_CLK_ENABLE(); // Enable GPIOA clock (LED is on PB13)
+  LED_ENABLE_PORT();
 
-  /* Configure PB13 (built-in LED) as output */
-  GPIO_InitStruct.Pin = GPIO_PIN_5;
+  GPIO_InitStruct.Pin = LED_GPIO;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  HAL_GPIO_Init(LED_PORT, &GPIO_InitStruct);
 
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(LED_PORT, LED_GPIO, GPIO_PIN_RESET);
 }
 void Error_Handler(void)
 {
