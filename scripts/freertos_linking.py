@@ -19,6 +19,7 @@ class Color:
    X = '\033[0m'
 
 Import("env")
+import os
 
 print(Color.C + "----------------------------------" + Color.X)
 print(Color.M + "*.*.* jescore dynamic linker *.*.*" + Color.X)
@@ -50,14 +51,28 @@ else:
       print(Color.R + f"Warning: Unsupported core {core} for FreeRTOS" + Color.X)
       freertos_port_path = None
 
+   try:
+      config_path = os.path.join(  
+         env.PioPlatform().get_package_dir("jescore"),
+         "lib",
+         "core",  
+         "FreeRTOSConfig",  
+         "FreeRTOSConfig.h"  
+      )  
+      env.Append(CPPPATH=[os.path.dirname(config_path)])  
+      print(f"Added STM32 FreeRTOSConfig.h from: {config_path}")  
+   except:
+      env.Append(CPPPATH=["$PROJECT_DIR/lib/core/FreeRTOSConfig"]) 
+      print("Local build of library...")
+
    env.Append(
       CPPPATH=[
          f"{freertos_base}/Middlewares/Third_Party/FreeRTOS/Source/include",
          f"{freertos_port_path}" if freertos_port_path else "",
-         "$PROJECT_DIR/include/FreeRTOSConfig",
-         "$PROJECT_DIR/include",
-         "$PROJECT_DIR/lib/jes_err",
-         "$PROJECT_DIR/lib/commands",
+         # "$PROJECT_DIR/include/FreeRTOSConfig",
+         # "$PROJECT_DIR/include",
+         # "$PROJECT_DIR/lib/jes_err",
+         # "$PROJECT_DIR/lib/commands",
       ],
 
       CCFLAGS=[
