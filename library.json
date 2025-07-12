@@ -19,7 +19,7 @@
     "frameworks": "Arduino, stm32cube",
     "platforms": "espressif32, ststm32",
     "build": {
-        "srcDir": "src",
+        "srcDir": ".",
         "includeDir": "include",
         "flags": [
           "-I src",
