@@ -15,7 +15,16 @@ extern "C" {
 
 /// @brief Start the core and all of its abilities.
 /// @return Status. Returns `e_err_no_err` in case of successful launch.
-jes_err_t jes_init();
+jes_err_t jes_init(void);
+
+#ifdef BUILD_FOR_STM32
+
+/// @brief Let the core take over your program flow.
+/// @note THIS IS ONLY NEEDED WHEN THE PROGRAM ENTRY IS `int main(void)`!
+///       Call this at the end of the main() function. This function will NOT return!
+void jes_dispatch(void);
+
+#endif // BUILD_FOR_STM32
 
 
 /// @brief Add a job (function block) to the list of all known jobs.

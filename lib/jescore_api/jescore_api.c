@@ -5,9 +5,17 @@
 #include "base_jobs.h"
 
 
-jes_err_t jes_init(){
+jes_err_t jes_init(void){
     return __core_init();
 }
+
+#ifdef BUILD_FOR_STM32
+
+void jes_dispatch(void){
+    vTaskStartScheduler();
+}
+
+#endif // BUILD_FOR_STM32
 
 
 jes_err_t register_job(const char* name,

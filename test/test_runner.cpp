@@ -14,6 +14,7 @@
 BEGIN: STM32 platform test runner (C-compatible)
 ----------------------------------------------------------------- */
 #include "common_test.h"
+#include "jescore_api.h"
 #include "board_parser.h"
 #include "FreeRTOSConfig.h"
 #include "task.h"
@@ -22,7 +23,7 @@ static TaskHandle_t pdispatch;
 
 int main(void) {
     xTaskCreate(test_all, "dispatch", 2048, NULL, 1, &pdispatch);
-    vTaskStartScheduler();
+    jes_dispatch();
     return 0;
 }
 /* -----------------------------------------------------------------

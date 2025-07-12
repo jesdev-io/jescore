@@ -25,9 +25,7 @@ int main(void){
 
   jes_init();
   register_and_launch_job("blink", 256, 1, blink, 1);
-
-  vTaskStartScheduler();
-  while (1) { }
+  jes_dispatch();
 }
 
 void SystemClock_Config(void){
