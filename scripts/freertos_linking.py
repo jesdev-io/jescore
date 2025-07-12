@@ -51,8 +51,7 @@ else:
       print(Color.R + f"Warning: Unsupported core {core} for FreeRTOS" + Color.X)
       freertos_port_path = None
 
-   print("PATH IS ", os.path.join(env["PROJECT_LIBDEPS_DIR"]))
-   if os.path.exists(os.path.join(env["PROJECT_LIBDEPS_DIR"], "jescore")):
+   if os.path.exists(os.path.join(env["PROJECT_LIBDEPS_DIR"], env["PIOENV"], "jescore")):
       config_path = os.path.join(  
          env.PioPlatform().get_package_dir("jescore"),
          "include", 
@@ -69,10 +68,6 @@ else:
       CPPPATH=[
          f"{freertos_base}/Middlewares/Third_Party/FreeRTOS/Source/include",
          f"{freertos_port_path}" if freertos_port_path else "",
-         # "$PROJECT_DIR/include/FreeRTOSConfig",
-         # "$PROJECT_DIR/include",
-         # "$PROJECT_DIR/lib/jes_err",
-         # "$PROJECT_DIR/lib/commands",
       ],
 
       CCFLAGS=[
