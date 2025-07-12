@@ -51,9 +51,11 @@ else:
       print(Color.R + f"Warning: Unsupported core {core} for FreeRTOS" + Color.X)
       freertos_port_path = None
 
-   if os.path.exists(os.path.join(env["PROJECT_LIBDEPS_DIR"], env["PIOENV"], "jescore")):
+   print(os.path.join(env["PROJECT_LIBDEPS_DIR"], env["PIOENV"]))
+   jescore_as_lib = os.path.join(env["PROJECT_LIBDEPS_DIR"], env["PIOENV"], "jescore")
+   if os.path.exists(jescore_as_lib):
       config_path = os.path.join(  
-         env.PioPlatform().get_package_dir("jescore"),
+         jescore_as_lib,
          "include", 
          "FreeRTOSConfig",  
          "FreeRTOSConfig.h"  

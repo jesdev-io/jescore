@@ -33,6 +33,7 @@
           "-I lib/job_names",
           "-I lib/unified"
         ],
-        "extraScript": "scripts/freertos_linking.py"
+        "extraScripts": ["scripts/freertos_linking.py",
+                         "scripts/build_time_macros.py"]
       }
   }
