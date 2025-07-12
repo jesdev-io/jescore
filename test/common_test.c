@@ -7,10 +7,14 @@
  * 
  */
 
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
+#include "board_parser.h"
+#ifdef BUILD_FOR_STM32
+#include "task.h"
+#include "queue.h"
+#endif
 #include <unity.h>
 #include "common_test.h"
+#include "delay_unif.h"
 
 
 void setUp(void) {
@@ -23,18 +27,17 @@ void tearDown(void) {
 }
 
 
-void test_all(void) {
-    vTaskDelay(2000 / portTICK_PERIOD_MS);
+void test_all(void* p) {
+    jes_delay_job_ms(2000);
     UNITY_BEGIN();
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    jes_delay_job_ms(1000);
 
     // Backend startup
     RUN_TEST(test_core_init);
-    vTaskDelay(100 / portTICK_PERIOD_MS);
+    jes_delay_job_ms(100);
     RUN_TEST(test_job_core);
     RUN_TEST(test_job_error_handler);
-    RUN_TEST(test_job_init_cli);
-    RUN_TEST(test_job_reprint_header);
+    RUN_TEST(test_cli_init);
     RUN_TEST(test_job_help);
     RUN_TEST(test_job_stats);
 

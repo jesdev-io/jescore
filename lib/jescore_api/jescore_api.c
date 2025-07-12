@@ -5,12 +5,20 @@
 #include "base_jobs.h"
 
 
-jes_err_t jes_init(){
+jes_err_t jes_init(void){
     return __core_init();
 }
 
+#ifdef BUILD_FOR_STM32
 
-jes_err_t register_job(const char* name,
+void jes_dispatch(void){
+    vTaskStartScheduler();
+}
+
+#endif // BUILD_FOR_STM32
+
+
+jes_err_t jes_register_job(const char* name,
                        uint32_t mem_size,
                        uint8_t priority,
                        void (*function)(void* p),
@@ -24,17 +32,17 @@ jes_err_t register_job(const char* name,
     }
 
 
-jes_err_t launch_job(const char* name){
+jes_err_t jes_launch_job(const char* name){
     return __job_launch_job_by_name(name, e_origin_api);
 }
 
 
-jes_err_t launch_job_args(const char* name, const char* args){
+jes_err_t jes_launch_job_args(const char* name, const char* args){
     return __job_launch_job_by_name_args(name, e_origin_api, args);
 }
 
 
-jes_err_t register_and_launch_job(const char* name,
+jes_err_t jes_register_and_launch_job(const char* name,
                                   uint32_t mem_size,
                                   uint8_t priority,
                                   void (*function)(void* p),
@@ -50,7 +58,7 @@ jes_err_t register_and_launch_job(const char* name,
 }
 
 
-jes_err_t set_args(char* s){
+jes_err_t jes_job_set_args(char* s){
     TaskHandle_t caller = xTaskGetCurrentTaskHandle();
     job_struct_t* pj = __job_get_job_by_handle(caller);
     if (pj == NULL) { return e_err_is_zero; }
@@ -58,7 +66,7 @@ jes_err_t set_args(char* s){
 }
 
 
-char* get_args(void){
+char* jes_job_get_args(void){
     TaskHandle_t caller = xTaskGetCurrentTaskHandle();
     job_struct_t* pj = __job_get_job_by_handle(caller);
     if (pj == NULL) { return NULL; }
@@ -66,7 +74,7 @@ char* get_args(void){
 }
 
 
-jes_err_t set_param(void* p){
+jes_err_t jes_job_set_param(void* p){
     TaskHandle_t caller = xTaskGetCurrentTaskHandle();
     job_struct_t* pj = __job_get_job_by_handle(caller);
     if (pj == NULL) { return e_err_is_zero; }
@@ -74,7 +82,7 @@ jes_err_t set_param(void* p){
 }
 
 
-void* job_get_param(void){
+void* jes_job_get_param(void){
     TaskHandle_t caller = xTaskGetCurrentTaskHandle();
     job_struct_t* pj = __job_get_job_by_handle(caller);
     if (pj == NULL) { return NULL; }
@@ -82,16 +90,16 @@ void* job_get_param(void){
 }
 
 
-void notify_job(const char* name, void* notification){
+void jes_notify_job(const char* name, void* notification){
     __job_notify_generic(__job_get_job_by_name(name), notification, 0);
 }
 
 
-void notify_job_ISR(const char* name, void* notification){
+void jes_notify_job_ISR(const char* name, void* notification){
     __job_notify_generic(__job_get_job_by_name(name), notification, 1);
 }
 
 
-void* wait_for_notification(void){
+void* jes_wait_for_notification(void){
     return __job_sleep_until_notified_generic();
 }

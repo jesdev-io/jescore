@@ -2,6 +2,8 @@
 #include "core.h"
 #include "core_job_names.h"
 #include "cli.h"
+#include "delay_unif.h"
+#include <malloc.h>
 
 jes_err_t __job_register_job(const char* n, 
                          uint32_t m,
@@ -120,12 +122,9 @@ void __job_runtime_env(void* p){
      * This is useful when an infinite job is triggered once by the CLI, otherwise
      * the prefix would never return.
     */
-    job_struct_t* pj_print = __job_get_job_by_name(HEADER_PRINTER_NAME);
-    if(pj->is_loop && pj_print != pj && cli_get_sess_state() == 1){
-        cli_set_sess_state(0);
-        pj_print->caller = e_origin_core;
-        __job_notify_with_job(__job_get_job_by_name(CORE_JOB_NAME), pj_print, 0);
-        // vTaskDelay(10 / portTICK_PERIOD_MS); // TODO: fix this!
+    if(pj->is_loop && __cli_get_sess_state() == 1){
+        __cli_set_sess_state(0);
+        __cli_reprint_header();
     }
     #endif
 
@@ -141,11 +140,10 @@ void __job_runtime_env(void* p){
     /* This section reprints the CLI prefix in case the started job is done.
      * This is the opposite of the similar looking statement above.
     */
-    if(!pj->is_loop && pj_print != pj && cli_get_sess_state() == 1){
-        cli_set_sess_state(0);
-        vTaskDelay(10 / portTICK_PERIOD_MS); // TODO: fix this!
-        pj_print->caller = e_origin_core;
-        __job_notify_with_job(__job_get_job_by_name(CORE_JOB_NAME), pj_print, 0);
+    if(!pj->is_loop && __cli_get_sess_state() == 1){
+        __cli_set_sess_state(0);
+        jes_delay_job_ms(50);
+        __cli_reprint_header();
     }
     #endif
     pj->handle = NULL;

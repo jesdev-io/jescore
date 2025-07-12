@@ -1,6 +1,3 @@
-#include "example_selector.h"
-#ifdef EXAMPLE_BLINK
-
 #include <Arduino.h>
 #include "jescore.h"
 
@@ -21,13 +18,14 @@ void blink(void* p){
 
 
 void setup() {
-    jes_init();
+    jes_err_t e = jes_init();
     pinMode(LED_PIN, OUTPUT);
-    register_and_launch_job("blink", 2048, 1, blink, 1);
+    if(e != e_err_no_err){
+        digitalWrite(LED_PIN, HIGH);
+    }
+    jes_register_and_launch_job("blink", 2048, 1, blink, 1);
 }
 
 void loop() {
 
 }
-
-#endif

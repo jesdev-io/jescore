@@ -1,5 +1,5 @@
-#ifndef FREERTOS_CONFIG_STM32_H
-#define FREERTOS_CONFIG_STM32_H
+#ifndef FREERTOS_CONFIG_H
+#define FREERTOS_CONFIG_H
 
 #include "board_parser.h"
 
@@ -23,7 +23,7 @@
 /*--- Memory allocation ---*/
 #define configSUPPORT_DYNAMIC_ALLOCATION        1
 #define configSUPPORT_STATIC_ALLOCATION         0
-#define configTOTAL_HEAP_SIZE                   ( ( size_t ) ( 10 * 1024 ) )
+#define configTOTAL_HEAP_SIZE                   ( ( size_t ) ( 30 * 1024 ) )
 
 /*--- Synchronization primitives ---*/
 #define configUSE_MUTEXES                       1
