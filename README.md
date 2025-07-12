@@ -16,8 +16,8 @@ The great thing about this name is that it can stand for "**J**'s **e**mbedded *
 ## Currently supported platforms
 |ESP32|STM32 (in development)|
 |-|-|
-|ESP32||
-|ESP32-C3||
+|ESP32|STM32L476|
+|ESP32-C3|STM32L432|
 |ESP32-S3||
 
 ## Get started, examples and use-cases
