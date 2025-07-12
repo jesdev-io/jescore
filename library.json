@@ -19,8 +19,8 @@
     "frameworks": "Arduino, stm32cube",
     "platforms": "espressif32, ststm32",
     "build": {
-        "srcDir": ".",
-        "includeDir": ".",
+        "srcDir": "src",
+        "includeDir": "include",
         "flags": [
           "-I src",
           "-I lib/base_jobs",
