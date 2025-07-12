@@ -1,3 +1,12 @@
+# -----------------------------------
+# Name: freertos_linking.py
+# Author: jake-is-ESD-protected
+# Date: 2025-07-12
+# Description: PlatformIO SConsScript that links the FreeRTOS source
+# shipped with PlatformIO.            
+# -----------------------------------
+
+
 class Color:
    R = '\033[91m'
    G = '\033[92m'

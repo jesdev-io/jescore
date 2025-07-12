@@ -1,5 +1,5 @@
-#ifndef FREERTOS_CONFIG_STM32_H
-#define FREERTOS_CONFIG_STM32_H
+#ifndef FREERTOS_CONFIG_H
+#define FREERTOS_CONFIG_H
 
 #include "board_parser.h"
 

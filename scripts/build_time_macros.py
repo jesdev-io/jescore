@@ -1,3 +1,12 @@
+# -----------------------------------
+# Name: build_time_macros.py
+# Author: jake-is-ESD-protected
+# Date: 2025-07-12
+# Description: PlatformIO SConsScript that fetches firmware version,
+# branch and commit hash and converts it to firmware macros.            
+# -----------------------------------
+
+
 Import("env")
 
 import json
@@ -5,7 +14,6 @@ import subprocess
 from os.path import exists
 
 def get_git_info():
-    # Try to get git branch
     try:
         branch = subprocess.check_output(
             ["git", "rev-parse", "--abbrev-ref", "HEAD"],
@@ -14,7 +22,6 @@ def get_git_info():
     except:
         branch = "unknown"
 
-    # Try to get git hash (short 7-character version)
     try:
         githash = subprocess.check_output(
             ["git", "rev-parse", "--short", "HEAD"],
@@ -52,7 +59,6 @@ def add_build_flags():
     fw_version = get_fw_version()
     git_branch, git_hash = get_git_info()
 
-    # Add macros as strings
     env.Append(
         CPPDEFINES=[
             ("JES_FW_VER", f'\\"{fw_version}\\"'),
@@ -67,5 +73,4 @@ def add_build_flags():
     print(f"Commit:   {git_hash}")
     print("=================================\n")
 
-# Execute the function
 add_build_flags()

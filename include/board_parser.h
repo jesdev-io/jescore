@@ -1,3 +1,37 @@
+/**
+ * @file board_parser.h
+ * @author jake-is-ESD-protected
+ * @date 2025-07-12
+ * @brief Board parser for avstraction of different hardware.
+ *
+ * This file defines the hardware specific inclusions and macros
+ * needed to make jescore be able to interact with the underlying hardware.
+ * While the ESP-platform is quite well abstracted already and does not need
+ * additional configuration for different boards, the STM platform requires 
+ * imports per family and macros per board. In order to run jescore with the
+ * CLI enabled, an STM-based project needs these macros for the specific board:
+ * 
+    #define BUILD_PLATFORM_NAME "<board type/name>"
+    #define USART_RCC_PERIPH RCC_PERIPHCLK_USART<num>
+    #define USART_CLK_SRC RCC_USART<num>CLKSOURCE_PCLK1
+    #define USART_CLK_ENABLE() __HAL_RCC_USART<num>_CLK_ENABLE()
+    #define USART_CLK_GPIO_ENABLE() __HAL_RCC_GPIO<port>_CLK_ENABLE()
+    #define USART_CLK_GPIO_DISABLE() __USART<num>_CLK_DISABLE();
+    #define USART_NUM USART<num>
+    #define USART_GPIO_TX_PORT GPIO<port>
+    #define USART_GPIO_RX_PORT GPIO<port>
+    #define USART_GPIO_TX_NUM GPIO_PIN_<pin>
+    #define USART_GPIO_RX_NUM GPIO_PIN_<pin>
+    #define USART_GPIO_TX_ALT GPIO_AF<AF num>_USART<num>
+    #define USART_GPIO_RX_ALT GPIO_AF<AF num>_USART<num>
+    #define USART_IRQn_NUM USART<num>_IRQn
+ * 
+ * where <num> is the UART peripheral index (often index 2), <port> is the GPIO
+ * bank of the UART TX and RX <pin>s. <AF num> denotes the alternate function
+ * index and is specific to the MCU. If BUILD_PLATFORM_NAME is not set, it defaults
+ * to "STM32" without the specific family number.
+ */
+
 #ifndef _BOARD_PARSER_H_
 #define _BOARD_PARSER_H_
 

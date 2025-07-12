@@ -9,8 +9,6 @@ extern "C" {
 #define ERROR_HANDLER_NAME  "errorhandler"
 #ifndef JES_DISABLE_CLI
 #define CLI_SERVER_NAME    "cliserver"
-#define HELP_NAME           "help"
-#define STATS_NAME          "stats"
 #endif
 
 #endif
