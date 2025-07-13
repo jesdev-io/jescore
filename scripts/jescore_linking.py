@@ -81,8 +81,6 @@ else:
         print("Local build of library...")
 
     mcu_flags = [
-        "-mfloat-abi=hard",
-        "-mfpu=fpv4-sp-d16",
         f"-mcpu={core}",
         "-mthumb",
         "-DUSE_HAL_DRIVER",
@@ -95,11 +93,6 @@ else:
         ],
         CCFLAGS=mcu_flags,
         CXXFLAGS=mcu_flags,
-        LINKFLAGS=[
-            "-mfloat-abi=hard",
-            "-mfpu=fpv4-sp-d16"
-        ],
-
         SRC_FILTER=[
             "+<**/*.c>",
             f"+<{freertos_base}/Middlewares/Third_Party/FreeRTOS/Source/*.c>",
@@ -108,6 +101,15 @@ else:
         ],
     )
 
+    fpu_args = [
+        "-mfloat-abi=hard",
+        "-mfpu=fpv4-sp-d16",
+    ]
+
+    if fpu_args[0] in env["BUILD_FLAGS"] and fpu_args[1] in env["BUILD_FLAGS"]:
+        print("Found FPU args")
+        env.Append(LINKFLAGS=fpu_args)
+    
     env.AppendUnique(
         BUILD_FLAGS=mcu_flags
     )
