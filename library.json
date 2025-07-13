@@ -21,6 +21,7 @@
     "build": {
         "srcDir": ".",
         "includeDir": "include",
+        "srcFilter": ["+<*>", "-<test/>", "-<examples/>"],
         "flags": [
           "-I src",
           "-I lib/base_jobs",
@@ -33,7 +34,6 @@
           "-I lib/job_names",
           "-I lib/unified"
         ],
-        "extraScripts": ["scripts/freertos_linking.py",
-                         "scripts/build_time_macros.py"]
+        "extraScript": "scripts/jescore_linking.py"
       }
   }
