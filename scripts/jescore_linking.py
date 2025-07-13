@@ -106,9 +106,10 @@ else:
         "-mfpu=fpv4-sp-d16",
     ]
 
-    if fpu_args[0] in env["BUILD_FLAGS"] and fpu_args[1] in env["BUILD_FLAGS"]:
-        print("Found FPU args")
-        env.Append(LINKFLAGS=fpu_args)
+    if env.get("BUILD_FLAGS", None):
+        if fpu_args[0] in env["BUILD_FLAGS"] and fpu_args[1] in env["BUILD_FLAGS"]:
+            print("Found FPU args")
+            env.Append(LINKFLAGS=fpu_args)
     
     env.AppendUnique(
         BUILD_FLAGS=mcu_flags
