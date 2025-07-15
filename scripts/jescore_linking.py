@@ -35,7 +35,8 @@ Import("env")
 import os
 import json
 import subprocess
-from os.path import exists
+from os.path import exists, join
+import inspect
 
 print(Color.C + "----------------------------------" + Color.X)
 print(Color.M + "*.*.* jescore dynamic linker *.*.*" + Color.X)
@@ -110,13 +111,31 @@ else:
         if fpu_args[0] in env["BUILD_FLAGS"] and fpu_args[1] in env["BUILD_FLAGS"]:
             print("Found FPU args")
             env.Append(LINKFLAGS=fpu_args)
-    
+
     env.AppendUnique(
         BUILD_FLAGS=mcu_flags
     )
 
     print(f"MCU: {Color.G + mcu + Color.X}, Core: {Color.G + core + Color.X}, STM Family: {Color.G + stm_family + Color.X}")
     print(f"FreeRTOS Path: {Color.G + freertos_port_path + Color.X}")
+
+    script_path = os.path.dirname(inspect.getfile(inspect.currentframe()))
+    lib_root = os.path.abspath(os.path.join(script_path, ".."))
+    mcu_dir = join(lib_root, "dynamic_src", mcu)
+
+    if os.path.isdir(mcu_dir):
+        dyn_sources = env.Glob(join(mcu_dir, "*.c")) + env.Glob(join(mcu_dir, "*.cpp"))
+        if dyn_sources:
+            obj_lib = env.BuildObjects(
+                target=env.subst(f"$BUILD_DIR/${{PIOENV}}/.dyn_{env.subst('PIOPACKAGE_NAME')}"),
+                source=dyn_sources
+            )
+            env.Append(
+                LIBSOURCE_GROUPS={"dynamic": obj_lib},
+                LIBS=["dynamic"],
+                LINKFLAGS=env.get("LINKFLAGS", [])
+            )
+
 
 
 
