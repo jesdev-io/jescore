@@ -94,12 +94,25 @@ else:
         ],
         CCFLAGS=mcu_flags,
         CXXFLAGS=mcu_flags,
-        SRC_FILTER=[
-            "+<**/*.c>",
-            f"+<{freertos_base}/Middlewares/Third_Party/FreeRTOS/Source/*.c>",
-            f"+<{freertos_port_path}/*.c>" if freertos_port_path else "",
-            f"+<{freertos_base}/Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c>",
-        ],
+    )
+
+
+    env.BuildSources(
+        "$BUILD_DIR/FreeRTOS_src",
+        f"{freertos_base}/Middlewares/Third_Party/FreeRTOS/Source",
+        src_filter=["+<*.c>"]
+    )
+
+    env.BuildSources(
+        "$BUILD_DIR/FreeRTOS_port",
+        f"{freertos_port_path}" if freertos_port_path else "",
+        src_filter=["+<*.c>"]
+    )
+
+    env.BuildSources(
+        "$BUILD_DIR/FreeRTOS_mem",
+        f"{freertos_base}/Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang",
+        src_filter=["-<*.c>", "+<heap_4.c>"]
     )
 
     fpu_args = [
