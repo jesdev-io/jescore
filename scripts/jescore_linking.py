@@ -36,7 +36,6 @@ import os
 import json
 import subprocess
 from os.path import exists, join
-import inspect
 
 print(Color.C + "----------------------------------" + Color.X)
 print(Color.M + "*.*.* jescore dynamic linker *.*.*" + Color.X)
@@ -87,6 +86,11 @@ else:
         "-DUSE_HAL_DRIVER",
     ]
 
+    fpu_args = [
+        "-mfloat-abi=hard",
+        "-mfpu=fpv4-sp-d16",
+    ]
+
     env.Append(
         CPPPATH=[
             f"{freertos_base}/Middlewares/Third_Party/FreeRTOS/Source/include",
@@ -96,6 +100,7 @@ else:
         CXXFLAGS=mcu_flags,
     )
 
+    env.Append(LINKFLAGS=fpu_args)
 
     env.BuildSources(
         "$BUILD_DIR/FreeRTOS_src",
@@ -115,15 +120,15 @@ else:
         src_filter=["-<*.c>", "+<heap_4.c>"]
     )
 
-    fpu_args = [
-        "-mfloat-abi=hard",
-        "-mfpu=fpv4-sp-d16",
-    ]
-
+    help_msg = Color.R + "Please add `build_flags = -mfloat-abi=hard -mfpu=fpv4-sp-d16` to your `platformio.ini` when building jescore for STM32!" + Color.X
     if env.get("BUILD_FLAGS", None):
-        if fpu_args[0] in env["BUILD_FLAGS"] and fpu_args[1] in env["BUILD_FLAGS"]:
-            print("Found FPU args")
-            env.Append(LINKFLAGS=fpu_args)
+        if not (fpu_args[0] in env["BUILD_FLAGS"] and fpu_args[1] in env["BUILD_FLAGS"]):
+            print(help_msg)
+            exit()
+    else:
+        print(help_msg)
+        exit()
+
 
     env.AppendUnique(
         BUILD_FLAGS=mcu_flags
@@ -131,26 +136,6 @@ else:
 
     print(f"MCU: {Color.G + mcu + Color.X}, Core: {Color.G + core + Color.X}, STM Family: {Color.G + stm_family + Color.X}")
     print(f"FreeRTOS Path: {Color.G + freertos_port_path + Color.X}")
-
-    script_path = os.path.dirname(inspect.getfile(inspect.currentframe()))
-    lib_root = os.path.abspath(os.path.join(script_path, ".."))
-    mcu_dir = join(lib_root, "dynamic_src", mcu)
-
-    if os.path.isdir(mcu_dir):
-        dyn_sources = env.Glob(join(mcu_dir, "*.c")) + env.Glob(join(mcu_dir, "*.cpp"))
-        if dyn_sources:
-            obj_lib = env.BuildObjects(
-                target=env.subst(f"$BUILD_DIR/${{PIOENV}}/.dyn_{env.subst('PIOPACKAGE_NAME')}"),
-                source=dyn_sources
-            )
-            env.Append(
-                LIBSOURCE_GROUPS={"dynamic": obj_lib},
-                LIBS=["dynamic"],
-                LINKFLAGS=env.get("LINKFLAGS", [])
-            )
-
-
-
 
 
 def get_git_info():
