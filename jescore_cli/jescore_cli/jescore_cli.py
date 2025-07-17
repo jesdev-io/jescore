@@ -31,6 +31,13 @@ class CjescoreCli:
         if args.verbose:
             self.verbose = True
 
+    def discoverPorts(self):
+        ports = list(list_ports.comports())
+        for port in ports:
+            for device, host in KNOWN_HOSTS.items():
+                if host in port.hwid:
+                    print(f"{device}({host}) on port {port.name}")
+
     def portAutoDetect(self):
         ports = list(list_ports.comports())
         for port in ports:
@@ -46,8 +53,11 @@ class CjescoreCli:
             return f"/dev/{port}"
         return port
     
-    def uartTransceive(self, msg: str, waitTime: float = 0.01) -> str:
-        port_name = self.__getPort()
+    def uartTransceive(self, msg: str, port: str = None, waitTime: float = 0.01) -> str:
+        if port:
+            port_name = port
+        else:
+            port_name = self.__getPort()
         self.__vPrint(f"Sending raw string '{msg}' to jescore on port {port_name}")
         ser = serial.Serial(port_name, baudrate=self.baudrate, timeout=waitTime)
         ser.flush()
@@ -82,12 +92,17 @@ def main():
     parser.add_argument("-p", "--port", type=str, help="Specify the port for connection")
     parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose output")
     parser.add_argument("-b", "--baudrate", type=int, default=115200, help="Baud rate for communication (default: 115200)")
+    parser.add_argument("-d", "--discover", action="store_true", help="Discover connected devices known to jescore")
 
     # Capture both known and unknown arguments
     args, unknown_args = parser.parse_known_args()
 
     cli = CjescoreCli(baudrate=args.baudrate, verbose=args.verbose, port=args.port)
     cli.applyArgs(args)
+
+    if args.discover:
+        cli.discoverPorts()
+        return
 
     # Join all command parts (including unknown arguments) into a single command string
     command_to_send = ' '.join([args.command] + unknown_args) if args.command else ' '.join(unknown_args)

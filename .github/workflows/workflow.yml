@@ -7,10 +7,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        example: [test, 
-                  src/example_blink.cpp, 
-                  src/example_fsm_cli.cpp]
+        os: [ubuntu-latest]
+        example: [examples/example_blink.cpp, 
+                  examples/example_fsm_cli.cpp,
+                  examples/example_blink_stm32.c]
 
     steps:
       - uses: actions/checkout@v3

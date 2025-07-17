@@ -1,6 +1,3 @@
-#include "example_selector.h"
-#ifdef EXAMPLE_FSM_CLI
-
 #include <Arduino.h>
 #include "jescore.h"
 #include <string.h>
@@ -16,9 +13,9 @@ void lights(void* p){
     CLI command is "lights", as registered in line 60 below. All
     other words that follow, such as "on" or "off" will pe passed
     as args to this job and can be retrieved as full string with
-    get_args().
+    jes_job_get_args().
     */
-    char* args = get_args();
+    char* args = jes_job_get_args();
     char* arg = strtok(args, " ");
     if (!arg){
         uart_unif_write("No argument specified! Use <on> or <off>\n\r");
@@ -30,7 +27,7 @@ void lights(void* p){
         processing = true;
         for(uint8_t i = 0; i < 255; i++){
             analogWrite(LED_PIN, i);
-            vTaskDelay(5 / portTICK_PERIOD_MS);
+            jes_delay_job_ms(5);
         }
         is_on = true;
         processing = false;
@@ -41,7 +38,7 @@ void lights(void* p){
         processing = true;
         for(uint8_t i = 255; i > 0; i--){
             analogWrite(LED_PIN, i);
-            vTaskDelay(5 / portTICK_PERIOD_MS);
+            jes_delay_job_ms(5);
         }
         is_on = false;
         processing = false;
@@ -57,7 +54,7 @@ void lights(void* p){
 void setup() {
     jes_init();
     pinMode(LED_PIN, OUTPUT);
-    register_job("lights", 2048, 1, lights, false);
+    jes_register_job("lights", 2048, 1, lights, false);
 }
 
 void loop() {
@@ -67,5 +64,3 @@ void loop() {
     // call `jescore lights status` to get a print
     // of the current status of the LED FSM
 }
-
-#endif

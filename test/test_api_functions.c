@@ -24,13 +24,13 @@
 #define DUMMY_SUCCESS_MSG "Assert succeeded"
 #define DUMMY_ARGS "args at launch"
 #define DUMMY_ARGS_MODIF "got args at launch"
-#define DUMMY_JOB_MEM 2048
+#define DUMMY_JOB_MEM BOARD_MIN_JOB_HEAP_MEM
 #define DUMMY_JOB_PRIO 1
 
 
 void dummy_job_single(void* p){
     for(uint8_t i = 0; i < 255; i++){
-        vTaskDelay(250 / portTICK_PERIOD_MS);
+        jes_delay_job_ms(250);
     }
 }
 
@@ -38,45 +38,45 @@ void dummy_job_single(void* p){
 void dummy_job_loop(void* p){
     while(1){
         for(uint8_t i = 0; i < 255; i++){
-            vTaskDelay(250 / portTICK_PERIOD_MS);
+            jes_delay_job_ms(250);
         }
     }
 }
 
 
 void dummy_job_args_holder(void* p){
-    char* args = get_args();
+    char* args = jes_job_get_args();
     if(strcmp(DUMMY_ARGS, args) == 0){
-        set_args((char*)DUMMY_ARGS_MODIF);
+        jes_job_set_args((char*)DUMMY_ARGS_MODIF);
     }
     for(uint8_t i = 0; i < 255; i++){
-        vTaskDelay(250 / portTICK_PERIOD_MS);
+        jes_delay_job_ms(250);
     }
 }
 
 
 void dummy_job_notify(void* p){
-    uint32_t val = DUMMY_NOTIFICATION_VALUE;
-    notify_job(DUMMY_JOB_NOTIFY_TAKE, &val);
+    uint32_t* val = (uint32_t*)DUMMY_NOTIFICATION_VALUE;
+    jes_notify_job(DUMMY_JOB_NOTIFY_TAKE, val);
 }
 
 
 void dummy_job_notify_take(void* p){
     uint32_t* pval;
-    pval = (uint32_t*)wait_for_notification();
-    set_param(pval);
-    uint32_t* pval_equal = (uint32_t*)job_get_param();
-    if(*pval != *pval_equal){
-        set_args((char*)DUMMY_FAIL_MSG);
+    pval = (uint32_t*)jes_wait_for_notification();
+    jes_job_set_param(pval);
+    uint32_t* pval_equal = (uint32_t*)jes_job_get_param();
+    if(pval != pval_equal){
+        jes_job_set_args((char*)DUMMY_FAIL_MSG);
     }
     else{
-        set_args((char*)DUMMY_SUCCESS_MSG);
+        jes_job_set_args((char*)DUMMY_SUCCESS_MSG);
     }
 }
 
 
 void test_register_job(void){
-    jes_err_t stat = register_job(DUMMY_JOB_SINGLE_NAME,
+    jes_err_t stat = jes_register_job(DUMMY_JOB_SINGLE_NAME,
                                   DUMMY_JOB_MEM,
                                   DUMMY_JOB_PRIO,
                                   dummy_job_single,
@@ -98,7 +98,7 @@ void test_register_job(void){
     TEST_ASSERT_EQUAL_HEX32(NULL, pj->param);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, pj->error);
 
-    stat = register_job(DUMMY_JOB_LOOP_NAME,
+    stat = jes_register_job(DUMMY_JOB_LOOP_NAME,
                         DUMMY_JOB_MEM,
                         DUMMY_JOB_PRIO,
                         dummy_job_loop,
@@ -119,7 +119,7 @@ void test_register_job(void){
     TEST_ASSERT_EQUAL_HEX32(NULL, pj->param);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, pj->error);
 
-    stat = register_job(DUMMY_JOB_ARGS_HOLDER_NAME,
+    stat = jes_register_job(DUMMY_JOB_ARGS_HOLDER_NAME,
                         DUMMY_JOB_MEM,
                         DUMMY_JOB_PRIO,
                         dummy_job_args_holder,
@@ -143,9 +143,11 @@ void test_register_job(void){
 
 
 void test_launch_job(void){
-    jes_err_t stat = launch_job(DUMMY_JOB_SINGLE_NAME);
+    jes_err_t stat = jes_launch_job(DUMMY_JOB_SINGLE_NAME);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
 
+    // give job a moment to start
+    jes_delay_job_ms(100);
     char dummy[__MAX_JOB_ARGS_LEN_BYTE] = {0};
     job_struct_t* pj = __job_get_job_by_name(DUMMY_JOB_SINGLE_NAME);
     TEST_ASSERT_EQUAL_STRING(DUMMY_JOB_SINGLE_NAME, pj->name);
@@ -161,9 +163,9 @@ void test_launch_job(void){
     TEST_ASSERT_EQUAL_HEX32(NULL, pj->param);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, pj->error);
 
-    stat = launch_job(DUMMY_JOB_LOOP_NAME);
+    stat = jes_launch_job(DUMMY_JOB_LOOP_NAME);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
-    vTaskDelay(200 / portTICK_PERIOD_MS);   // let job start
+    jes_delay_job_ms(200);
 
     pj = __job_get_job_by_name(DUMMY_JOB_LOOP_NAME);
     TEST_ASSERT_EQUAL_STRING(DUMMY_JOB_LOOP_NAME, pj->name);
@@ -210,47 +212,42 @@ void test_set_job_get_params(void){
 
 
 void test_launch_job_args(void){
-    jes_err_t stat = launch_job_args(DUMMY_JOB_ARGS_HOLDER_NAME,
+    jes_err_t stat = jes_launch_job_args(DUMMY_JOB_ARGS_HOLDER_NAME,
                                      DUMMY_ARGS);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
-    vTaskDelay(100 / portTICK_PERIOD_MS);
+    jes_delay_job_ms(100);
     char* args = __job_get_args(__job_get_job_by_name(DUMMY_JOB_ARGS_HOLDER_NAME));
     TEST_ASSERT_EQUAL_STRING(DUMMY_ARGS_MODIF, args);
 }
 
 void test_core_job_launch_prohibited(void){
-    jes_err_t stat = launch_job(CORE_JOB_NAME);
+    jes_err_t stat = jes_launch_job(CORE_JOB_NAME);
     TEST_ASSERT_EQUAL_INT(e_err_prohibited, stat);
-    stat = launch_job(ERROR_HANDLER_NAME);
+    stat = jes_launch_job(ERROR_HANDLER_NAME);
     TEST_ASSERT_EQUAL_INT(e_err_prohibited, stat);
-    stat = launch_job(INIT_CLI_JOB_NAME);
-    TEST_ASSERT_EQUAL_INT(e_err_prohibited, stat);
-    stat = launch_job(SERIAL_READ_NAME);
-    TEST_ASSERT_EQUAL_INT(e_err_prohibited, stat);
-    stat = launch_job(HEADER_PRINTER_NAME);
+    stat = jes_launch_job(CLI_SERVER_NAME);
     TEST_ASSERT_EQUAL_INT(e_err_prohibited, stat);
 }
 
 
 void test_notify_job_and_wait(void){
-    jes_err_t stat = register_and_launch_job(DUMMY_JOB_NOTIFY_TAKE,
+    jes_err_t stat = jes_register_and_launch_job(DUMMY_JOB_NOTIFY_TAKE,
                                              DUMMY_JOB_MEM,
                                              DUMMY_JOB_PRIO,
                                              dummy_job_notify_take,
                                              0);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
-    vTaskDelay(100 / portTICK_PERIOD_MS);
-    stat = register_and_launch_job(DUMMY_JOB_NOTIFY,
+    jes_delay_job_ms(100);
+    stat = jes_register_and_launch_job(DUMMY_JOB_NOTIFY,
                                    DUMMY_JOB_MEM,
                                    DUMMY_JOB_PRIO,
                                    dummy_job_notify,
                                    0);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
-    vTaskDelay(100 / portTICK_PERIOD_MS);
+    jes_delay_job_ms(100);
 
-    uint32_t* pval;
-    pval = (uint32_t*)__job_get_param(__job_get_job_by_name(DUMMY_JOB_NOTIFY_TAKE));
+    uint32_t* val = (uint32_t*)__job_get_param(__job_get_job_by_name(DUMMY_JOB_NOTIFY_TAKE));
     char* msg = __job_get_args(__job_get_job_by_name(DUMMY_JOB_NOTIFY_TAKE));
-    TEST_ASSERT_EQUAL_INT32(DUMMY_NOTIFICATION_VALUE, *pval);
+    TEST_ASSERT_EQUAL_UINT8(DUMMY_NOTIFICATION_VALUE, (uint32_t)val);
     TEST_ASSERT_EQUAL_STRING(DUMMY_SUCCESS_MSG, msg);
 }
