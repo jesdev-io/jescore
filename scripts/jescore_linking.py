@@ -37,9 +37,9 @@ import json
 import subprocess
 from os.path import exists, join
 
-print(Color.C + "----------------------------------" + Color.X)
+print(Color.G + "----------------------------------" + Color.X)
 print(Color.M + "*.*.* jescore dynamic linker *.*.*" + Color.X)
-print(Color.C + "----------------------------------" + Color.X)
+print(Color.G + "----------------------------------" + Color.X)
 
 # Get MCU and board info from PlatformIO
 board = env.BoardConfig()
@@ -56,17 +56,36 @@ else:
     # Determine STM32 family (e.g., "stm32l4", "stm32f4")
     stm_family = mcu[:7].lower() if mcu.startswith("stm32") else "unknown"
 
+    # FreeRTOS path based on MCU family
     freertos_base = f"$PROJECT_PACKAGES_DIR/framework-stm32cube{stm_family[5:7]}"  # e.g., "l4", "f4"
 
-    if "cortex-m4" in core:
-        freertos_port_path = f"{freertos_base}/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F"
-    elif "cortex-m33" in core:
-        freertos_port_path = f"{freertos_base}/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM33_NTZ/non_secure"
+    # Determine the correct architecture port path for FreeRTOS.
+    if "cortex-m0" in core:
+        freertos_port_path = f"{freertos_base}/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM0"
+    elif "cortex-m3" in core:
+        if "cortex-m33" in core:
+            freertos_port_path = f"{freertos_base}/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM33_NTZ"
+        else:
+            freertos_port_path = f"{freertos_base}/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3"
+    elif "cortex-m4" in core:
+        if "cortex-m4+mpu" in core:
+            freertos_port_path = f"{freertos_base}/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4_MPU"
+        else:
+            freertos_port_path = f"{freertos_base}/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F"
+    elif "cortex-m7" in core:
+        if "cortex-m7+mpu" in core:
+            freertos_port_path = f"{freertos_base}/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7_MPU"
+        else:
+            freertos_port_path = f"{freertos_base}/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7"
+    elif "cortex-m23" in core:
+        freertos_port_path = f"{freertos_base}/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM23_NTZ"
     else:
         print(Color.R + f"Warning: Unsupported core {core} for FreeRTOS" + Color.X)
         freertos_port_path = None
 
+    # Check if jescore is used as library and append the FreeRTOS config.
     jescore_as_lib = os.path.join(env["PROJECT_LIBDEPS_DIR"], env["PIOENV"], "jescore")
+    is_lib = False
     if os.path.exists(jescore_as_lib):
         config_path = os.path.join(  
             jescore_as_lib,
@@ -76,9 +95,11 @@ else:
         )  
         env.Append(CPPPATH=[os.path.dirname(config_path)])  
         print(f"Added STM32 FreeRTOSConfig.h from: {config_path}")  
+        is_lib = True
     else:
         env.Append(CPPPATH=["$PROJECT_DIR/include/FreeRTOSConfig"]) 
         print("Local build of library...")
+        jescore_as_lib = "."
 
     mcu_flags = [
         f"-mcpu={core}",
@@ -91,6 +112,16 @@ else:
         "-mfpu=fpv4-sp-d16",
     ]
 
+    # Fail in case that FPU specifiers are not set from outside (can't be set from in here)
+    help_msg = Color.R + "Please add `build_flags = -mfloat-abi=hard -mfpu=fpv4-sp-d16` to your `platformio.ini` when building jescore for STM32!" + Color.X
+    if env.get("BUILD_FLAGS", None):
+        if not (fpu_args[0] in env["BUILD_FLAGS"] and fpu_args[1] in env["BUILD_FLAGS"]):
+            print(help_msg)
+            env.Fatal()
+    else:
+        print(help_msg)
+        env.Fatal()
+
     env.Append(
         CPPPATH=[
             f"{freertos_base}/Middlewares/Third_Party/FreeRTOS/Source/include",
@@ -98,9 +129,8 @@ else:
         ],
         CCFLAGS=mcu_flags,
         CXXFLAGS=mcu_flags,
+        LINKFLAGS=fpu_args
     )
-
-    env.Append(LINKFLAGS=fpu_args)
 
     env.BuildSources(
         "$BUILD_DIR/FreeRTOS_src",
@@ -120,20 +150,6 @@ else:
         src_filter=["-<*.c>", "+<heap_4.c>"]
     )
 
-    help_msg = Color.R + "Please add `build_flags = -mfloat-abi=hard -mfpu=fpv4-sp-d16` to your `platformio.ini` when building jescore for STM32!" + Color.X
-    if env.get("BUILD_FLAGS", None):
-        if not (fpu_args[0] in env["BUILD_FLAGS"] and fpu_args[1] in env["BUILD_FLAGS"]):
-            print(help_msg)
-            exit()
-    else:
-        print(help_msg)
-        exit()
-
-
-    env.AppendUnique(
-        BUILD_FLAGS=mcu_flags
-    )
-
     print(f"MCU: {Color.G + mcu + Color.X}, Core: {Color.G + core + Color.X}, STM Family: {Color.G + stm_family + Color.X}")
     print(f"FreeRTOS Path: {Color.G + freertos_port_path + Color.X}")
 
@@ -141,7 +157,7 @@ else:
 def get_git_info():
     try:
         branch = subprocess.check_output(
-            ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+            ["git", "-C", jescore_as_lib, "rev-parse", "--abbrev-ref", "HEAD"],
             stderr=subprocess.STDOUT
         ).decode("utf-8").strip()
     except:
@@ -149,7 +165,7 @@ def get_git_info():
 
     try:
         githash = subprocess.check_output(
-            ["git", "rev-parse", "--short", "HEAD"],
+            ["git", "-C", jescore_as_lib, "rev-parse", "--short", "HEAD"],
             stderr=subprocess.STDOUT
         ).decode("utf-8").strip()
     except:
@@ -166,6 +182,7 @@ def get_fw_version():
     ]
 
     for file in version_files:
+        file = join(jescore_as_lib, file)
         if exists(file):
             try:
                 with open(file) as f:
@@ -192,10 +209,10 @@ def add_build_flags():
         ]
     )
 
-    print("\n==== Firmware Build Information ====")
-    print(f"Version:  {fw_version}")
-    print(f"Branch:   {git_branch}")
-    print(f"Commit:   {git_hash}")
-    print("=================================\n")
+    print("\n==== jescore Build Information ====")
+    print(f"Version:  {Color.G + fw_version + Color.X}")
+    print(f"Branch:   {Color.G + git_branch + Color.X}")
+    print(f"Commit:   {Color.G + git_hash + Color.X}")
+    print("=====================================\n")
 
 add_build_flags()
