@@ -47,6 +47,8 @@ mcu = board.get("build.mcu", "").lower()  # e.g., "stm32l476rg"
 core = board.get("build.cpu", "").lower()  # e.g., "cortex-m4"
 vendor = board.get("build.vendor", "").lower()  # e.g., "st"
 
+jescore_as_lib = os.path.join(env["PROJECT_LIBDEPS_DIR"], env["PIOENV"], "jescore")
+
 print(f"Starting dynamic linking script for jescore on {Color.G + mcu + Color.X} ...")
 # ESP32 specific linking is done out-of-the-box
 if "esp" in mcu:
@@ -84,7 +86,6 @@ else:
         freertos_port_path = None
 
     # Check if jescore is used as library and append the FreeRTOS config.
-    jescore_as_lib = os.path.join(env["PROJECT_LIBDEPS_DIR"], env["PIOENV"], "jescore")
     is_lib = False
     if os.path.exists(jescore_as_lib):
         config_path = os.path.join(  
