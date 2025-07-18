@@ -26,6 +26,10 @@
         "jescore.wiki"
       ]
     },
+    "headers": [
+      "jescore.h",
+      "uart_unif.h"
+    ],
     "build": {
         "srcDir": ".",
         "includeDir": "include",
