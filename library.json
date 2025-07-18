@@ -1,6 +1,6 @@
 {
     "name": "jescore",
-    "version": "2.0.0",
+    "version": "2.0.0post1",
     "description": "FreeRTOS attached core for easier multitasking and native CLI support",
     "keywords": "core, FreeRTOS",
     "repository":
