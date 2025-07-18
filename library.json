@@ -15,9 +15,17 @@
         "url": "https://github.com/jake-is-ESD-protected"
       }
     ],
-    "license": "Apache 2.0",
+    "license": "Apache-2.0",
     "frameworks": "Arduino, stm32cube",
     "platforms": "espressif32, ststm32",
+    "export": {
+      "exclude": [
+        ".pio",
+        ".venv*",
+        ".vscode",
+        "jescore.wiki"
+      ]
+    },
     "build": {
         "srcDir": ".",
         "includeDir": "include",
