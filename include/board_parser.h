@@ -119,6 +119,8 @@
 #define USART_GPIO_TX_ALT GPIO_AF7_USART2
 #define USART_GPIO_RX_ALT GPIO_AF7_USART2
 #define USART_IRQn_NUM USART2_IRQn
+#define MAX_JESCORE_KB_MEM 28 // default in FreeRTOSConfig.h is too much
+
 #endif // STM32G431xx
 
 #endif
