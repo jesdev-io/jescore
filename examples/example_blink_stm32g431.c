@@ -8,9 +8,9 @@ static void MX_GPIO_Init(void);
 void Error_Handler();
 
 // definitions for a Nucleo-L476RG
-#define LED_PORT GPIOA
-#define LED_GPIO GPIO_PIN_5
-#define LED_ENABLE_PORT() __HAL_RCC_GPIOA_CLK_ENABLE()
+#define LED_PORT GPIOB
+#define LED_GPIO GPIO_PIN_8
+#define LED_ENABLE_PORT() __HAL_RCC_GPIOB_CLK_ENABLE()
 
 void blink(void* p){
     static uint8_t act = 0;
