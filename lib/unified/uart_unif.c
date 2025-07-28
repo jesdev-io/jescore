@@ -103,15 +103,7 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t len){
 void HAL_UART_MspInit(UART_HandleTypeDef* huart){
     GPIO_InitTypeDef GPIO_InitStruct = {0};
     RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
-    if(huart->Instance==USART1){
-        PeriphClkInit.Usart1ClockSelection = USART_CLK_SRC;
-    }
-    else if(huart->Instance==USART2){
-        PeriphClkInit.Usart2ClockSelection = USART_CLK_SRC;
-    }
-    else{
-        /// TODO: 
-    }
+    USART_CLK_SRC_DEFAULT(PeriphClkInit);
     PeriphClkInit.PeriphClockSelection = USART_RCC_PERIPH;
     if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK){
         /// TODO: figure out how to return driver issues for this
@@ -159,6 +151,10 @@ void USART1_IRQHandler(void){
 }
 
 void USART2_IRQHandler(void){
+    HAL_UART_IRQHandler(&huart_num);
+}
+
+void USART3_IRQHandler(void){
     HAL_UART_IRQHandler(&huart_num);
 }
 

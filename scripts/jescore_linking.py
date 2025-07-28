@@ -76,9 +76,9 @@ else:
             freertos_port_path = f"{freertos_base}/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F"
     elif "cortex-m7" in core:
         if "cortex-m7+mpu" in core:
-            freertos_port_path = f"{freertos_base}/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7_MPU"
+            freertos_port_path = f"{freertos_base}/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7_MPU/r0p1"
         else:
-            freertos_port_path = f"{freertos_base}/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7"
+            freertos_port_path = f"{freertos_base}/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1"
     elif "cortex-m23" in core:
         freertos_port_path = f"{freertos_base}/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM23_NTZ"
     else:

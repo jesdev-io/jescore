@@ -20,7 +20,8 @@ General baseline constants
 KNOWN_HOSTS =  {"Electrosmith Daisy Seed": "VID:PID=0483:5740",
                 "Generic board with CH340 USB-to-UART converter": "VID:PID=1A86:7523",
                 "USB enhanced serial CH343": "VID:PID=1A86:55D3",
-                "ST LINK": "VID:PID=0483:374B"}
+                "ST LINK": "VID:PID=0483:374B",
+                "ST LINK V3": "VID:PID=0483:374E"}
 CLI_PREFIX_CLIENT = "[jescore]:\t"
 CLI_PREFIX_MCU = "jescore $ "
 CLI_CLIENT_IDENTIFIER = "@py" # unused

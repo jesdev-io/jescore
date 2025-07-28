@@ -3,6 +3,12 @@
 
 #include "board_parser.h"
 
+#ifndef MAX_JESCORE_KB_MEM
+#define __MAX_JESCORE_KB_MEM 30
+#else
+#define __MAX_JESCORE_KB_MEM MAX_JESCORE_KB_MEM
+#endif
+
 /*--- Scheduler behavior ---*/
 #define configUSE_PREEMPTION                    1
 #define configUSE_TIME_SLICING                  1
@@ -23,7 +29,7 @@
 /*--- Memory allocation ---*/
 #define configSUPPORT_DYNAMIC_ALLOCATION        1
 #define configSUPPORT_STATIC_ALLOCATION         0
-#define configTOTAL_HEAP_SIZE                   ( ( size_t ) ( 30 * 1024 ) )
+#define configTOTAL_HEAP_SIZE                   ( ( size_t ) ( __MAX_JESCORE_KB_MEM * 1024 ) )
 
 /*--- Synchronization primitives ---*/
 #define configUSE_MUTEXES                       1

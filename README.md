@@ -18,7 +18,8 @@ The great thing about this name is that it can stand for "**J**'s **e**mbedded *
 |-|-|
 |ESP32|STM32L476|
 |ESP32-C3|STM32L432|
-|ESP32-S3||
+|ESP32-S3|STM32G431|
+||STM32H753|
 
 ## Get started, examples and use-cases
 
