@@ -33,12 +33,23 @@ jes_err_t jes_register_job(const char* name,
 
 
 jes_err_t jes_launch_job(const char* name){
-    return __job_launch_job_by_name(name, e_origin_api);
+    job_struct_t* pj = __job_get_job_by_name(name);
+    if(pj == NULL) { return e_err_unknown_job; }
+    pj->caller = e_origin_api;
+    __core_notify(pj, 0);
+    return e_err_no_err;
 }
 
 
 jes_err_t jes_launch_job_args(const char* name, const char* args){
-    return __job_launch_job_by_name_args(name, e_origin_api, args);
+    if (args == NULL) { return e_err_is_zero; }
+    job_struct_t* pj = __job_get_job_by_name(name);
+    if(pj == NULL) { return e_err_unknown_job; }
+    jes_err_t e = __job_set_args((char*)args, pj);
+    if (e != e_err_no_err) { return e; }
+    pj->caller = e_origin_api;
+    __core_notify(pj, 0);
+    return e_err_no_err;
 }
 
 
@@ -54,7 +65,7 @@ jes_err_t jes_register_and_launch_job(const char* name,
                                         is_loop,
                                         e_role_user);
     if(stat != e_err_no_err){ return stat; }
-    return __job_launch_job_by_name(name, e_origin_api);
+    return jes_launch_job(name);
 }
 
 

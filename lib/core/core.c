@@ -108,6 +108,7 @@ void __core_job(void* p){
                 core.state = e_state_fault;
                 __core_err_handler_inline(e, NULL);
             }
+            pj->error = e;
         }
         core.state = e_state_idle;
     }
