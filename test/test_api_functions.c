@@ -220,13 +220,30 @@ void test_launch_job_args(void){
     TEST_ASSERT_EQUAL_STRING(DUMMY_ARGS_MODIF, args);
 }
 
+void test_error_throw_get(void){
+    jes_err_t e;
+    e = jes_error_get(DUMMY_JOB_LOOP_NAME);
+    TEST_ASSERT_EQUAL(e_err_no_err, e);
+    e = jes_error_get_any();
+    TEST_ASSERT_EQUAL(e_err_no_err, e);
+    __core_error_throw(e_err_driver_fail, __job_get_job_by_name(DUMMY_JOB_LOOP_NAME));
+    e = jes_error_get(DUMMY_JOB_LOOP_NAME);
+    TEST_ASSERT_EQUAL(e_err_driver_fail, e);
+}
+
 void test_core_job_launch_prohibited(void){
     jes_err_t stat = jes_launch_job(CORE_JOB_NAME);
-    TEST_ASSERT_EQUAL_INT(e_err_prohibited, stat);
+    TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
+    jes_delay_job_ms(10);
+    TEST_ASSERT_EQUAL(e_err_prohibited, jes_error_get(CORE_JOB_NAME));
     stat = jes_launch_job(ERROR_HANDLER_NAME);
-    TEST_ASSERT_EQUAL_INT(e_err_prohibited, stat);
+    TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
+    jes_delay_job_ms(10);
+    TEST_ASSERT_EQUAL(e_err_prohibited, jes_error_get(ERROR_HANDLER_NAME));
     stat = jes_launch_job(CLI_SERVER_NAME);
-    TEST_ASSERT_EQUAL_INT(e_err_prohibited, stat);
+    TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
+    jes_delay_job_ms(10);
+    TEST_ASSERT_EQUAL(e_err_prohibited, jes_error_get(CLI_SERVER_NAME));
 }
 
 

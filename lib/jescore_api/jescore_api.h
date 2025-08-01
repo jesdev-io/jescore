@@ -87,6 +87,20 @@ jes_err_t jes_job_set_args(char* s);
 char* jes_job_get_args(void);
 
 
+/// @brief Get the next arg from the args field.
+/// @return Next arg delimited by a whitespace.
+/// @note Use this in an arg-parsing loop.
+char* jes_job_arg_next(void);
+
+
+/// @brief Check if two args are the same.
+/// @param arg Input arg from `jes_job_get_args()` or `jes_job_arg_next()`
+/// @param name Name of arg to compare.
+/// @return 1 if matching, 0 if not.
+/// @note Use this in an arg-parsing loop.
+uint8_t jes_job_is_arg(char* arg, const char* name);
+
+
 /// @brief Set the field `param` of the calling job.
 /// @param p: Arbitrary reference to parameter.
 /// @return status, `e_err_no_err` if OK.
@@ -97,6 +111,28 @@ jes_err_t jes_job_set_param(void* p);
 /// @return Pointer to `param` field of the job.
 /// @attention Will return NULL on error.
 void* jes_job_get_param(void);
+
+
+/// @brief Get the field `error` of a given job.
+/// @param job_name Name of the job.
+/// @return Stored error.
+jes_err_t jes_error_get(char* job_name);
+
+
+/// @brief Get the first error that of all jobs.
+/// @return Error of first job that has one.
+/// @note Returns `e_err_no_err` in case that every
+///       job is error-free.
+/// @note Use this function to quickly spot if the
+///       program is error free.
+jes_err_t jes_error_get_any(void);
+
+
+/// @brief Throw an error that is registered in the core.
+/// @param e Error to throw.
+/// @note This is useful to let other jobs or the core know when
+///       a job exits based on a user condition.
+void jes_throw_error(jes_err_t e);
 
 
 /// @brief Notify a job with an optional message.

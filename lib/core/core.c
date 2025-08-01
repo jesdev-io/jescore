@@ -93,6 +93,33 @@ __job_notify_with_job(__job_get_job_by_name(CORE_JOB_NAME),
 }
 
 
+jes_err_t __core_error_get(char* job_name){
+    job_struct_t* pj = __job_get_job_by_name(job_name);
+    if (pj == NULL) { return e_err_unknown_job; }
+    return pj->error;
+}
+
+
+jes_err_t __core_error_get_any(){
+    job_struct_t** job_list = __core_get_job_list();
+    job_struct_t* cur = *job_list;
+    jes_err_t e;
+    while(cur != NULL){
+        e = cur->error;
+        if(e != e_err_no_err) { return e; }
+        cur = cur->pn;
+    }
+    return e_err_no_err;
+}
+
+
+void __core_error_throw(jes_err_t e, job_struct_t* pj){
+    if (pj == NULL) { return; }
+    pj->error = e;
+}
+
+
+
 void __core_job(void* p){
     while(1){
         job_struct_t* pj = __job_sleep_until_notified_with_job();
@@ -108,6 +135,7 @@ void __core_job(void* p){
                 core.state = e_state_fault;
                 __core_err_handler_inline(e, NULL);
             }
+            pj->error = e;
         }
         core.state = e_state_idle;
     }

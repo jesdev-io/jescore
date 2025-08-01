@@ -61,6 +61,23 @@ void __core_notify(job_struct_t* pjob_to_run,
                     uint8_t from_isr);
 
 
+/// @brief Get the error of a job.
+/// @param job_name: job name (callable by CLI).
+/// @return Error of the given job as stored by the core.
+jes_err_t __core_error_get(char* job_name);
+
+
+/// @brief Get the first error that of all jobs.
+/// @return Error of first job that has one.
+/// @note Returns `e_err_no_err` in case that every
+///       job is error-free.
+jes_err_t __core_error_get_any();
+
+
+/// @brief Actively throw an error and store it in the core.
+/// @param e Error to throw.
+void __core_error_throw(jes_err_t e, job_struct_t* pj);
+
 /// @brief Main core job. Handles calls and runs jobs.
 /// @param p: Mandatory args pointer.
 void __core_job(void* p);

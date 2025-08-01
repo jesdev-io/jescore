@@ -33,12 +33,23 @@ jes_err_t jes_register_job(const char* name,
 
 
 jes_err_t jes_launch_job(const char* name){
-    return __job_launch_job_by_name(name, e_origin_api);
+    job_struct_t* pj = __job_get_job_by_name(name);
+    if(pj == NULL) { return e_err_unknown_job; }
+    pj->caller = e_origin_api;
+    __core_notify(pj, 0);
+    return e_err_no_err;
 }
 
 
 jes_err_t jes_launch_job_args(const char* name, const char* args){
-    return __job_launch_job_by_name_args(name, e_origin_api, args);
+    if (args == NULL) { return e_err_is_zero; }
+    job_struct_t* pj = __job_get_job_by_name(name);
+    if(pj == NULL) { return e_err_unknown_job; }
+    jes_err_t e = __job_set_args((char*)args, pj);
+    if (e != e_err_no_err) { return e; }
+    pj->caller = e_origin_api;
+    __core_notify(pj, 0);
+    return e_err_no_err;
 }
 
 
@@ -54,7 +65,7 @@ jes_err_t jes_register_and_launch_job(const char* name,
                                         is_loop,
                                         e_role_user);
     if(stat != e_err_no_err){ return stat; }
-    return __job_launch_job_by_name(name, e_origin_api);
+    return jes_launch_job(name);
 }
 
 
@@ -74,6 +85,28 @@ char* jes_job_get_args(void){
 }
 
 
+char* jes_job_arg_next(void) {
+    static char* input = NULL;
+    char* token;
+    if (input == NULL) {
+        input = jes_job_get_args();
+        if (input == NULL) return NULL;
+        token = strtok(input, " ");
+    } else {
+        token = strtok(NULL, " ");
+    }
+    if (token == NULL) {
+        input = NULL;
+    }
+    return token;
+}
+
+
+uint8_t jes_job_is_arg(char* arg, const char* name){
+    return strcmp((const char*)arg, name) == 0;
+}
+
+
 jes_err_t jes_job_set_param(void* p){
     TaskHandle_t caller = xTaskGetCurrentTaskHandle();
     job_struct_t* pj = __job_get_job_by_handle(caller);
@@ -87,6 +120,23 @@ void* jes_job_get_param(void){
     job_struct_t* pj = __job_get_job_by_handle(caller);
     if (pj == NULL) { return NULL; }
     return __job_get_param(pj);
+}
+
+
+jes_err_t jes_error_get(char* job_name){
+    return __core_error_get(job_name);
+}
+
+
+jes_err_t jes_error_get_any(void){
+    return __core_error_get_any();
+}
+
+
+void jes_throw_error(jes_err_t e){
+    TaskHandle_t hj = xTaskGetCurrentTaskHandle();
+    job_struct_t* pj = __job_get_job_by_handle(hj);
+    return __core_error_throw(e, pj);
 }
 
 
