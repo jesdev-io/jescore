@@ -87,6 +87,20 @@ jes_err_t jes_job_set_args(char* s);
 char* jes_job_get_args(void);
 
 
+/// @brief Get the next arg from the args field.
+/// @return Next arg delimited by a whitespace.
+/// @note Use this in an arg-parsing loop.
+char* jes_job_arg_next(void);
+
+
+/// @brief Check if two args are the same.
+/// @param arg Input arg from `jes_job_get_args()` or `jes_job_arg_next()`
+/// @param name Name of arg to compare.
+/// @return 1 if matching, 0 if not.
+/// @note Use this in an arg-parsing loop.
+uint8_t jes_job_is_arg(char* arg, const char* name);
+
+
 /// @brief Set the field `param` of the calling job.
 /// @param p: Arbitrary reference to parameter.
 /// @return status, `e_err_no_err` if OK.

@@ -85,6 +85,28 @@ char* jes_job_get_args(void){
 }
 
 
+char* jes_job_arg_next(void) {
+    static char* input = NULL;
+    char* token;
+    if (input == NULL) {
+        input = jes_job_get_args();
+        if (input == NULL) return NULL;
+        token = strtok(input, " ");
+    } else {
+        token = strtok(NULL, " ");
+    }
+    if (token == NULL) {
+        input = NULL;
+    }
+    return token;
+}
+
+
+uint8_t jes_job_is_arg(char* arg, const char* name){
+    return strcmp((const char*)arg, name) == 0;
+}
+
+
 jes_err_t jes_job_set_param(void* p){
     TaskHandle_t caller = xTaskGetCurrentTaskHandle();
     job_struct_t* pj = __job_get_job_by_handle(caller);
