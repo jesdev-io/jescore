@@ -101,6 +101,23 @@ void* jes_job_get_param(void){
 }
 
 
+jes_err_t jes_error_get(char* job_name){
+    return __core_error_get(job_name);
+}
+
+
+jes_err_t jes_error_get_any(void){
+    return __core_error_get_any();
+}
+
+
+void jes_throw_error(jes_err_t e){
+    TaskHandle_t hj = xTaskGetCurrentTaskHandle();
+    job_struct_t* pj = __job_get_job_by_handle(hj);
+    return __core_error_throw(e, pj);
+}
+
+
 void jes_notify_job(const char* name, void* notification){
     __job_notify_generic(__job_get_job_by_name(name), notification, 0);
 }

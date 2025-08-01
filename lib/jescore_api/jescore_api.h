@@ -99,6 +99,26 @@ jes_err_t jes_job_set_param(void* p);
 void* jes_job_get_param(void);
 
 
+/// @brief Get the field `error` of a given job.
+/// @param job_name Name of the job.
+/// @return Stored error.
+jes_err_t jes_error_get(char* job_name);
+
+
+/// @brief Get the first error that of all jobs.
+/// @return Error of first job that has one.
+/// @note Returns `e_err_no_err` in case that every
+///       job is error-free.
+/// @note Use this function to quickly spot if the
+///       program is error free.
+jes_err_t jes_error_get_any(void);
+
+
+/// @brief 
+/// @param e 
+void jes_throw_error(jes_err_t e);
+
+
 /// @brief Notify a job with an optional message.
 /// @param name Name of job which should be notified.
 /// @param notification Optional pointer to notification value.
