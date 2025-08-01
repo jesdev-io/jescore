@@ -128,8 +128,10 @@ jes_err_t jes_error_get(char* job_name);
 jes_err_t jes_error_get_any(void);
 
 
-/// @brief 
-/// @param e 
+/// @brief Throw an error that is registered in the core.
+/// @param e Error to throw.
+/// @note This is useful to let other jobs or the core know when
+///       a job exits based on a user condition.
 void jes_throw_error(jes_err_t e);
 
 
