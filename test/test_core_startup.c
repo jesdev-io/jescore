@@ -30,6 +30,9 @@
 void test_core_init(void){
     jes_err_t stat = jes_init();
     TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
+    // Test double init
+    stat = jes_init();
+    TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
 }
 
 
