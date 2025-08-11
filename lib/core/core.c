@@ -3,10 +3,13 @@
 #include "base_jobs.h"
 #include "job_names.h"
 
-static core_t core;
+static core_t core = {
+    .state = e_state_init,
+    .job_list = NULL
+};
 
 jes_err_t __core_init(){
-    core.state = e_state_init;
+    if(core.state == e_state_idle) return e_err_no_err;
     jes_err_t e;
     e = __job_register_job(CORE_JOB_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __core_job, 1, e_role_core);
     if(e != e_err_no_err){ return e; }
