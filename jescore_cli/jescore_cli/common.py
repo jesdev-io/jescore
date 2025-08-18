@@ -17,7 +17,8 @@ General baseline constants
 `CLI_CLIENT_IDENTIFIER`:        Prefix for the transmitted message to distinguish
                                 between this CLI and the headless CLI.
 """
-KNOWN_HOSTS =  {"Electrosmith Daisy Seed": "VID:PID=0483:5740",
+KNOWN_HOSTS =  {"Generic board with CP2102 USB-to-UART converter": "VID:PID=10C4:EA60",
+                "Electrosmith Daisy Seed": "VID:PID=0483:5740",
                 "Generic board with CH340 USB-to-UART converter": "VID:PID=1A86:7523",
                 "USB enhanced serial CH343": "VID:PID=1A86:55D3",
                 "ST LINK": "VID:PID=0483:374B",
