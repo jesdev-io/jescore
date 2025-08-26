@@ -12,7 +12,7 @@ ports = list(list_ports.comports())
 for port in ports:
     for host in KNOWN_HOSTS.values():
         if host in port.hwid:
-            device_ports.append(cli._formatPortForOS(port.name))
+            device_ports.append(cli._CjescoreCli__formatPortForOS(port.name))
 
 def test_cli_init():
     assert cli.os_type == platform.system()
