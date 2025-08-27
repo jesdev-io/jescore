@@ -9,3 +9,6 @@ void jes_delay_job_ms(uint32_t ms){
     vTaskDelay(ms / portTICK_PERIOD_MS);
 }
 
+uint32_t __get_systime_ms(void){
+    return xTaskGetTickCount();
+}

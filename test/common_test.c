@@ -40,6 +40,7 @@ void test_all(void* p) {
     RUN_TEST(test_cli_init);
     RUN_TEST(test_job_help);
     RUN_TEST(test_job_stats);
+    RUN_TEST(test_sys_time);
 
     // API functions
     RUN_TEST(test_register_job);

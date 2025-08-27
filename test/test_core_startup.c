@@ -112,3 +112,10 @@ void test_job_stats(void){
     TEST_ASSERT_EQUAL_HEX32(NULL, pj->param);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, pj->error);
 }
+
+void test_sys_time(void){
+    jes_delay_job_ms(200);
+    volatile uint32_t sys_time = __get_systime_ms();
+    TEST_ASSERT_GREATER_THAN_INT32(0, sys_time);
+    TEST_ASSERT_INT32_WITHIN(4000, 500, sys_time);
+}
