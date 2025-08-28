@@ -11,6 +11,14 @@ extern "C" {
 #include "commands.h"
 #include "job_driver.h"
 
+#ifndef JES_LOG_LEN
+#define __JES_LOG_LEN 8
+#else
+#define __JES_LOG_LEN JES_LOG_LEN
+#endif // JES_LOG_LEN
+
+#define JES_LOG_TYPE_NAME_LEN 8
+
 
 /// @brief Types of states.
 /// @note Always prefixed with "e_state".
@@ -22,6 +30,14 @@ typedef enum state_t{
     NUM_STATES
 } state_t;
 
+#if __JES_LOG_LEN > 0
+typedef struct log_entry_t{
+    uint32_t sys_time;
+    char type[JES_LOG_TYPE_NAME_LEN];
+    job_struct_t job_state;
+} log_entry_t;
+#endif
+
 
 /// @brief Main core object, has one instance.
 /// @param state (state_t): current state of core (fsm).
@@ -29,6 +45,11 @@ typedef enum state_t{
 typedef struct core_t{
     state_t state;
     job_struct_t* job_list;
+    #if __JES_LOG_LEN > 0
+    log_entry_t log[__JES_LOG_LEN];
+    uint32_t log_write;
+    uint32_t log_read;
+    #endif
 }core_t;
 
 
@@ -77,6 +98,30 @@ jes_err_t __core_error_get_any();
 /// @brief Actively throw an error and store it in the core.
 /// @param e Error to throw.
 void __core_error_throw(jes_err_t e, job_struct_t* pj);
+
+#if __JES_LOG_LEN > 0
+
+/// @brief 
+/// @param pj 
+/// @param idx 
+void __core_add_to_log_index(job_struct_t* pj, uint32_t idx, const char* type);
+
+/// @brief 
+/// @param pj 
+void __core_add_to_log_auto(job_struct_t* pj, const char* type);
+
+/// @brief 
+/// @param  
+/// @return 
+log_entry_t __core_read_from_log_next(void);
+
+#ifndef JES_DISABLE_CLI
+/// @brief 
+/// @param p 
+void __core_log_printer(void* p);
+#endif
+
+#endif // __JES_LOG_LEN > 0
 
 /// @brief Main core job. Handles calls and runs jobs.
 /// @param p: Mandatory args pointer.

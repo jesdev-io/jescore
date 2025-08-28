@@ -25,6 +25,7 @@
 #include "job_names.h"
 #include "cli.h"
 #include "base_jobs.h"
+#include "core.h"
 
 
 void test_core_init(void){
@@ -119,3 +120,22 @@ void test_sys_time(void){
     TEST_ASSERT_GREATER_THAN_INT32(0, sys_time);
     TEST_ASSERT_INT32_WITHIN(4000, 500, sys_time);
 }
+
+
+#if __JES_LOG_LEN > 0
+void test_logging(void){
+    job_struct_t* pj = __job_get_job_by_name(STATS_NAME);
+    __core_add_to_log_auto(pj, "test");
+    log_entry_t le;
+    /*  skip the first few entries as they are registrations
+        made by the core */ 
+    for(uint8_t i = 0; i < 7; i++){
+        le = __core_read_from_log_next();
+        uart_unif_write(le.type);
+    }
+    le = __core_read_from_log_next();
+    TEST_ASSERT_UINT32_WITHIN(500, 3000, le.sys_time);
+    TEST_ASSERT_EQUAL_STRING("test", le.type);
+    TEST_ASSERT_EQUAL_STRING(pj->name, le.job_state.name);
+}
+#endif

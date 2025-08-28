@@ -2,10 +2,17 @@
 #include "cli.h"
 #include "base_jobs.h"
 #include "job_names.h"
+#include "delay_unif.h"
+#include "uart_unif.h"
+#include "jescore_api.h"
 
 static core_t core = {
     .state = e_state_init,
-    .job_list = NULL
+    .job_list = NULL,
+    #if __JES_LOG_LEN > 0
+    .log_write = 0,
+    .log_read = 0,
+    #endif
 };
 
 jes_err_t __core_init(){
@@ -17,6 +24,9 @@ jes_err_t __core_init(){
     if(e != e_err_no_err){ return e; }
 
     #ifndef JES_DISABLE_CLI
+    #if __JES_LOG_LEN > 0
+    e = __job_register_job(LOG_PRINTER_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __core_log_printer, 0, e_role_base);
+    #endif // __JES_LOG_LEN > 0
     e = __cli_init();
     if(e != e_err_no_err){ return e; }
     e = __job_register_job(HELP_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __base_job_help, 0, e_role_base);
@@ -122,10 +132,84 @@ void __core_error_throw(jes_err_t e, job_struct_t* pj){
 }
 
 
+#if __JES_LOG_LEN > 0
+void __core_add_to_log_index(job_struct_t* pj, uint32_t idx, const char* type){
+    core.log[idx].sys_time = __get_systime_ms();
+    strncpy(core.log[idx].type, type, JES_LOG_TYPE_NAME_LEN);
+    if(pj == NULL){
+        memset(&core.log[idx].job_state, 0, sizeof(job_struct_t));
+    }
+    else{
+        memcpy(&core.log[idx].job_state, pj, sizeof(job_struct_t));
+    }
+}
+
+
+void __core_add_to_log_auto(job_struct_t* pj, const char* type){
+    __core_add_to_log_index(pj, core.log_write, type);
+    if(++core.log_write == __JES_LOG_LEN){
+        core.log_write = 0;
+    }
+    core.log_read = core.log_write;
+}
+
+log_entry_t __core_read_from_log_next(void){
+    log_entry_t le = {
+        .sys_time = core.log[core.log_read].sys_time,
+        .job_state = core.log[core.log_read].job_state,
+    };
+    strcpy(le.type, core.log[core.log_read].type);
+    if(++core.log_read == __JES_LOG_LEN){
+        core.log_read = 0;
+    }
+    return le;
+}
+
+#ifndef JES_DISABLE_CLI
+void __core_log_printer(void* p){
+    log_entry_t le = __core_read_from_log_next();
+    char desc[__MAX_JOB_ARGS_LEN_BYTE*4] = {0};
+    char spacing_name[] = {'\t', 0, 0};
+    char spacing_addr[] = {'\t', 0, 0};
+    uint8_t* clr;
+    for(uint32_t i = 0; i < __JES_LOG_LEN; i++){
+        if(le.type == NULL){
+            continue;
+        }
+        le = __core_read_from_log_next();
+        spacing_name[1] = (strlen(le.job_state.name) < 8) ? '\t' : 0;
+        spacing_addr[1] = (le.job_state.handle == NULL) ? '\t' : 0;
+
+        switch (le.job_state.role) {
+            case e_role_core: clr = CLR_Gr; break;
+            case e_role_base: clr = CLR_Y;  break;
+            case e_role_user: clr = CLR_G;  break;
+            default:          clr = CLR_X;  break;
+        }
+        sprintf(desc, "(%010ld) %s: %s%s%s%lx%s\t%d\t\t%d\t%s%s\n\r", 
+                le.sys_time,
+                le.type,
+                clr,
+                le.job_state.name, 
+                spacing_name,
+                (uint32_t)le.job_state.handle, 
+                spacing_addr,
+                le.job_state.instances,
+                le.job_state.error,
+                le.job_state.args,
+                CLR_X);
+        uart_unif_write(desc);
+    }
+}
+#endif // JES_DISABLE_CLI
+#endif // __JES_LOG_LEN > 0
 
 void __core_job(void* p){
     while(1){
         job_struct_t* pj = __job_sleep_until_notified_with_job();
+        #if __JES_LOG_LEN > 0
+        __core_add_to_log_auto(pj, "launch");
+        #endif // __JES_LOG_LEN > 0
         if(pj == NULL){
             core.state = e_state_fault;
             jes_err_t e = e_err_unknown_job;

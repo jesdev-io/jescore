@@ -9,6 +9,9 @@ extern "C" {
 #define ERROR_HANDLER_NAME  "errorhandler"
 #ifndef JES_DISABLE_CLI
 #define CLI_SERVER_NAME    "cliserver"
+#if __JES_LOG_LEN > 0
+#define LOG_PRINTER_NAME    "logp"
+#endif // __JES_LOG_LEN > 0
 #endif
 
 #endif

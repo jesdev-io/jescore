@@ -21,6 +21,7 @@ void test_cli_init(void);
 void test_job_help(void);
 void test_job_stats(void);
 void test_sys_time(void);
+void test_logging(void);
 
 void test_register_job(void);
 void test_launch_job(void);
