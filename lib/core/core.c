@@ -147,10 +147,10 @@ void __core_add_to_log_index(job_struct_t* pj, uint32_t idx, const char* type){
 
 void __core_add_to_log_auto(job_struct_t* pj, const char* type){
     __core_add_to_log_index(pj, core.log_write, type);
+    core.log_read = core.log_write;
     if(++core.log_write == __JES_LOG_LEN){
         core.log_write = 0;
     }
-    core.log_read = core.log_write;
 }
 
 log_entry_t __core_read_from_log_next(void){

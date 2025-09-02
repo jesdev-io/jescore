@@ -127,12 +127,6 @@ void test_logging(void){
     job_struct_t* pj = __job_get_job_by_name(STATS_NAME);
     __core_add_to_log_auto(pj, "test");
     log_entry_t le;
-    /*  skip the first few entries as they are registrations
-        made by the core */ 
-    for(uint8_t i = 0; i < 7; i++){
-        le = __core_read_from_log_next();
-        uart_unif_write(le.type);
-    }
     le = __core_read_from_log_next();
     TEST_ASSERT_UINT32_WITHIN(500, 3000, le.sys_time);
     TEST_ASSERT_EQUAL_STRING("test", le.type);
