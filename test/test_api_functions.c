@@ -13,19 +13,19 @@
 #include "job_names.h"
 #include "base_jobs.h"
 
-#define DUMMY_JOB_SINGLE_NAME "dummysingle"
-#define DUMMY_JOB_LOOP_NAME "dummyloop"
-#define DUMMY_JOB_ARGS_HOLDER_NAME "dummyargs"
-#define DUMMY_JOB_NOTIFY "dummynotify"
-#define DUMMY_JOB_NOTIFY_TAKE "dummynotifytake"
-#define DUMMY_NOTIFICATION_VALUE 1234
-#define DUMMY_PRINT "hello world!"
-#define DUMMY_FAIL_MSG "Assert failed"
-#define DUMMY_SUCCESS_MSG "Assert succeeded"
-#define DUMMY_ARGS "args at launch"
-#define DUMMY_ARGS_MODIF "got args at launch"
-#define DUMMY_JOB_MEM BOARD_MIN_JOB_HEAP_MEM
-#define DUMMY_JOB_PRIO 1
+#define DUMMY_JOB_SINGLE_NAME       "dummysingle"
+#define DUMMY_JOB_LOOP_NAME         "dummyloop"
+#define DUMMY_JOB_ARGS_HOLDER_NAME  "dummyargs"
+#define DUMMY_JOB_NOTIFY            "dummynotify"
+#define DUMMY_JOB_NOTIFY_TAKE       "dummynotifytake"
+#define DUMMY_NOTIFICATION_VALUE    1234
+#define DUMMY_PRINT                 "hello world!"
+#define DUMMY_FAIL_MSG              "Assert failed"
+#define DUMMY_SUCCESS_MSG           "Assert succeeded"
+#define DUMMY_ARGS                  "args at launch"
+#define DUMMY_ARGS_MODIF            "got args at launch"
+#define DUMMY_JOB_MEM               BOARD_MIN_JOB_HEAP_MEM
+#define DUMMY_JOB_PRIO              1
 
 
 void dummy_job_single(void* p){
