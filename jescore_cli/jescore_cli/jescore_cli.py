@@ -10,6 +10,10 @@ class CjescoreCli:
         self.os_type = platform.system()
         self.baudrate = baudrate
         self.verbose = verbose
+        _port = port if port else self.portAutoDetect()
+        if not _port:
+            print("No jescore-enabled device detected!")
+            exit()
         self.port = self.__formatPortForOS(port if port else self.portAutoDetect())
         
     def __vPrint(self, printable, end='\n'):
