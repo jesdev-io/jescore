@@ -169,16 +169,14 @@ log_entry_t __core_read_from_log_next(void){
 void __core_log_printer(void* p){
     log_entry_t le = __core_read_from_log_next();
     char desc[__MAX_JOB_ARGS_LEN_BYTE*4] = {0};
-    char spacing_name[] = {'\t', 0, 0};
-    char spacing_addr[] = {'\t', 0, 0};
+    char header[] = "systime (ms) type\t name\t\tinstances\terror\targs\n\r";
     uint8_t* clr;
+    uart_unif_write(header);
     for(uint32_t i = 0; i < __JES_LOG_LEN; i++){
         if(le.type == NULL){
             continue;
         }
         le = __core_read_from_log_next();
-        spacing_name[1] = (strlen(le.job_state.name) < 8) ? '\t' : 0;
-        spacing_addr[1] = (le.job_state.handle == NULL) ? '\t' : 0;
 
         switch (le.job_state.role) {
             case e_role_core: clr = CLR_Gr; break;
@@ -186,14 +184,11 @@ void __core_log_printer(void* p){
             case e_role_user: clr = CLR_G;  break;
             default:          clr = CLR_X;  break;
         }
-        sprintf(desc, "(%010ld) %s: %s%s%s%lx%s\t%d\t\t%d\t%s%s\n\r", 
+        sprintf(desc, "(%010ld) %s:\t %s%s\t\t%d\t\t%d\t%s%s\n\r", 
                 le.sys_time,
                 le.type,
                 clr,
-                le.job_state.name, 
-                spacing_name,
-                (uint32_t)le.job_state.handle, 
-                spacing_addr,
+                le.job_state.name,
                 le.job_state.instances,
                 le.job_state.error,
                 le.job_state.args,
