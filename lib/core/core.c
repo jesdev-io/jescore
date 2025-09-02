@@ -106,7 +106,7 @@ __job_notify_with_job(__job_get_job_by_name(CORE_JOB_NAME),
 }
 
 
-jes_err_t __core_error_get(char* job_name){
+jes_err_t __core_error_get(const char* job_name){
     job_struct_t* pj = __job_get_job_by_name(job_name);
     if (pj == NULL) { return e_err_unknown_job; }
     return pj->error;

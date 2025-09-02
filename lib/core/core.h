@@ -85,7 +85,7 @@ void __core_notify(job_struct_t* pjob_to_run,
 /// @brief Get the error of a job.
 /// @param job_name: job name (callable by CLI).
 /// @return Error of the given job as stored by the core.
-jes_err_t __core_error_get(char* job_name);
+jes_err_t __core_error_get(const char* job_name);
 
 
 /// @brief Get the first error that of all jobs.
