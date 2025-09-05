@@ -22,10 +22,12 @@ class CjescoreCli:
 
     def discoverPorts(self):
         ports = list(list_ports.comports())
+        descriptors = []
         for port in ports:
             for device, host in KNOWN_HOSTS.items():
                 if host in port.hwid:
-                    print(f"{device}({host}) on port {port.name}")
+                    descriptors.append(f"{device} ({host} | {port.name}) ")
+        return descriptors
 
     def portAutoDetect(self):
         ports = list(list_ports.comports())
@@ -106,7 +108,9 @@ def main():
     cli = CjescoreCli(baudrate=args.baudrate, verbose=args.verbose, port=args.port)
 
     if args.discover:
-        cli.discoverPorts()
+        descriptors = cli.discoverPorts()
+        for descriptor in descriptors:
+            print(descriptor)
         return
     
     if args.listen:
