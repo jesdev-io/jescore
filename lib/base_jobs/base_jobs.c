@@ -62,8 +62,8 @@ void __base_job_stats(void* p){
 
     sprintf(desc, "\x1b[1mname\t\thandle\t\tmemory\tprio\tloop\tinstances\terror\x1b[0m\n\r");
     if(!flag_none){
-        sprintf(header, "%sjescore%s running on %s%s%s (FW %s, %s)\n\r\n\r", 
-            CLR_Y, CLR_X, CLR_G, BUILD_PLATFORM_NAME, CLR_X, JES_FW_VER, JES_FW_BRANCH);
+        sprintf(header, "%sjescore%s running on %s%s%s (FW %s)\n\r\n\r", 
+            CLR_Y, CLR_X, CLR_G, BUILD_PLATFORM_NAME, CLR_X, JES_FW_VER);
         uart_unif_write(header);
     }
     uart_unif_write(desc);

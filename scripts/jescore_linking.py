@@ -200,20 +200,15 @@ def get_fw_version():
 
 def add_build_flags():
     fw_version = get_fw_version()
-    git_branch, git_hash = get_git_info()
 
     env.Append(
         CPPDEFINES=[
-            ("JES_FW_VER", f'\\"{fw_version}\\"'),
-            ("JES_FW_BRANCH", f'\\"{git_branch}\\"'),
-            ("JES_FW_GIT_HASH", f'\\"{git_hash}\\"')
+            ("JES_FW_VER", f'\\"{fw_version}\\"')
         ]
     )
 
     print("\n==== jescore Build Information ====")
     print(f"Version:  {Color.G + fw_version + Color.X}")
-    print(f"Branch:   {Color.G + git_branch + Color.X}")
-    print(f"Commit:   {Color.G + git_hash + Color.X}")
     print("=====================================\n")
 
 add_build_flags()
