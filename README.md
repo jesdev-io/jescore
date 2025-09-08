@@ -14,12 +14,12 @@ Many times I find myself needing the same type of overarching architecture for e
 The great thing about this name is that it can stand for "**J**'s **e**mbedded **s**ystems **core**" but it can also be an homage to the legacy YouTube name "**J's e-shack**", which inspired this core system in the first place.
 
 ## Currently supported platforms
-|ESP32|STM32 (in development)|
+|ESP32|STM32|
 |-|-|
 |ESP32|STM32L476|
 |ESP32-C3|STM32L432|
 |ESP32-S3|STM32G431|
-||STM32H753|
+|ESP32-WROVER|STM32H753|
 
 ## Get started, examples and use-cases
 

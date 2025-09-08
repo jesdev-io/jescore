@@ -12,7 +12,7 @@ ports = list(list_ports.comports())
 for port in ports:
     for host in KNOWN_HOSTS.values():
         if host in port.hwid:
-            device_ports.append(cli._formatPortForOS(port.name))
+            device_ports.append(cli._CjescoreCli__formatPortForOS(port.name))
 
 def test_cli_init():
     assert cli.os_type == platform.system()
@@ -57,11 +57,29 @@ def test_cli_stats():
         assert "error" in stat
         
         assert "echo" in stat
-        assert "cliserver" in stat
+        assert "clisrv" in stat
         assert "stats" in stat
         assert "help" in stat
         assert "errorhandler" in stat
         assert "core" in stat 
+
+def test_cli_logp():
+    for port in device_ports:
+        msg = "logp"
+        stat = cli.uartTransceive(msg, port=port)
+        assert stat[-1] == CLI_PREFIX_MCU
+        stat = ' '.join(stat)
+
+        assert "systime (ms)" in stat
+        assert "type" in stat
+        assert "name" in stat
+        assert "instances" in stat
+        assert "error" in stat
+        assert "args" in stat
+        
+        assert "launch" in stat
+        assert "stats" in stat
+
 
 if __name__ == "__main__":
     pytest.main()

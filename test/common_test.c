@@ -15,6 +15,7 @@
 #include <unity.h>
 #include "common_test.h"
 #include "delay_unif.h"
+#include "core.h"
 
 
 void setUp(void) {
@@ -40,6 +41,10 @@ void test_all(void* p) {
     RUN_TEST(test_cli_init);
     RUN_TEST(test_job_help);
     RUN_TEST(test_job_stats);
+    RUN_TEST(test_sys_time);
+    #if __JES_LOG_LEN > 0
+    RUN_TEST(test_logging);
+    #endif // __JES_LOG_LEN > 0
 
     // API functions
     RUN_TEST(test_register_job);

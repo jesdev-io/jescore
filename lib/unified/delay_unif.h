@@ -12,6 +12,10 @@ extern "C" {
 /// @note Timing is handled by FreeRTOS
 void jes_delay_job_ms(uint32_t ms);
 
+/// @brief Get the current system time since boot in milliseconds.
+/// @return System time in milliseconds.
+uint32_t __get_systime_ms(void);
+
 #endif
 
 #ifdef __cplusplus

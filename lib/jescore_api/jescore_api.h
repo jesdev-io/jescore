@@ -116,7 +116,7 @@ void* jes_job_get_param(void);
 /// @brief Get the field `error` of a given job.
 /// @param job_name Name of the job.
 /// @return Stored error.
-jes_err_t jes_error_get(char* job_name);
+jes_err_t jes_error_get(const char* job_name);
 
 
 /// @brief Get the first error that of all jobs.

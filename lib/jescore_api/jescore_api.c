@@ -123,7 +123,7 @@ void* jes_job_get_param(void){
 }
 
 
-jes_err_t jes_error_get(char* job_name){
+jes_err_t jes_error_get(const char* job_name){
     return __core_error_get(job_name);
 }
 

@@ -2,7 +2,7 @@
 #include "jescore.h"
 #include <string.h>
 
-#define LED_PIN 4
+#define LED_PIN 5
 
 static bool is_on = false;
 static bool processing = false;
