@@ -36,6 +36,8 @@ import os
 import json
 import subprocess
 from os.path import exists, join
+from SCons.Script import Exit
+from time import sleep
 
 print(Color.G + "----------------------------------" + Color.X)
 print(Color.M + "*.*.* jescore dynamic linker *.*.*" + Color.X)
@@ -117,11 +119,11 @@ else:
     help_msg = Color.R + "Please add `build_flags = -mfloat-abi=hard -mfpu=fpv4-sp-d16` to your `platformio.ini` when building jescore for STM32!" + Color.X
     if env.get("BUILD_FLAGS", None):
         if not (fpu_args[0] in env["BUILD_FLAGS"] and fpu_args[1] in env["BUILD_FLAGS"]):
-            print(help_msg)
-            env.Fatal()
+            sleep(0.001)
+            Exit(help_msg)
     else:
-        print(help_msg)
-        env.Fatal()
+        sleep(0.001)
+        Exit(help_msg)
 
     env.Append(
         CPPPATH=[
