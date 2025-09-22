@@ -39,9 +39,7 @@ jes_err_t __job_register_job(const char* n,
     if(pj->notif_queue == NULL) { return e_err_mem_null; }
     pj->pn = *job_list;
     *job_list = pj;
-    #if __JES_LOG_LEN > 0
-    __core_add_to_log_auto(pj, "rgistr");
-    #endif //__JES_LOG_LEN > 0
+    JES_LOG_REGISTER(pj);
     return e_err_no_err;
 }
 
@@ -132,6 +130,7 @@ void __job_runtime_env(void* p){
     #endif
 
     pj->instances++;
+    JES_LOG_LAUNCH(pj);
     
     /// This runs the user function
     pj->function((void*)pj);
