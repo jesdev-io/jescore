@@ -37,11 +37,11 @@ jes_err_t __job_register_job(const char* n,
     pj->error = e_err_no_err;
     pj->notif_queue = xQueueCreate(MAX_JOB_NOTIF_QUEUE_SIZE, sizeof(void*));
     if(pj->notif_queue == NULL) { return e_err_mem_null; }
+    pj->timing_begin = 0;
+    pj->timing_end = 0;
     pj->pn = *job_list;
     *job_list = pj;
-    #if __JES_LOG_LEN > 0
-    __core_add_to_log_auto(pj, "rgistr");
-    #endif //__JES_LOG_LEN > 0
+    JES_LOG_REGISTER(pj);
     return e_err_no_err;
 }
 
@@ -118,7 +118,7 @@ jes_err_t __job_launch_job_by_name_args(const char* n, origin_t o, const char* a
 
 
 void __job_runtime_env(void* p){
-    volatile job_struct_t* pj = (job_struct_t*)p;
+    job_struct_t* pj = (job_struct_t*)p;
 
     #ifndef JES_DISABLE_CLI
     /* This section reprints the CLI prefix in case the started job is a loop.
@@ -132,11 +132,17 @@ void __job_runtime_env(void* p){
     #endif
 
     pj->instances++;
+    JES_LOG_LAUNCH(pj);
+
+    if(!pj->is_loop) __job_set_timing_begin(__get_systime_ms(), pj);
     
     /// This runs the user function
     pj->function((void*)pj);
     /// ---------------------------
 
+    if(!pj->is_loop) __job_set_timing_end(__get_systime_ms(), pj);
+
+    JES_LOG_FINISH(pj);
     pj->instances--;
 
     #ifndef JES_DISABLE_CLI
@@ -235,4 +241,19 @@ jes_err_t __job_set_param(void* p, job_struct_t* pj){
 void* __job_get_param(job_struct_t* pj){
     if(pj == NULL){ return NULL; }
     return pj->param;
+}
+
+
+void __job_set_timing_begin(uint32_t t, job_struct_t* pj){
+    pj->timing_begin = t;
+}
+
+
+void __job_set_timing_end(uint32_t t, job_struct_t* pj){
+    pj->timing_end = t;
+} 
+
+
+uint32_t __job_get_timing(job_struct_t* pj){
+    return pj->timing_end - pj->timing_begin;
 }

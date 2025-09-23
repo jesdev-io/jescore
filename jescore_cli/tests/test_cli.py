@@ -3,9 +3,11 @@ from jescore_cli.common import CLI_PREFIX_MCU, KNOWN_HOSTS
 from serial.tools import list_ports
 import platform
 import pytest
-import os
+import re
 
 cli = CjescoreCli()
+
+known_jobs = ["help", "echo", "stats", "logp", "bench"]
 
 device_ports = []
 ports = list(list_ports.comports())
@@ -19,10 +21,8 @@ def test_cli_init():
 
 def test_cli_echo():
     for port in device_ports:
-        print("opening ", port)
-        cli.uartTransceive("provoke flush", port=port)
         msg = "echo test"
-        stat = cli.uartTransceive(msg)
+        stat = cli.uartTransceive(msg, port=port)
         assert stat[0] == "test"
         assert stat[1] == CLI_PREFIX_MCU
 
@@ -80,6 +80,25 @@ def test_cli_logp():
         assert "launch" in stat
         assert "stats" in stat
 
+def test_cli_bench():
+    for port in device_ports:
+        msg = "bench"
+        stat = cli.uartTransceive(msg, port=port)
+        assert stat[-1] == CLI_PREFIX_MCU
+        stat = ' '.join(stat)
+        assert "Provide a job name to bench!" in stat
+
+        for job in known_jobs:
+            msg = f"bench {job}"
+            stat = cli.uartTransceive(msg, port=port)
+            stat = ' '.join(stat)
+
+            assert "Roundtrip time" in stat
+            assert job in stat
+            assert "ms" in stat
+            match = re.search(r'\[ (\d+) \]', stat)
+            time = int(match[1]) if match else 1
+            assert time < 50
 
 if __name__ == "__main__":
     pytest.main()

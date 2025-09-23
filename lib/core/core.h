@@ -17,7 +17,18 @@ extern "C" {
 #define __JES_LOG_LEN JES_LOG_LEN
 #endif // JES_LOG_LEN
 
-#define JES_LOG_TYPE_NAME_LEN 8
+#define JES_LOG_TYPE_NAME_LEN 10
+
+#if __JES_LOG_LEN > 0
+#define JES_LOG_FAULT(pj) __core_add_to_log_auto((job_struct_t*)pj, "\x1b[31m" "fault" "\x1b[0m")
+#define JES_LOG_REGISTER(pj) __core_add_to_log_auto((job_struct_t*)pj, "rgistr")
+#define JES_LOG_LAUNCH(pj) __core_add_to_log_auto((job_struct_t*)pj, "launch")
+#define JES_LOG_FINISH(pj) __core_add_to_log_auto((job_struct_t*)pj, "finish")
+#else
+#define JES_LOG_FAULT(pj) 
+#define JES_LOG_REGISTER(pj) 
+#define JES_LOG_LAUNCH(pj) 
+#endif // __JES_LOG_LEN > 0
 
 
 /// @brief Types of states.

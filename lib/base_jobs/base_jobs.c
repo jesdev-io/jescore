@@ -101,3 +101,29 @@ void __base_job_stats(void* p){
         cur = cur->pn;
     }
 }
+
+
+void __base_job_bench(void* p){
+    job_struct_t* pj_self = (job_struct_t*)p;
+    if(strcmp(pj_self->args, "") == 0){
+        uart_unif_write("Provide a job name to bench!\n\r");
+        return;
+    }
+    job_struct_t* pj_arg = __job_get_job_by_name(pj_self->args);
+    if(!pj_arg){
+        uart_unif_writef("Unknown job <%s> to benchmark!\n\r", pj_self->args);
+        return;
+    }
+    if(pj_arg->timing_end == 0 && !pj_arg->is_loop){
+        uart_unif_writef("Job <%s> has not yet run once!\n\r", pj_arg->name);
+        return;
+    }
+    if(pj_arg->timing_end == 0 && pj_arg->is_loop){
+        uart_unif_writef("Job <%s> is a loop without timing hooks!\n\r", pj_arg->name);
+        return;
+    }
+    char lesser[] = "<";
+    uint32_t timing = __job_get_timing(pj_arg);
+    if(timing) lesser[0] = '\0';
+    uart_unif_writef("Roundtrip time (%s) = [ %s%ld ] ms\n\r", pj_arg->name, lesser, ++timing);
+}

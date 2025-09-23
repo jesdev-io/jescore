@@ -33,6 +33,8 @@ jes_err_t __core_init(){
     if(e != e_err_no_err){ return e; }
     e = __job_register_job(STATS_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __base_job_stats, 0, e_role_base);
     if(e != e_err_no_err){ return e; }
+    e = __job_register_job(BENCH_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __base_job_bench, 0, e_role_base);
+    if(e != e_err_no_err){ return e; }
     #endif
     
     e = __job_launch_job_by_name(CORE_JOB_NAME, e_origin_core);
@@ -83,7 +85,7 @@ inline void __core_err_handler_inline(jes_err_t e, void* args){
         description = "Unknown error.";
         break;
     }
-    strcpy(err_print_job->args, description);
+    sprintf(err_print_job->args, "%s (%d)\n\r", description, e);
     __job_launch_job(err_print_job, e_origin_core);
 }
 
@@ -202,22 +204,24 @@ void __core_log_printer(void* p){
 void __core_job(void* p){
     while(1){
         job_struct_t* pj = __job_sleep_until_notified_with_job();
-        #if __JES_LOG_LEN > 0
-        __core_add_to_log_auto(pj, "launch");
-        #endif // __JES_LOG_LEN > 0
         if(pj == NULL){
             core.state = e_state_fault;
             jes_err_t e = e_err_unknown_job;
+            job_struct_t placeholder;
+            memset(&placeholder, 0, sizeof(job_struct_t));
+            strcpy(placeholder.name, "<?>");
+            placeholder.error = e_err_unknown_job;
+            JES_LOG_FAULT(&placeholder);
             __core_err_handler_inline(e, NULL);
         }
         else{
             core.state = e_state_spawning;
-            jes_err_t e = __job_launch_job_by_name(pj->name, pj->caller);
-            if(e != e_err_no_err){
+            pj->error = __job_launch_job_by_name(pj->name, pj->caller);
+            if(pj->error != e_err_no_err){
                 core.state = e_state_fault;
-                __core_err_handler_inline(e, NULL);
+                __core_err_handler_inline(pj->error, NULL);
+                JES_LOG_FAULT(pj);
             }
-            pj->error = e;
         }
         core.state = e_state_idle;
     }

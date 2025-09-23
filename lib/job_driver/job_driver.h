@@ -54,6 +54,8 @@ typedef enum{
 /// @param param (void*): Optional information.
 /// @param error (jes_err_t): Error associated with fault from/in job. Gets used by the error handler
 /// @param notif_queue (QueueHandle_t): Job's notification queue handle.
+/// @param timing_begin (uint32_t): Timestamp for the beginning of a job execution.
+/// @param timing_end (uint32_t): Timestamp for the end of a job execution.
 /// @param pn (job_struct_t*): Pointer to next job (llist).
 typedef struct job_struct_t{
     char name[__MAX_JOB_NAME_LEN_BYTE];
@@ -69,6 +71,8 @@ typedef struct job_struct_t{
     void* param;
     jes_err_t error;
     QueueHandle_t notif_queue;
+    uint32_t timing_begin;
+    uint32_t timing_end;
     struct job_struct_t* pn;
 }job_struct_t;
 
@@ -225,6 +229,20 @@ jes_err_t __job_set_param(void* p, job_struct_t* pj);
 /// @return Pointer to `param` field of the job.
 /// @attention Will return NULL on error.
 void* __job_get_param(job_struct_t* pj);
+
+/// @brief Set the field `timing_begin` of the job.
+/// @param t Current time.
+/// @param pj Pointer to job.
+void __job_set_timing_begin(uint32_t t, job_struct_t* pj);
+
+/// @brief Set the field `timing_end` of the job.
+/// @param t Current time.
+/// @param pj Pointer to job.
+void __job_set_timing_end(uint32_t t, job_struct_t* pj);
+
+/// @brief Get the difference of `timing_end` and `timing_begin` of the job.
+/// @param pj Pointer to job.
+uint32_t __job_get_timing(job_struct_t* pj);
 
 #endif
 

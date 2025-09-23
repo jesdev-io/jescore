@@ -9,6 +9,7 @@ extern "C" {
 #define PRINT_JOB_NAME      "echo"
 #define HELP_NAME           "help"
 #define STATS_NAME          "stats"
+#define BENCH_NAME          "bench"
 #endif // JES_DISABLE_CLI
 
 #endif

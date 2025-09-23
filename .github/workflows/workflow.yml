@@ -10,6 +10,10 @@ jobs:
         os: [ubuntu-latest]
         example: [examples/example_blink.cpp, 
                   examples/example_fsm_cli.cpp,
+                  examples/example_sync_async.cpp,
+                  examples/example_blink_stm32g431.c,
+                  examples/example_blink_stm32h753.c,
+                  examples/example_blink_stm32l476.c,
                   examples/example_blink_stm32.c]
 
     steps:
