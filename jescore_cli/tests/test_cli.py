@@ -21,10 +21,8 @@ def test_cli_init():
 
 def test_cli_echo():
     for port in device_ports:
-        print("opening ", port)
-        cli.uartTransceive("provoke flush", port=port)
         msg = "echo test"
-        stat = cli.uartTransceive(msg)
+        stat = cli.uartTransceive(msg, port=port)
         assert stat[0] == "test"
         assert stat[1] == CLI_PREFIX_MCU
 
