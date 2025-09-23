@@ -8,6 +8,7 @@
 - 📖 Docs on `bench` job
 - 📜 Logging type macros `JES_LOG_REGISTER`, `JES_LOG_LAUNCH`, `JES_LOG_FINISH`, `JES_LOG_FAULT`
 - 🐍 Python unit tests for `bench` job CLI interaction
+- ✒️ Missing CI builds for examples 
 
 ### Changed
 - 🚫 Errors are now displayed with their `enum` in brackets
