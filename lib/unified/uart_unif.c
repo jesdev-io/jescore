@@ -172,7 +172,6 @@ int32_t uart_unif_write(const char* msg){
 }
 
 int32_t uart_unif_writef(const char *format, ...) {
-    return 0;
     char buffer[__JES_STM32_UART_BUF_LEN_BYTE];
     va_list args;
     va_start(args, format);
