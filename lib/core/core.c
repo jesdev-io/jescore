@@ -85,7 +85,7 @@ inline void __core_err_handler_inline(jes_err_t e, void* args){
         description = "Unknown error.";
         break;
     }
-    sprintf(err_print_job->args, "%s (%d)", description, e);
+    sprintf(err_print_job->args, "%s (%d)\n\r", description, e);
     __job_launch_job(err_print_job, e_origin_core);
 }
 
