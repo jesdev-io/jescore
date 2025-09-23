@@ -33,6 +33,8 @@ jes_err_t __core_init(){
     if(e != e_err_no_err){ return e; }
     e = __job_register_job(STATS_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __base_job_stats, 0, e_role_base);
     if(e != e_err_no_err){ return e; }
+    e = __job_register_job(BENCH_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __base_job_bench, 0, e_role_base);
+    if(e != e_err_no_err){ return e; }
     #endif
     
     e = __job_launch_job_by_name(CORE_JOB_NAME, e_origin_core);

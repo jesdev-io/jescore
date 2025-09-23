@@ -23,6 +23,7 @@ extern "C" {
 #define JES_LOG_FAULT(pj) __core_add_to_log_auto((job_struct_t*)pj, "\x1b[31m" "fault" "\x1b[0m")
 #define JES_LOG_REGISTER(pj) __core_add_to_log_auto((job_struct_t*)pj, "rgistr")
 #define JES_LOG_LAUNCH(pj) __core_add_to_log_auto((job_struct_t*)pj, "launch")
+#define JES_LOG_FINISH(pj) __core_add_to_log_auto((job_struct_t*)pj, "finish")
 #else
 #define JES_LOG_FAULT(pj) 
 #define JES_LOG_REGISTER(pj) 
