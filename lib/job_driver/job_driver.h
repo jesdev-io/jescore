@@ -54,6 +54,8 @@ typedef enum{
 /// @param param (void*): Optional information.
 /// @param error (jes_err_t): Error associated with fault from/in job. Gets used by the error handler
 /// @param notif_queue (QueueHandle_t): Job's notification queue handle.
+/// @param timing_begin (uint32_t): Timestamp for the beginning of a job execution.
+/// @param timing_end (uint32_t): Timestamp for the end of a job execution.
 /// @param pn (job_struct_t*): Pointer to next job (llist).
 typedef struct job_struct_t{
     char name[__MAX_JOB_NAME_LEN_BYTE];
