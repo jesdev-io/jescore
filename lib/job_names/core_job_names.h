@@ -6,7 +6,7 @@ extern "C" {
 #define _CORE_JOB_NAMES_H_
 
 #define CORE_JOB_NAME       "core"
-#define ERROR_HANDLER_NAME  "errorhandler"
+#define ERROR_HANDLER_NAME  "errh"
 #ifndef JES_DISABLE_CLI
 #define CLI_SERVER_NAME    "clisrv"
 #if __JES_LOG_LEN > 0
