@@ -9,7 +9,7 @@
 
 void __base_job_echo(void* p){
     job_struct_t* pj = (job_struct_t*)p;
-    uart_unif_write((char*)pj->args);
+    uart_unif_writef("%s\n\r", (char*)pj->args);
 }
 
 
