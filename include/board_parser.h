@@ -254,7 +254,7 @@
 #ifdef BUILD_FOR_STM32
 #include "FreeRTOS.h"
 
-#define BOARD_MIN_JOB_HEAP_MEM 512
+#define BOARD_MIN_JOB_HEAP_MEM 256
 #ifndef BUILD_PLATFORM_NAME
 #define BUILD_PLATFORM_NAME "STM32"
 #endif
