@@ -52,31 +52,31 @@ inline void __core_err_handler_inline(jes_err_t e, void* args){
     switch (e)
     {
     case e_err_mem_null:
-        description = "Memory could not be allocated!";
+        description = "Malloc fail!";
         break;
     case e_err_is_zero:
-        description = "Result is unexpectedly 0!";
+        description = "Unexpected 0!";
         break;
     case e_err_param:
-        description = "Parameter error!";
+        description = "Param error!";
         break;
     case e_err_peripheral_block:
-        description = "Peripheral was blocked!";
+        description = "Peripheral blocked!";
         break;
     case e_err_core_fail:
-        description = "Core failure!";
+        description = "Core fault!";
         break;
     case e_err_duplicate:
-        description = "Entry already exists!";
+        description = "Already exists!";
         break;
     case e_err_too_long:
-        description = "Given string is too long!";
+        description = "String too long!";
         break;
     case e_err_unknown_job:
-        description = "Job has not been registered!";
+        description = "Job not registered!";
         break;
     case e_err_leading_whitespace:
-        description = "Leading whitespace error!";
+        description = "Leading whitespace!";
         break;
     case e_err_prohibited:
         description = "Access denied!";
@@ -85,14 +85,14 @@ inline void __core_err_handler_inline(jes_err_t e, void* args){
         description = "Unknown error.";
         break;
     }
-    sprintf(err_print_job->args, "%s (%d)\n\r", description, e);
+    sprintf(err_print_job->args, "(E:) %s (%d)", description, e);
     __job_launch_job(err_print_job, e_origin_core);
 }
 
 
 void __core_job_err_handler(void* p){
     job_struct_t* pj = (job_struct_t*)p;
-    __core_err_handler_inline(pj->error, NULL);
+    __core_err_handler_inline((uint32_t)pj->param, NULL);
 }
 
 
