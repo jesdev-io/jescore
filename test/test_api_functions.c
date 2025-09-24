@@ -267,6 +267,6 @@ void test_notify_job_and_wait(void){
 
     uint32_t* val = (uint32_t*)__job_get_param(__job_get_job_by_name(DUMMY_JOB_NOTIFY_TAKE));
     char* msg = __job_get_args(__job_get_job_by_name(DUMMY_JOB_NOTIFY_TAKE));
-    TEST_ASSERT_EQUAL_UINT8(DUMMY_NOTIFICATION_VALUE, (uint32_t)val);
+    TEST_ASSERT_EQUAL_UINT32(DUMMY_NOTIFICATION_VALUE, (uint32_t)val);
     TEST_ASSERT_EQUAL_STRING(DUMMY_SUCCESS_MSG, msg);
 }
