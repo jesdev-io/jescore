@@ -28,6 +28,7 @@ extern "C" {
 #define JES_LOG_FAULT(pj) 
 #define JES_LOG_REGISTER(pj) 
 #define JES_LOG_LAUNCH(pj) 
+#define JES_LOG_FINISH(pj)
 #endif // __JES_LOG_LEN > 0
 
 
