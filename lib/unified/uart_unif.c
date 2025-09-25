@@ -86,9 +86,10 @@ int32_t uart_unif_deinit(void){
 #define __JES_STM32_UART_BUF_LEN_BYTE (__MAX_JOB_NAME_LEN_BYTE + __MAX_JOB_ARGS_LEN_BYTE)
 
 // shared buf for the RxCpltCallback and uart_unif_read
-static uint8_t uart_buf[__JES_STM32_UART_BUF_LEN_BYTE]; 
+static uint8_t uart_buf_dma[__JES_STM32_UART_BUF_LEN_BYTE];
+static uint8_t uart_buf_sw[__JES_STM32_UART_BUF_LEN_BYTE]; 
 
- // the right huart has to be defined externally (depends on the board)
+// the right huart has to be defined externally (depends on the board)
 UART_HandleTypeDef huart_num;
 
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t len){
@@ -96,8 +97,18 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t len){
     evt.type = UART_DATA;
     evt.size = len;
     BaseType_t woke_task = pdFALSE;
-    xQueueSendFromISR(*p_queue, (void*)&evt, &woke_task);
-    HAL_UARTEx_ReceiveToIdle_IT(huart, uart_buf, __JES_STM32_UART_BUF_LEN_BYTE);
+    if(uart_buf_dma[0]){
+        // Only handle non-nonsense input
+        if(evt.size >= (__JES_STM32_UART_BUF_LEN_BYTE-1)){
+            uart_unif_flush();
+            evt.type = UART_BUFFER_FULL;
+        }
+        else{
+            memcpy(uart_buf_sw, uart_buf_dma, len);
+        }
+        xQueueSendFromISR(*p_queue, (void*)&evt, &woke_task);
+    }
+    HAL_UARTEx_ReceiveToIdle_IT(huart, uart_buf_dma, __JES_STM32_UART_BUF_LEN_BYTE);
 }
 
 void HAL_UART_MspInit(UART_HandleTypeDef* huart){
@@ -162,7 +173,7 @@ int32_t uart_unif_init(uint32_t baud, uint32_t rx_buf_len, uint32_t tx_buf_len, 
     *(QueueHandle_t*)args = xQueueCreate(5, sizeof(uart_event_t));
     p_queue = (QueueHandle_t*)args;
     MX_USART_UART_Init();
-    HAL_StatusTypeDef stat = HAL_UARTEx_ReceiveToIdle_IT(&huart_num, uart_buf, __JES_STM32_UART_BUF_LEN_BYTE);
+    HAL_StatusTypeDef stat = HAL_UARTEx_ReceiveToIdle_IT(&huart_num, uart_buf_dma, __JES_STM32_UART_BUF_LEN_BYTE);
     if(stat != HAL_OK) return -1;
     return 0;
 }
@@ -185,17 +196,20 @@ int32_t uart_unif_writef(const char *format, ...) {
 int32_t uart_unif_read(char* buf, uint32_t len, uint32_t timeout){
     UNUSED(timeout);
     if(len > __JES_STM32_UART_BUF_LEN_BYTE) return -1;
-    for(uint32_t i = 0; i < len; i++){
-        buf[i] = (char)uart_buf[i];
-    }
+    memcpy(buf, uart_buf_sw, len);
     return 0;
 }
 
 int32_t uart_unif_flush(void){
     __HAL_UART_DISABLE(&huart_num);
-    __HAL_UART_CLEAR_FLAG(&huart_num, UART_CLEAR_OREF | UART_CLEAR_NEF | UART_CLEAR_PEF | UART_CLEAR_FEF);
+    __HAL_UART_CLEAR_FLAG(&huart_num, UART_FLAG_ORE |
+                                      UART_CLEAR_OREF | 
+                                      UART_CLEAR_NEF | 
+                                      UART_CLEAR_PEF | 
+                                      UART_CLEAR_FEF);
     __HAL_UART_ENABLE(&huart_num);
-    memset(uart_buf, 0, __JES_STM32_UART_BUF_LEN_BYTE);
+    memset(uart_buf_dma, 0, __JES_STM32_UART_BUF_LEN_BYTE);
+    memset(uart_buf_sw, 0, __JES_STM32_UART_BUF_LEN_BYTE);
     return 0;
 }
 
