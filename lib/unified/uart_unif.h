@@ -22,6 +22,8 @@ extern "C" {
 #define __UNIF_UART_WRITE_BUF_SIZE __MAX_JOB_ARGS_LEN_BYTE
 #endif
 
+#define __extraUART_CLOSE_SESS      6
+#define __extraUART_INVALID         7
 #ifdef BUILD_FOR_STM32
 #define UART_DATA           0
 #define UART_FIFO_OVF       1
