@@ -15,7 +15,7 @@
 
 ### Fixed
 - 🔆 Core initializer now calls all registrations in one place 
-- `jescore dynamic linker` adds the FW version to ESP32 builds again
+- 🔢 `jescore dynamic linker` adds the FW version to ESP32 builds again
 
 ### Removed
 - 🛠️ Public reference to CLI helper functions
