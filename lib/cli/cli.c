@@ -25,7 +25,7 @@ static jes_err_t __cli_reprint_header(void){
 /// @param buf String to analyze.
 /// @param len Length of string.
 /// @return Index of white space in string. Returns -1 for the absence of a white space.
-static int16_t __get_ws_index(char* buf, uint16_t len){
+static int16_t __cli_get_ws_index(char* buf, uint16_t len){
     int16_t i = 0;
     while(i < len){
         if(buf[i] == ' '){
@@ -34,6 +34,42 @@ static int16_t __get_ws_index(char* buf, uint16_t len){
         i++;
     }
     return -1;
+}
+
+/// @brief Strip whitespaces and delimit string.
+/// @param inp Input array, raw string.
+/// @param len Length of valid input, at most length of array.
+/// @return Pointer to sanitized substring in original array.
+/// @note len is the string length without '\0'.
+static char* __cli_sanitize_input(char* inp, uint32_t len){
+    if (inp == NULL || len == 0) return NULL;
+    char* front = inp;
+    char* back = &inp[len-1];
+    while(*back == ' ' || *back == '\r'){
+        *back = 0;
+        back--;
+    }
+    while(*front == ' '){
+        front++;
+    }
+    return front;
+}
+
+/// @brief Split the command string from the argstring in a string.
+/// @param inp Input buffer.
+/// @param len Length of input.
+/// @return Pointer to arguments.
+/// @note After this call, inp is equivalent to the command string.
+/// @note Call `__cli_sanitize_input()` before this!
+static char* __cli_cmd_arg_split(char* inp, uint32_t len){
+    if(inp == NULL || len == 0) return NULL;
+    int16_t ws_i = __cli_get_ws_index(inp, len);
+    if(ws_i == -1){
+        return NULL;
+    }
+    char* args = __cli_sanitize_input(&inp[ws_i], len - ws_i);
+    inp[ws_i] = 0;
+    return args;
 }
 
 
@@ -55,9 +91,9 @@ void __cli_close_sess(void){
     xQueueSend(queue_uart, &ev, portMAX_DELAY);
 }
 
-void cli_server(void *pvParameters){
+void cli_server(void *p){
+    job_struct_t* pself = (job_struct_t*)p;
     char raw_str[__MAX_JOB_STR_LEN_BYTE] = {0};
-    char* arg_str = NULL;
     job_struct_t* pj_to_do = NULL;
     uart_event_t event;
 
@@ -66,13 +102,18 @@ void cli_server(void *pvParameters){
             switch (event.type) {
             case UART_DATA:
                 uart_unif_read(raw_str, event.size, portMAX_DELAY);
+                // skip nonsense or empty input
+                if(!raw_str[0] || raw_str[0] == '\r'){
+                    __cli_reprint_header();
+                    continue;
+                }
                 break;
             case UART_FIFO_OVF:
                 // fallthrough to UART_BUFFER_FULL
             case UART_BUFFER_FULL:
                 uart_unif_flush();
                 xQueueReset(queue_uart);
-                pj_to_do = __job_get_job_by_name(CLI_SERVER_NAME);
+                pj_to_do = pself;
                 pj_to_do->caller = e_origin_core;
                 pj_to_do->error = e_err_too_long;
                 __core_notify(pj_to_do, 0);
@@ -92,30 +133,18 @@ void cli_server(void *pvParameters){
             default:
                 break;
             }
-            if(raw_str[event.size-1] == '\r'){
-                raw_str[event.size-1] = 0;
-            }
-            int16_t ws_i = __get_ws_index(raw_str, __MAX_JOB_STR_LEN_BYTE);
-            if(ws_i == 0){
-                pj_to_do = __job_get_job_by_name(ERROR_HANDLER_NAME);
-                pj_to_do->caller = e_origin_core;
-                pj_to_do->error = e_err_leading_whitespace;
-            }
-            else{
-                if(ws_i != -1){
-                    raw_str[ws_i] = '\0';
+            char* clean = __cli_sanitize_input(raw_str, event.size);
+            char* cmd = clean;
+            char* args = __cli_cmd_arg_split(clean, event.size);
+            pj_to_do = __job_get_job_by_name(cmd);
+            if(pj_to_do){
+                pj_to_do->caller = e_origin_cli;
+                if(args){
+                    pj_to_do->error = e_err_no_err;
+                    strncpy(pj_to_do->args, args, __MAX_JOB_ARGS_LEN_BYTE);
                 }
-                pj_to_do = __job_get_job_by_name(raw_str); // is only read to '\0'
-                if(pj_to_do){
-                    pj_to_do->caller = e_origin_cli;
-                    if(ws_i == -1){
-                        memset(pj_to_do->args, 0, __MAX_JOB_ARGS_LEN_BYTE);
-                    }
-                    else{
-                        arg_str = &raw_str[ws_i+1];
-                        pj_to_do->error = e_err_no_err;
-                        strncpy(pj_to_do->args, arg_str, __MAX_JOB_ARGS_LEN_BYTE);
-                    }
+                else{
+                    memset(pj_to_do->args, 0, __MAX_JOB_ARGS_LEN_BYTE);
                 }
             }
             memset((void*)raw_str, 0, __MAX_JOB_STR_LEN_BYTE);
