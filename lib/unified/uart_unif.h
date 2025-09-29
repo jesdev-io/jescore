@@ -16,11 +16,7 @@ extern "C" {
 #include "queue.h"
 #endif
 
-#ifdef UNIF_UART_WRITE_BUF_SIZE
-#define __UNIF_UART_WRITE_BUF_SIZE UNIF_UART_WRITE_BUF_SIZE
-#else
-#define __UNIF_UART_WRITE_BUF_SIZE __MAX_JOB_ARGS_LEN_BYTE
-#endif
+#define __UNIF_UART_WRITE_BUF_SIZE (__MAX_JOB_NAME_LEN_BYTE + __MAX_JOB_ARGS_LEN_BYTE)
 
 #define __extraUART_CLOSE_SESS      6
 #define __extraUART_INVALID         7

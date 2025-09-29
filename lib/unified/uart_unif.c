@@ -83,11 +83,9 @@ int32_t uart_unif_deinit(void){
 #include "projdefs.h"
 #include "portmacro.h"
 
-#define __JES_STM32_UART_BUF_LEN_BYTE (__MAX_JOB_NAME_LEN_BYTE + __MAX_JOB_ARGS_LEN_BYTE)
-
 // shared buf for the RxCpltCallback and uart_unif_read
-static uint8_t uart_buf_dma[__JES_STM32_UART_BUF_LEN_BYTE];
-static uint8_t uart_buf_sw[__JES_STM32_UART_BUF_LEN_BYTE]; 
+static uint8_t uart_buf_dma[__UNIF_UART_WRITE_BUF_SIZE];
+static uint8_t uart_buf_sw[__UNIF_UART_WRITE_BUF_SIZE]; 
 
 // the right huart has to be defined externally (depends on the board)
 UART_HandleTypeDef huart_num;
@@ -99,7 +97,7 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t len){
     BaseType_t woke_task = pdFALSE;
     if(uart_buf_dma[0]){
         // Only handle non-nonsense input
-        if(evt.size >= (__JES_STM32_UART_BUF_LEN_BYTE-1)){
+        if(evt.size >= (__UNIF_UART_WRITE_BUF_SIZE-1)){
             uart_unif_flush();
             evt.type = UART_BUFFER_FULL;
         }
@@ -108,7 +106,7 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t len){
         }
         xQueueSendFromISR(*p_queue, (void*)&evt, &woke_task);
     }
-    HAL_UARTEx_ReceiveToIdle_IT(huart, uart_buf_dma, __JES_STM32_UART_BUF_LEN_BYTE);
+    HAL_UARTEx_ReceiveToIdle_IT(huart, uart_buf_dma, __UNIF_UART_WRITE_BUF_SIZE);
 }
 
 void HAL_UART_MspInit(UART_HandleTypeDef* huart){
@@ -173,7 +171,7 @@ int32_t uart_unif_init(uint32_t baud, uint32_t rx_buf_len, uint32_t tx_buf_len, 
     *(QueueHandle_t*)args = xQueueCreate(5, sizeof(uart_event_t));
     p_queue = (QueueHandle_t*)args;
     MX_USART_UART_Init();
-    HAL_StatusTypeDef stat = HAL_UARTEx_ReceiveToIdle_IT(&huart_num, uart_buf_dma, __JES_STM32_UART_BUF_LEN_BYTE);
+    HAL_StatusTypeDef stat = HAL_UARTEx_ReceiveToIdle_IT(&huart_num, uart_buf_dma, __UNIF_UART_WRITE_BUF_SIZE);
     if(stat != HAL_OK) return -1;
     return 0;
 }
@@ -183,7 +181,7 @@ int32_t uart_unif_write(const char* msg){
 }
 
 int32_t uart_unif_writef(const char *format, ...) {
-    char buffer[__JES_STM32_UART_BUF_LEN_BYTE];
+    char buffer[__UNIF_UART_WRITE_BUF_SIZE];
     va_list args;
     va_start(args, format);
     int len = vsnprintf(buffer, sizeof(buffer), format, args);
@@ -195,7 +193,7 @@ int32_t uart_unif_writef(const char *format, ...) {
 
 int32_t uart_unif_read(char* buf, uint32_t len, uint32_t timeout){
     UNUSED(timeout);
-    if(len > __JES_STM32_UART_BUF_LEN_BYTE) return -1;
+    if(len > __UNIF_UART_WRITE_BUF_SIZE) return -1;
     memcpy(buf, uart_buf_sw, len);
     return 0;
 }
@@ -208,8 +206,8 @@ int32_t uart_unif_flush(void){
                                       UART_CLEAR_PEF | 
                                       UART_CLEAR_FEF);
     __HAL_UART_ENABLE(&huart_num);
-    memset(uart_buf_dma, 0, __JES_STM32_UART_BUF_LEN_BYTE);
-    memset(uart_buf_sw, 0, __JES_STM32_UART_BUF_LEN_BYTE);
+    memset(uart_buf_dma, 0, __UNIF_UART_WRITE_BUF_SIZE);
+    memset(uart_buf_sw, 0, __UNIF_UART_WRITE_BUF_SIZE);
     return 0;
 }
 
