@@ -55,24 +55,6 @@ void test_job_core(void){
 }
 
 
-void test_job_error_handler(void){
-    char dummy[__MAX_JOB_ARGS_LEN_BYTE] = {0};
-    job_struct_t* pj = __job_get_job_by_name(ERROR_HANDLER_NAME);
-    TEST_ASSERT_EQUAL_STRING(ERROR_HANDLER_NAME, pj->name);
-    TEST_ASSERT_EQUAL_HEX32(NULL, pj->handle);
-    TEST_ASSERT_EQUAL_UINT32(BOARD_MIN_JOB_HEAP_MEM, pj->mem_size);
-    TEST_ASSERT_EQUAL_UINT8(1, pj->priority);
-    TEST_ASSERT_EQUAL_HEX32(__core_job_err_handler, pj->function);    
-    TEST_ASSERT_EQUAL_INT8_ARRAY(dummy, pj->args, __MAX_JOB_ARGS_LEN_BYTE);
-    TEST_ASSERT_EQUAL_UINT8(0, pj->is_loop);
-    TEST_ASSERT_EQUAL_UINT8(0, pj->instances);
-    TEST_ASSERT_EQUAL_INT(e_role_core, pj->role);
-    TEST_ASSERT_EQUAL_INT(e_origin_undefined, pj->caller);
-    TEST_ASSERT_EQUAL_HEX32(NULL, pj->param);
-    TEST_ASSERT_EQUAL_INT(e_err_no_err, pj->error);
-}
-
-
 void test_cli_init(void){
     jes_err_t e = __cli_init();
     TEST_ASSERT_EQUAL(e_err_no_err, e);

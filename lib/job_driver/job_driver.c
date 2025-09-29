@@ -107,13 +107,15 @@ jes_err_t __job_launch_job_by_name(const char* n, origin_t o){
 }
 
 
-jes_err_t __job_launch_job_by_name_args(const char* n, origin_t o, const char* args){
+jes_err_t __job_launch_job_by_name_args_core(const char* n, origin_t o, const char* args){
     if (args == NULL) { return e_err_is_zero; }
     job_struct_t* pj = __job_get_job_by_name(n);
     if (pj == NULL) { return e_err_is_zero; }
     jes_err_t e = __job_set_args((char*)args, pj);
     if (e != e_err_no_err) { return e; }
-    return __job_launch_job(pj, o);
+    pj->caller = o;
+    __core_notify(pj, 0);
+    return e_err_no_err;
 }
 
 
@@ -125,9 +127,8 @@ void __job_runtime_env(void* p){
      * This is useful when an infinite job is triggered once by the CLI, otherwise
      * the prefix would never return.
     */
-    if(pj->is_loop && __cli_get_sess_state() == 1){
-        __cli_set_sess_state(0);
-        __cli_reprint_header();
+    if(pj->is_loop && pj->caller == e_origin_cli){
+        __cli_close_sess();
     }
     #endif
 
@@ -149,10 +150,8 @@ void __job_runtime_env(void* p){
     /* This section reprints the CLI prefix in case the started job is done.
      * This is the opposite of the similar looking statement above.
     */
-    if(!pj->is_loop && __cli_get_sess_state() == 1){
-        __cli_set_sess_state(0);
-        jes_delay_job_ms(50);
-        __cli_reprint_header();
+    if(!pj->is_loop && pj->caller == e_origin_cli){
+        __cli_close_sess();
     }
     #endif
     pj->handle = NULL;

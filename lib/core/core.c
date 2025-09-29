@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "core.h"
 #include "cli.h"
 #include "base_jobs.h"
@@ -16,67 +17,78 @@ static core_t core = {
 };
 
 jes_err_t __core_init(){
-    if(core.state == e_state_idle) return e_err_no_err;
+    if(core.state != e_state_init) return e_err_no_err;
     jes_err_t e;
+    // Register the bare minimum of core and error handler
     e = __job_register_job(CORE_JOB_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __core_job, 1, e_role_core);
     if(e != e_err_no_err){ return e; }
-    e = __job_register_job(ERROR_HANDLER_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __core_job_err_handler, 0, e_role_core);
+
+    // Launch the core
+    e = __job_launch_job_by_name(CORE_JOB_NAME, e_origin_core);
     if(e != e_err_no_err){ return e; }
 
+    // Launch the CLI if enabled
     #ifndef JES_DISABLE_CLI
+    // Initialize the underlying UART drivers and variables
+    e = __cli_init();
+    if(e != e_err_no_err){ return e; }
+
+    // register jobs associated with CLI
+    e = __job_register_job(CLI_SERVER_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, cli_server, 1, e_role_core);
+    if(e != e_err_no_err){ return e; }
     #if __JES_LOG_LEN > 0
     e = __job_register_job(LOG_PRINTER_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __core_log_printer, 0, e_role_base);
     #endif // __JES_LOG_LEN > 0
-    e = __cli_init();
-    if(e != e_err_no_err){ return e; }
     e = __job_register_job(HELP_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __base_job_help, 0, e_role_base);
     if(e != e_err_no_err){ return e; }
     e = __job_register_job(STATS_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __base_job_stats, 0, e_role_base);
     if(e != e_err_no_err){ return e; }
     e = __job_register_job(BENCH_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __base_job_bench, 0, e_role_base);
     if(e != e_err_no_err){ return e; }
-    #endif
-    
-    e = __job_launch_job_by_name(CORE_JOB_NAME, e_origin_core);
+    e = __job_register_job(PRINT_JOB_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __base_job_echo, 0, e_role_base);
     if(e != e_err_no_err){ return e; }
+    // Launch CLI server
+    e = __job_launch_job_by_name(CLI_SERVER_NAME, e_origin_core);
+    if(e != e_err_no_err){ return e; }
+    #endif
 
     core.state = e_state_idle;
     return e_err_no_err;
 }
 
-
-inline void __core_err_handler_inline(jes_err_t e, void* args){
-
-    job_struct_t* err_print_job = __job_get_job_by_name(PRINT_JOB_NAME);
+/// @brief Core error handler.
+/// @param e: Error to handle.
+/// @param args: optional additional arguments.
+static inline void __core_err_handler_inline(jes_err_t e, void* args){
     const char* description = NULL;
     switch (e)
     {
     case e_err_mem_null:
-        description = "Memory could not be allocated!";
+        description = "Malloc fail!";
         break;
     case e_err_is_zero:
-        description = "Result is unexpectedly 0!";
+        description = "Unexpected 0!";
         break;
     case e_err_param:
-        description = "Parameter error!";
+        description = "Param error!";
         break;
     case e_err_peripheral_block:
-        description = "Peripheral was blocked!";
+        description = "Peripheral blocked!";
         break;
     case e_err_core_fail:
-        description = "Core failure!";
+        description = "Core fault!";
         break;
     case e_err_duplicate:
-        description = "Entry already exists!";
+        description = "Already exists!";
         break;
     case e_err_too_long:
-        description = "Given string is too long!";
+        description = "String too long!";
         break;
     case e_err_unknown_job:
-        description = "Job has not been registered!";
+        description = "Job not registered!";
         break;
     case e_err_leading_whitespace:
-        description = "Leading whitespace error!";
+        description = "Leading whitespace!";
         break;
     case e_err_prohibited:
         description = "Access denied!";
@@ -85,14 +97,15 @@ inline void __core_err_handler_inline(jes_err_t e, void* args){
         description = "Unknown error.";
         break;
     }
-    sprintf(err_print_job->args, "%s (%d)\n\r", description, e);
-    __job_launch_job(err_print_job, e_origin_core);
+    uart_unif_writef("(E:) %s (%d)\n\r", description, e);
+    __cli_close_sess();
 }
 
 
 void __core_job_err_handler(void* p){
     job_struct_t* pj = (job_struct_t*)p;
-    __core_err_handler_inline(pj->error, NULL);
+    jes_err_t e = (jes_err_t)atoi(pj->args);
+    __core_err_handler_inline(e, NULL);
 }
 
 
@@ -202,6 +215,7 @@ void __core_log_printer(void* p){
 #endif // __JES_LOG_LEN > 0
 
 void __core_job(void* p){
+    job_struct_t* pself = (job_struct_t*)p;
     while(1){
         job_struct_t* pj = __job_sleep_until_notified_with_job();
         if(pj == NULL){
@@ -216,13 +230,16 @@ void __core_job(void* p){
         }
         else{
             core.state = e_state_spawning;
-            pj->error = __job_launch_job_by_name(pj->name, pj->caller);
+            if(pj->error == e_err_no_err){
+                pj->error = __job_launch_job(pj, pj->caller);
+            }
             if(pj->error != e_err_no_err){
                 core.state = e_state_fault;
                 __core_err_handler_inline(pj->error, NULL);
                 JES_LOG_FAULT(pj);
             }
         }
+        pself->error = e_err_no_err;
         core.state = e_state_idle;
     }
 }

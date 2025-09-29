@@ -28,6 +28,7 @@ extern "C" {
 #define JES_LOG_FAULT(pj) 
 #define JES_LOG_REGISTER(pj) 
 #define JES_LOG_LAUNCH(pj) 
+#define JES_LOG_FINISH(pj)
 #endif // __JES_LOG_LEN > 0
 
 
@@ -68,12 +69,6 @@ typedef struct core_t{
 /// @return status, `e_err_no_err` if OK.
 /// @note Registers/launches itself and CLI if `JES_DISABLE_CLI` is not defined
 jes_err_t __core_init();
-
-
-/// @brief Core error handler.
-/// @param e: Error to handle.
-/// @param args: optional additional arguments.
-void __core_err_handler_inline(jes_err_t e, void* args);
 
 
 /// @brief Error handler as callable job

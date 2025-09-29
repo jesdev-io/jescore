@@ -37,7 +37,6 @@ void test_all(void* p) {
     RUN_TEST(test_core_init);
     jes_delay_job_ms(100);
     RUN_TEST(test_job_core);
-    RUN_TEST(test_job_error_handler);
     RUN_TEST(test_cli_init);
     RUN_TEST(test_job_help);
     RUN_TEST(test_job_stats);

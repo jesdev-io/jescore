@@ -15,6 +15,7 @@ extern "C" {
 
 #ifdef BUILD_FOR_STM32
 #include "queue.h"
+#include "semphr.h"
 #endif
 
 #define __GET_SAFE_SIZE(SIZE, LIMIT) ((SIZE)<=(LIMIT)?(SIZE):(LIMIT))
@@ -31,6 +32,16 @@ extern "C" {
 #define __MAX_JOB_ARGS_LEN_LIMIT    64
 #define __MAX_JOB_ARGS_LEN_BYTE __GET_SAFE_SIZE(MAX_JOB_ARGS_LEN_BYTE, MAX_JOB_ARGS_LEN_LIMIT)
 #endif
+
+#define __MAX_JOB_STR_LEN_BYTE __MAX_JOB_NAME_LEN_BYTE + __MAX_JOB_ARGS_LEN_BYTE
+
+#define __AWAIT_GET_PROTECTED(protected, copy, lock) xSemaphoreTake(lock, portMAX_DELAY); \
+                                                     copy = protected; \
+                                                     xSemaphoreGive(lock);
+
+#define __AWAIT_SET_PROTECTED(protected, value, lock) xSemaphoreTake(lock, portMAX_DELAY); \
+                                                      protected = value; \
+                                                      xSemaphoreGive(lock); 
 
 #define MAX_JOB_NOTIF_QUEUE_SIZE    4
 
@@ -121,6 +132,7 @@ job_struct_t* __job_get_job_by_handle(TaskHandle_t t);
 /// @param pj: Pointer to job to do.
 /// @param o: Origin of activation.
 /// @returns status, `e_err_no_err` if OK.
+/// @note This may only be called by the core job.
 jes_err_t __job_launch_job(job_struct_t* pj, origin_t o);
 
 /// @brief Job creation wrapper.
@@ -128,6 +140,7 @@ jes_err_t __job_launch_job(job_struct_t* pj, origin_t o);
 /// @param o: Origin of activation.
 /// @returns status, `e_err_no_err` if OK.
 /// @note Checks if task memory could be allocated.
+/// @note This may only be called by the core job.
 jes_err_t __job_launch_job_by_name(const char* n, origin_t o);
 
 
@@ -140,7 +153,9 @@ jes_err_t __job_launch_job_by_name(const char* n, origin_t o);
 /// @note Arguments are expected to be whitespace delimited substrings
 ///       in a string. They should not exceed `MAX_JOB_ARGS_LEN_BYTE`.
 ///       A copy is stored in the `args` field of the job.
-jes_err_t __job_launch_job_by_name_args(const char* n, origin_t o, const char* args);
+/// @note This does not create a task; it notifies the core to create
+///       a task by itself.
+jes_err_t __job_launch_job_by_name_args_core(const char* n, origin_t o, const char* args);
 
 
 /// @brief Jescore runtime environment. This is the FreeRTOS task that

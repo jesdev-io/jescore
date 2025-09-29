@@ -234,14 +234,17 @@ void test_error_throw_get(void){
 
 
 void test_core_job_launch_prohibited(void){
-    jes_err_t stat = jes_launch_job(CORE_JOB_NAME);
+    jes_err_t stat;
+    #if __JES_LOG_LEN > 0
+    /*  The core refreshes its error state to `e_err_no_err`
+        after every iteration. However, the error is logged.
+    */
+    stat = jes_launch_job(CORE_JOB_NAME);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
     jes_delay_job_ms(20);
-    TEST_ASSERT_EQUAL(e_err_prohibited, jes_error_get(CORE_JOB_NAME));
-    stat = jes_launch_job(ERROR_HANDLER_NAME);
-    TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
-    jes_delay_job_ms(20);
-    TEST_ASSERT_EQUAL(e_err_prohibited, jes_error_get(ERROR_HANDLER_NAME));
+    log_entry_t le = __core_read_from_log_next();
+    TEST_ASSERT_EQUAL(e_err_prohibited, le.job_state.error);
+    #endif // __JES_LOG_LEN > 0
     stat = jes_launch_job(CLI_SERVER_NAME);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
     jes_delay_job_ms(20);
@@ -267,6 +270,6 @@ void test_notify_job_and_wait(void){
 
     uint32_t* val = (uint32_t*)__job_get_param(__job_get_job_by_name(DUMMY_JOB_NOTIFY_TAKE));
     char* msg = __job_get_args(__job_get_job_by_name(DUMMY_JOB_NOTIFY_TAKE));
-    TEST_ASSERT_EQUAL_UINT8(DUMMY_NOTIFICATION_VALUE, (uint32_t)val);
+    TEST_ASSERT_EQUAL_UINT32(DUMMY_NOTIFICATION_VALUE, (uint32_t)val);
     TEST_ASSERT_EQUAL_STRING(DUMMY_SUCCESS_MSG, msg);
 }

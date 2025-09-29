@@ -19,6 +19,20 @@ for port in ports:
 def test_cli_init():
     assert cli.os_type == platform.system()
 
+def test_cli_unknown():
+    for port in device_ports:
+        msg = "test"
+        stat = cli.uartTransceive(msg, port=port)
+        assert stat[0] == "(E:) Job not registered! (8)"
+        assert stat[1] == CLI_PREFIX_MCU
+
+def test_cli_denied():
+    for port in device_ports:
+        msg = "core"
+        stat = cli.uartTransceive(msg, port=port)
+        assert stat[0] == "(E:) Access denied! (10)"
+        assert stat[1] == CLI_PREFIX_MCU
+
 def test_cli_echo():
     for port in device_ports:
         msg = "echo test"
@@ -60,7 +74,6 @@ def test_cli_stats():
         assert "clisrv" in stat
         assert "stats" in stat
         assert "help" in stat
-        assert "errorhandler" in stat
         assert "core" in stat 
 
 def test_cli_logp():

@@ -54,6 +54,8 @@ jescore_as_lib = os.path.join(env["PROJECT_LIBDEPS_DIR"], env["PIOENV"], "jescor
 print(f"Starting dynamic linking script for jescore on {Color.G + mcu + Color.X} ...")
 # ESP32 specific linking is done out-of-the-box
 if "esp" in mcu:
+    if not os.path.exists(jescore_as_lib):
+        jescore_as_lib = "."
     print(" > Found ESP32 platform, defaulting to base config ...")
 
 else:
@@ -157,25 +159,6 @@ else:
     print(f"FreeRTOS Path: {Color.G + freertos_port_path + Color.X}")
 
 
-def get_git_info():
-    try:
-        branch = subprocess.check_output(
-            ["git", "-C", jescore_as_lib, "rev-parse", "--abbrev-ref", "HEAD"],
-            stderr=subprocess.STDOUT
-        ).decode("utf-8").strip()
-    except:
-        branch = "unknown"
-
-    try:
-        githash = subprocess.check_output(
-            ["git", "-C", jescore_as_lib, "rev-parse", "--short", "HEAD"],
-            stderr=subprocess.STDOUT
-        ).decode("utf-8").strip()
-    except:
-        githash = "unknown"
-
-    return branch, githash
-
 def get_fw_version():
     version = "unknown"
     version_files = [
@@ -187,6 +170,7 @@ def get_fw_version():
     for file in version_files:
         file = join(jescore_as_lib, file)
         if exists(file):
+            
             try:
                 with open(file) as f:
                     if file.endswith('.json'):
@@ -196,7 +180,8 @@ def get_fw_version():
                         version = f.read().strip()
                 break
             except:
-                pass
+                print("sus")
+                # pass
 
     return version
 

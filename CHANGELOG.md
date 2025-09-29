@@ -1,5 +1,27 @@
 # Changelog
 
+## 2.2.1 - 2025-09-29
+
+### Added
+- 💬 UART queue commands for invalid data and CLI session closing
+- 🌊 Early termination on CLI input overflow 
+- 🔆 Core now checks for errors in job **before** launch as well
+- 🛡️ Macros for generic resource protection
+- ‼️ UART double buffer to stop DMA override of burst data
+
+### Changed
+- 🚫 Shorter error messages
+- 🧑‍🌾 Reduced heap size for STM32 projects
+
+### Fixed
+- 🔆 Core initializer now calls all registrations in one place 
+- 🔢 `jescore dynamic linker` adds the FW version to ESP32 builds again
+
+### Removed
+- 🛠️ Public reference to CLI helper functions
+- ❌ `errorhandler` is now inline and no longer a job
+- 😺 `jescore dynamic linker` will no longer log git information
+
 ## 2.2.0 - 2025-09-23
 
 ### Added
