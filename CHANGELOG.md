@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.2.1 - 2025-09-2x
+## 2.2.1 - 2025-09-29
 
 ### Added
 - 💬 UART queue commands for invalid data and CLI session closing
