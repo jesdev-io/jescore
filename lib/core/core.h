@@ -71,12 +71,6 @@ typedef struct core_t{
 jes_err_t __core_init();
 
 
-/// @brief Core error handler.
-/// @param e: Error to handle.
-/// @param args: optional additional arguments.
-void __core_err_handler_inline(jes_err_t e, void* args);
-
-
 /// @brief Error handler as callable job
 /// @param p: Mandatory args pointer.
 void __core_job_err_handler(void* p);
