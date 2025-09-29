@@ -169,7 +169,6 @@ def get_fw_version():
 
     for file in version_files:
         file = join(jescore_as_lib, file)
-        print("DEBUGG: ", file)
         if exists(file):
             
             try:
