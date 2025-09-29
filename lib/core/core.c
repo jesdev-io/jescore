@@ -22,8 +22,6 @@ jes_err_t __core_init(){
     // Register the bare minimum of core and error handler
     e = __job_register_job(CORE_JOB_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __core_job, 1, e_role_core);
     if(e != e_err_no_err){ return e; }
-    e = __job_register_job(ERROR_HANDLER_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __core_job_err_handler, 0, e_role_core);
-    if(e != e_err_no_err){ return e; }
 
     // Launch the core
     e = __job_launch_job_by_name(CORE_JOB_NAME, e_origin_core);
@@ -58,8 +56,10 @@ jes_err_t __core_init(){
     return e_err_no_err;
 }
 
-
-inline void __core_err_handler_inline(jes_err_t e, void* args){
+/// @brief Core error handler.
+/// @param e: Error to handle.
+/// @param args: optional additional arguments.
+static inline void __core_err_handler_inline(jes_err_t e, void* args){
     const char* description = NULL;
     switch (e)
     {

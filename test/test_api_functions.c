@@ -245,10 +245,6 @@ void test_core_job_launch_prohibited(void){
     log_entry_t le = __core_read_from_log_next();
     TEST_ASSERT_EQUAL(e_err_prohibited, le.job_state.error);
     #endif // __JES_LOG_LEN > 0
-    stat = jes_launch_job(ERROR_HANDLER_NAME);
-    TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
-    jes_delay_job_ms(20);
-    TEST_ASSERT_EQUAL(e_err_prohibited, jes_error_get(ERROR_HANDLER_NAME));
     stat = jes_launch_job(CLI_SERVER_NAME);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
     jes_delay_job_ms(20);
