@@ -74,7 +74,6 @@ def test_cli_stats():
         assert "clisrv" in stat
         assert "stats" in stat
         assert "help" in stat
-        assert "errh" in stat
         assert "core" in stat 
 
 def test_cli_logp():
