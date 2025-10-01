@@ -2,7 +2,7 @@
 #include "jescore.h"
 #include <inttypes.h>
 
-#define LED_PIN 5
+#define LED_PIN LED_BUILTIN
 
 static uint32_t blink_pause = 1000;
 

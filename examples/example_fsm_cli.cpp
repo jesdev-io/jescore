@@ -2,7 +2,7 @@
 #include "jescore.h"
 #include <string.h>
 
-#define LED_PIN 5
+#define LED_PIN LED_BUILTIN
 
 static bool is_on = false;
 static bool processing = false;
@@ -37,7 +37,7 @@ void lights(void* p){
         if(processing) return; // blocked by lights_off
         processing = true;
         for(uint8_t i = 255; i > 0; i--){
-            analogWrite(LED_PIN, i);
+            analogWrite(LED_PIN, i-1);
             jes_delay_job_ms(5);
         }
         is_on = false;
