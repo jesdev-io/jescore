@@ -57,6 +57,7 @@ typedef struct log_entry_t{
 typedef struct core_t{
     state_t state;
     job_struct_t* job_list;
+    SemaphoreHandle_t lock;
     #if __JES_LOG_LEN > 0
     log_entry_t log[__JES_LOG_LEN];
     uint32_t log_write;

@@ -10,6 +10,7 @@
 static core_t core = {
     .state = e_state_init,
     .job_list = NULL,
+    .lock = 0,
     #if __JES_LOG_LEN > 0
     .log_write = 0,
     .log_read = 0,
@@ -52,6 +53,7 @@ jes_err_t __core_init(){
     if(e != e_err_no_err){ return e; }
     #endif
 
+    core.lock = xSemaphoreCreateMutex();
     core.state = e_state_idle;
     return e_err_no_err;
 }

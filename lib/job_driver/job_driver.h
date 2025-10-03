@@ -82,6 +82,7 @@ typedef struct job_struct_t{
     void* param;
     jes_err_t error;
     QueueHandle_t notif_queue;
+    SemaphoreHandle_t lock;
     uint32_t timing_begin;
     uint32_t timing_end;
     struct job_struct_t* pn;
