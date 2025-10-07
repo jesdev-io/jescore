@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.2.2 - 2025-10-07
+
+### Added
+- 🔆 Support for ESP32-NodeMCU
+- 🛡️ Core and job task lock
+- 📜 Compilation now outputs `compile_commands.json` for clangd
+
+### Fixed
+- 💡 LED pin definitions for boards without `LED_BUILTIN`
+
 ## 2.2.1 - 2025-09-29
 
 ### Added
