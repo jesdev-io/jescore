@@ -5,7 +5,7 @@
 #include "task.h"
 #endif // BUILD_FOR_STM32
 
-void jes_delay_job_ms(uint32_t ms){
+void __delay_job_ms(uint32_t ms){
     vTaskDelay(ms / portTICK_PERIOD_MS);
 }
 

@@ -2,7 +2,7 @@
 #include "jescore.h"
 
 #define MAX_JOB_ARGS_LEN_BYTE 64
-#define LED_PIN 4
+#define LED_PIN LED_BUILTIN
 
 
 void blink(void* p){

@@ -10,7 +10,7 @@ extern "C" {
 /// @brief Delay a job in milliseconds.
 /// @param ms Milliseconds of delay.
 /// @note Timing is handled by FreeRTOS
-void jes_delay_job_ms(uint32_t ms);
+void __delay_job_ms(uint32_t ms);
 
 /// @brief Get the current system time since boot in milliseconds.
 /// @return System time in milliseconds.

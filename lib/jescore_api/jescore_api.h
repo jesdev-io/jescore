@@ -150,6 +150,11 @@ void jes_notify_job_ISR(const char* name, void* notification);
 /// @brief Pause the calling job until a notification arrives.
 /// @return The optional notification value.
 void* jes_wait_for_notification(void);
+
+/// @brief Delay a job in milliseconds.
+/// @param ms Milliseconds of delay.
+/// @note Timing is handled by FreeRTOS.
+void jes_delay_job_ms(uint32_t ms);
 #endif
 
 #ifdef __cplusplus
