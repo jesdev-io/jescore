@@ -153,3 +153,7 @@ void jes_notify_job_ISR(const char* name, void* notification){
 void* jes_wait_for_notification(void){
     return __job_sleep_until_notified_generic();
 }
+
+void jes_delay_job_ms(uint32_t ms){
+    __delay_job_ms(ms);
+}
