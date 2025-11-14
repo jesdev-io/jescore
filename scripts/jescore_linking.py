@@ -180,8 +180,7 @@ def get_fw_version():
                         version = f.read().strip()
                 break
             except:
-                print("sus")
-                # pass
+                pass
 
     return version
 
