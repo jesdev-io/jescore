@@ -4,6 +4,7 @@ from serial.tools import list_ports
 from .common import *
 import platform
 
+config_iteration_print_end = '\n'
 
 class CjescoreCli:
     def __init__(self, baudrate=115200, verbose=False, port=None) -> None:
@@ -80,7 +81,7 @@ class CjescoreCli:
             while(1):
                 stat = ser.readline().decode('utf-8', errors="ignore").strip("\n\r\x00")
                 if stat != "":
-                    print(stat)
+                    print(stat, end=config_iteration_print_end)
         except KeyboardInterrupt:
             self.__vPrint(f"Closing port {port_name}.")
             return
@@ -101,6 +102,7 @@ def main():
     parser.add_argument("-b", "--baudrate", type=int, default=115200, help="Baud rate for communication (default: 115200)")
     parser.add_argument("-d", "--discover", action="store_true", help="Discover connected devices known to jescore")
     parser.add_argument("-l", "--listen", action="store_true", help="Listen to the given UART stream")
+    parser.add_argument("--inline", action="store_true", help="Enable inline mode when listening with -l")
 
     # Capture both known and unknown arguments
     args, unknown_args = parser.parse_known_args()
@@ -114,6 +116,8 @@ def main():
         return
     
     if args.listen:
+        if args.inline:
+            config_iteration_print_end = '\r'
         cli.uartReceive()
         return
 
