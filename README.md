@@ -15,6 +15,19 @@
 
 `jescore` works by launching a given **"job"** in a runtime environment that is then executed in a multitasking context. The core handles calls to these jobs and checks if they have been registered by the user. Such a call can happen in the form of the [API](https://github.com/jesdev-io/jescore/wiki/API-Documentation) from within the program or the [CLI](https://github.com/jesdev-io/jescore/wiki/CLI-Documentation) if the MCU is connected to a host machine. This means that a program can be written that has **automatic and native** CLI support for **automation tasks**, **in-situ debugging** or **backend-access** that the UI of a project doesn't allow. It additionally implements so called [**"base jobs"**](https://github.com/jesdev-io/jescore/wiki/CLI-Documentation#built-in-jobs), which offer additional functionality like **job status**, **logging** and **benchmarking**.
 
+## Installation
+`jescore` is built with **PlatformIO**. To get started there immediately, you just need to add `jescore` to your dependencies in `platformio.ini`:
+```ini
+; platformio.ini:
+[env:my_board]
+...
+lib_deps = 
+    https://github.com/jake-is-ESD-protected/jescore ; as repo
+    ; or
+    jescore ; as PlatformIO registry library
+```
+Find more instructions on [project setup in the wiki](https://github.com/jesdev-io/jescore/wiki/API-Documentation#imports).
+
 ## Why?
 Many times I find myself needing the same type of overarching architecture for embedded systems projects. This includes things like multitasking, interrupts, sampling tasks and user input tasks. As of now, every project consists of me setting up this architecture manually for every project, always slightly different with new knowledge added. At one point I stopped and thought, why not outsource this specific framework into its own project, software, module... Something that is always at the center of my projects: **jescore**.
 
