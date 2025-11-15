@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.2.3 -
+
+### Added
+- 🖥️ Inline flag for CLI responses to reuse same line
+- 🔆 New logo banner and function diagram 
+- 📜 Short installation paragraph in main README
+
 ## 2.2.2 - 2025-10-07
 
 ### Added
