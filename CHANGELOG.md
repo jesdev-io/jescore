@@ -6,6 +6,7 @@
 - 🖥️ Inline flag for CLI responses to reuse same line
 - 🔆 New logo banner and function diagram 
 - 📜 Short installation paragraph in main README
+- 🚫 `e_err_NUM_ERR` enum for better "inheritance" of errors
 
 ## 2.2.2 - 2025-10-07
 
