@@ -20,7 +20,8 @@ typedef enum jes_err{
     e_err_unknown_job,
     e_err_leading_whitespace,
     e_err_prohibited,
-    e_err_driver_fail
+    e_err_driver_fail,
+    e_err_NUM_ERR
 }jes_err_t;
 
 #endif
