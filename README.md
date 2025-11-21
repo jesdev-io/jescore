@@ -3,7 +3,7 @@
 # `jescore`
 |Examples Repo 🔆|`main` CI 📦️|`dev` CI 🚢|Support 🙏|
 |-|-|-|-|
-|[<img src="https://github.com/user-attachments/assets/b05f7ef9-e437-47c2-84b4-22feb22bd528" width="100"/>](https://github.com/jesdev-io/jescore)|[![Main](https://github.com/jesdev-io/jescore/actions/workflows/workflow.yml/badge.svg?branch=main)](https://github.com/jesdev-io/jescore/actions/workflows/workflow.yml)|[![Dev](https://github.com/jesdev-io/jescore/actions/workflows/workflow.yml/badge.svg?branch=dev)](https://github.com/jesdev-io/jescore/actions/workflows/workflow.yml)|[![Buy me a coffee](https://img.shields.io/badge/Ko--fi-Support%20Me-FF5E5B?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/jseshack)|
+|[<img src="https://github.com/user-attachments/assets/b05f7ef9-e437-47c2-84b4-22feb22bd528" width="100"/>](https://github.com/jesdev-io/jescore-examples)|[![Main](https://github.com/jesdev-io/jescore/actions/workflows/workflow.yml/badge.svg?branch=main)](https://github.com/jesdev-io/jescore/actions/workflows/workflow.yml)|[![Dev](https://github.com/jesdev-io/jescore/actions/workflows/workflow.yml/badge.svg?branch=dev)](https://github.com/jesdev-io/jescore/actions/workflows/workflow.yml)|[![Buy me a coffee](https://img.shields.io/badge/Ko--fi-Support%20Me-FF5E5B?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/jseshack)|
 
 **J's Embedded Systems Core**: a convenient, dynamic and portable wrapper for FreeRTOS with native CLI support running on embedded systems with a central core unit that makes adding, debugging and abstracting new features easy.
 
