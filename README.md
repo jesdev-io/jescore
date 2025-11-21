@@ -1,7 +1,7 @@
 <img width="1920" height="300" alt="jescore_logo_banner" src="https://github.com/user-attachments/assets/2fc4f696-0a6c-444b-a99b-053f9bee6d59" />
 
 # `jescore`
-|Examples Repo 🔆|`jescore` CLI|`main` CI 📦️|`dev` CI 🚢|Support 🙏|
+|Examples 🔆|CLI 💻️|`main` CI 📦️|`dev` CI 🚢|Support 🙏|
 |-|-|-|-|-|
 |[<img src="https://github.com/user-attachments/assets/b05f7ef9-e437-47c2-84b4-22feb22bd528" width="100"/>](https://github.com/jesdev-io/jescore-examples)|[<img src="https://github.com/user-attachments/assets/65346ad1-1f6f-41f8-86b4-0e27a6e0d3b5" width="100"/>](hhttps://github.com/jesdev-io/jescorecli)|[![Main](https://github.com/jesdev-io/jescore/actions/workflows/workflow.yml/badge.svg?branch=main)](https://github.com/jesdev-io/jescore/actions/workflows/workflow.yml)|[![Dev](https://github.com/jesdev-io/jescore/actions/workflows/workflow.yml/badge.svg?branch=dev)](https://github.com/jesdev-io/jescore/actions/workflows/workflow.yml)|[![Buy me a coffee](https://img.shields.io/badge/Ko--fi-Support%20Me-FF5E5B?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/jseshack)|
 
