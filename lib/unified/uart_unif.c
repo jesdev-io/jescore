@@ -81,6 +81,7 @@ int32_t uart_unif_deinit(void){
 #include "board_parser.h"
 #include "projdefs.h"
 #include "portmacro.h"
+#include "cli.h"
 
 // shared buf for the RxCpltCallback and uart_unif_read
 static uint8_t uart_buf_dma[__UNIF_UART_WRITE_BUF_SIZE];
@@ -140,7 +141,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart){
 
 void MX_USART_UART_Init(void){
   huart_num.Instance = USART_NUM;
-  huart_num.Init.BaudRate = 115200;
+  huart_num.Init.BaudRate = CLI_BAUDRATE;
   huart_num.Init.WordLength = UART_WORDLENGTH_8B;
   huart_num.Init.StopBits = UART_STOPBITS_1;
   huart_num.Init.Parity = UART_PARITY_NONE;
