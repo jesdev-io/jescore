@@ -1,6 +1,9 @@
 <img width="1920" height="300" alt="jescore_logo_banner" src="https://github.com/user-attachments/assets/2fc4f696-0a6c-444b-a99b-053f9bee6d59" />
 
 # `jescore`
+|Examples Repo 🔆|`main` CI 📦️|`dev` CI 🚢|Support 🙏|
+|-|-|-|-|
+|[<img src="https://github.com/user-attachments/assets/b05f7ef9-e437-47c2-84b4-22feb22bd528" width="100"/>](https://github.com/jesdev-io/jescore)|[![Main](https://github.com/jesdev-io/jescore/actions/workflows/workflow.yml/badge.svg?branch=main)](https://github.com/jesdev-io/jescore/actions/workflows/workflow.yml)|[![Dev](https://github.com/jesdev-io/jescore/actions/workflows/workflow.yml/badge.svg?branch=dev)](https://github.com/jesdev-io/jescore/actions/workflows/workflow.yml)|[![Buy me a coffee](https://img.shields.io/badge/Ko--fi-Support%20Me-FF5E5B?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/jseshack)|
 
 **J's Embedded Systems Core**: a convenient, dynamic and portable wrapper for FreeRTOS with native CLI support running on embedded systems with a central core unit that makes adding, debugging and abstracting new features easy.
 
@@ -48,9 +51,6 @@ The great thing about this name is that it can stand for "**J**'s **e**mbedded *
 - [Gallery](https://github.com/jake-is-ESD-protected/jescore/wiki#check-the-stats-of-your-program)
 
 All that stuff is explained in detail in the [wiki](https://github.com/jake-is-ESD-protected/jescore/wiki).
-
-## Find this stuff useful? Consider a donation!
-[![Buy me a coffee](https://img.shields.io/badge/Ko--fi-Support%20Me-FF5E5B?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/jseshack) 
 
 ## Disclaimer
 The software shown here is how **I like to structure my projects**. You might disagree with the way the code is structured. If you would like to try this code out as well and you are not happy with certain features, you are very welcome to contribute. I keep this core updated to always reflect my current coding style for embedded systems. For any legal conditions regarding this software, see the [license](LICENSE).
