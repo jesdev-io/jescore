@@ -7,8 +7,6 @@
 
 **J's Embedded Systems Core**: a convenient, dynamic and portable wrapper for FreeRTOS with native CLI support running on embedded systems with a central core unit that makes adding, debugging and abstracting new features easy.
 
-[![PlatformIO CI](https://github.com/jake-is-ESD-protected/jescore/actions/workflows/workflow.yml/badge.svg?branch=main)](https://github.com/jake-is-ESD-protected/jescore/actions/workflows/workflow.yml)
-
 ![jescore_blink](https://github.com/user-attachments/assets/d180d1a6-2823-451f-9092-45aa2639c013)
 
 ## Key-concepts
