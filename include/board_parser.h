@@ -35,6 +35,10 @@
 #ifndef _BOARD_PARSER_H_
 #define _BOARD_PARSER_H_
 
+#ifdef JES_UART_CUSTOM
+#include "uart_cfg.h"
+#endif // JES_UART_CUSTOM
+
 // --- ESP32 -- //
 #ifdef ESP32
 #define BUILD_FOR_ESP32
@@ -46,6 +50,10 @@
 
 #define BOARD_MIN_JOB_HEAP_MEM 2048
 #define BUILD_PLATFORM_NAME "ESP32"
+
+#ifndef JES_UART_CUSTOM
+#define BASE_UART UART_NUM_0
+#endif // JES_UART_CUSTOM
 
 #endif
 
@@ -106,6 +114,7 @@
 #ifdef STM32G431xx
 #include "stm32g4xx_hal.h"
 #define BUILD_PLATFORM_NAME "STM32G431"
+#ifndef JES_UART_CUSTOM
 #define USART_RCC_PERIPH RCC_PERIPHCLK_USART2
 #define USART_CLK_SRC_DEFAULT(PeriphClkInit_struct) PeriphClkInit_struct.Usart2ClockSelection = __HAL_RCC_GET_USART2_SOURCE()
 #define USART_CLK_ENABLE() __HAL_RCC_USART2_CLK_ENABLE()
@@ -119,6 +128,7 @@
 #define USART_GPIO_TX_ALT GPIO_AF7_USART2
 #define USART_GPIO_RX_ALT GPIO_AF7_USART2
 #define USART_IRQn_NUM USART2_IRQn
+#endif // JES_UART_CUSTOM
 #define MAX_JESCORE_KB_MEM 28 // default in FreeRTOSConfig.h is too much
 
 #endif // STM32G431xx
@@ -139,6 +149,7 @@
 #ifdef STM32H753xx
 #include "stm32h7xx_hal.h"
 #define BUILD_PLATFORM_NAME "STM32H753"
+#ifndef JES_UART_CUSTOM
 #define USART_RCC_PERIPH RCC_PERIPHCLK_USART3
 #define USART_CLK_SRC_DEFAULT(PeriphClkInit_struct) PeriphClkInit_struct.Usart234578ClockSelection = __HAL_RCC_GET_USART234578_SOURCE()
 #define USART_CLK_ENABLE() __HAL_RCC_USART3_CLK_ENABLE()
@@ -152,6 +163,7 @@
 #define USART_GPIO_TX_ALT GPIO_AF7_USART3
 #define USART_GPIO_RX_ALT GPIO_AF7_USART3
 #define USART_IRQn_NUM USART3_IRQn
+#endif // JES_UART_CUSTOM
 #endif // STM32H753xx
 
 #endif
@@ -175,6 +187,7 @@
 
 #ifdef STM32L476xx
 #define BUILD_PLATFORM_NAME "STM32L476"
+#ifndef JES_UART_CUSTOM
 #define USART_RCC_PERIPH RCC_PERIPHCLK_USART2
 #define USART_CLK_SRC_DEFAULT(PeriphClkInit_struct) PeriphClkInit_struct.Usart2ClockSelection = __HAL_RCC_GET_USART2_SOURCE()
 #define USART_CLK_ENABLE() __HAL_RCC_USART2_CLK_ENABLE()
@@ -188,10 +201,12 @@
 #define USART_GPIO_TX_ALT GPIO_AF7_USART2
 #define USART_GPIO_RX_ALT GPIO_AF7_USART2
 #define USART_IRQn_NUM USART2_IRQn
+#endif // JES_UART_CUSTOM
 #endif // STM32L476xx
 
 #ifdef STM32L432xx
 #define BUILD_PLATFORM_NAME "STM32L432"
+#ifndef JES_UART_CUSTOM
 #define USART_RCC_PERIPH RCC_PERIPHCLK_USART2
 #define USART_CLK_SRC_DEFAULT(PeriphClkInit_struct) PeriphClkInit_struct.Usart2ClockSelection = __HAL_RCC_GET_USART2_SOURCE()
 #define USART_CLK_ENABLE() __HAL_RCC_USART2_CLK_ENABLE()
@@ -205,6 +220,7 @@
 #define USART_GPIO_TX_ALT GPIO_AF7_USART2
 #define USART_GPIO_RX_ALT GPIO_AF3_USART2
 #define USART_IRQn_NUM USART2_IRQn
+#endif // JES_UART_CUSTOM
 #endif // STM32L432xx
 
 #endif // STM32L4

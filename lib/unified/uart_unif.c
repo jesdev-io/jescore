@@ -4,7 +4,6 @@ QueueHandle_t* p_queue;
 
 #if defined(BUILD_FOR_ESP32)
 #include "driver/uart.h"
-#define BASE_UART UART_NUM_0
 
 int32_t uart_unif_init(uint32_t baud, uint32_t rx_buf_len, uint32_t tx_buf_len, void* args){
     uart_config_t uart_config = {
