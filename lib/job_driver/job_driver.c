@@ -172,9 +172,10 @@ jes_err_t __job_copy_str(char* buf, char* str, uint16_t max_len){
 }
 
 
-void __job_notify_generic(job_struct_t* pjob_to_notify, 
-                          void* notif, 
-                          uint8_t from_isr){
+jes_err_t __job_notify_generic(job_struct_t* pjob_to_notify, 
+                               void* notif, 
+                               uint8_t from_isr){
+    if(!pjob_to_notify) return e_err_is_zero;
     if(from_isr){
         BaseType_t dummy = pdFALSE;
         xTaskNotifyFromISR(pjob_to_notify->handle, 
@@ -187,13 +188,14 @@ void __job_notify_generic(job_struct_t* pjob_to_notify,
                     (uint32_t)notif,
                     eSetValueWithOverwrite);
     }
+    return e_err_no_err;
 }
 
 
-void __job_notify_with_job(job_struct_t* pjob_to_notify, 
-                job_struct_t* pjob_to_run, 
-                uint8_t from_isr){
-    __job_notify_generic(pjob_to_notify, pjob_to_run, from_isr);
+jes_err_t __job_notify_with_job(job_struct_t* pjob_to_notify, 
+                                job_struct_t* pjob_to_run, 
+                                uint8_t from_isr){
+    return __job_notify_generic(pjob_to_notify, pjob_to_run, from_isr);
 }
 
 

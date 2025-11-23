@@ -138,13 +138,15 @@ void jes_throw_error(jes_err_t e);
 /// @brief Notify a job with an optional message.
 /// @param name Name of job which should be notified.
 /// @param notification Optional pointer to notification value.
-void jes_notify_job(const char* name, void* notification);
+/// @return status, `e_err_no_err` if OK.
+jes_err_t jes_notify_job(const char* name, void* notification);
 
 
 /// @brief Notify a job with an optional message from within an interrupt.
 /// @param name Name of job which should be notified.
 /// @param notification Optional pointer to notification value. 
-void jes_notify_job_ISR(const char* name, void* notification);
+/// @return status, `e_err_no_err` if OK.
+jes_err_t jes_notify_job_ISR(const char* name, void* notification);
 
 
 /// @brief Pause the calling job until a notification arrives.

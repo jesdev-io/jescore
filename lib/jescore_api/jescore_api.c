@@ -140,13 +140,13 @@ void jes_throw_error(jes_err_t e){
 }
 
 
-void jes_notify_job(const char* name, void* notification){
-    __job_notify_generic(__job_get_job_by_name(name), notification, 0);
+jes_err_t jes_notify_job(const char* name, void* notification){
+    return __job_notify_generic(__job_get_job_by_name(name), notification, 0);
 }
 
 
-void jes_notify_job_ISR(const char* name, void* notification){
-    __job_notify_generic(__job_get_job_by_name(name), notification, 1);
+jes_err_t jes_notify_job_ISR(const char* name, void* notification){
+    return __job_notify_generic(__job_get_job_by_name(name), notification, 1);
 }
 
 
