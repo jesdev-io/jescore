@@ -42,6 +42,8 @@ The great thing about this name is that it can stand for "**J**'s **e**mbedded *
 |ESP32-S3|STM32G431|
 |ESP32-WROVER|STM32H753|
 
+**Want more boards?** Check out [Board Support](https://github.com/jesdev-io/jescore/wiki/Backend-Documentation#board-support) or open an issue!
+
 ## Get started, examples and use-cases
 
 - [Examples](https://github.com/jake-is-ESD-protected/jescore/wiki/Examples)
