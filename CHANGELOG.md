@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.2.3 -
+## 2.2.3 - 2025-11-23
 
 ### Added
 - 🖥️ Inline flag for CLI responses to reuse same line
