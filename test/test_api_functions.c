@@ -57,7 +57,10 @@ void dummy_job_args_holder(void* p){
 
 void dummy_job_notify(void* p){
     uint32_t* val = (uint32_t*)DUMMY_NOTIFICATION_VALUE;
-    jes_notify_job(DUMMY_JOB_NOTIFY_TAKE, val);
+    jes_err_t je = jes_notify_job(DUMMY_JOB_NOTIFY_TAKE, val);
+    if(je != e_err_no_err){
+        jes_throw_error(je);
+    }
 }
 
 
@@ -268,8 +271,15 @@ void test_notify_job_and_wait(void){
     TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
     jes_delay_job_ms(100);
 
+    stat = jes_error_get(DUMMY_JOB_NOTIFY);
+    TEST_ASSERT_EQUAL(e_err_no_err, stat);
     uint32_t* val = (uint32_t*)__job_get_param(__job_get_job_by_name(DUMMY_JOB_NOTIFY_TAKE));
     char* msg = __job_get_args(__job_get_job_by_name(DUMMY_JOB_NOTIFY_TAKE));
     TEST_ASSERT_EQUAL_UINT32(DUMMY_NOTIFICATION_VALUE, (uint32_t)val);
     TEST_ASSERT_EQUAL_STRING(DUMMY_SUCCESS_MSG, msg);
+}
+
+void test_notify_job_non_existing(void){
+    jes_err_t je = jes_notify_job("foo", NULL);
+    TEST_ASSERT_EQUAL(e_err_is_zero, je);
 }

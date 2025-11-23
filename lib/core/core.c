@@ -116,10 +116,11 @@ job_struct_t** __core_get_job_list(void){
 }
 
 
-void __core_notify(job_struct_t* pjob_to_run, 
-                    uint8_t from_isr){
-__job_notify_with_job(__job_get_job_by_name(CORE_JOB_NAME),
-             pjob_to_run, from_isr);
+void __core_notify(job_struct_t* pjob_to_run, uint8_t from_isr){
+    /* Return value is only a failure if the core job does not
+    exist, which is impossible. Check is not needed.*/
+    __job_notify_with_job(__job_get_job_by_name(CORE_JOB_NAME),
+                          pjob_to_run, from_isr);
 }
 
 

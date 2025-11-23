@@ -17,7 +17,7 @@ SemaphoreHandle_t cli_lock;
 /// @note This is neccessary to determine if a transaction has finished on the 
 ///       client side.
 static jes_err_t __cli_reprint_header(void){
-    if(uart_unif_write(CLI_HEADER) != 0) return e_err_driver_fail;
+    if(uart_unif_write("\r" CLI_HEADER " $ ") != 0) return e_err_driver_fail;
     return e_err_no_err;
 }
 

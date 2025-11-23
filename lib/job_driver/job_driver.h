@@ -177,7 +177,8 @@ jes_err_t __job_copy_str(char* buf, char* str, uint16_t max_len);
 /// @param pjob_to_notify: handle to job to be notified.
 /// @param notif: Arbitrary 32 bit notification.
 /// @param from_isr: specifies ISR or non-ISR origin.
-void __job_notify_generic(job_struct_t* pjob_to_notify, 
+/// @returns status, `e_err_no_err` if OK.
+jes_err_t __job_notify_generic(job_struct_t* pjob_to_notify, 
                           void* notif,
                           uint8_t from_isr);
 
@@ -186,9 +187,10 @@ void __job_notify_generic(job_struct_t* pjob_to_notify,
 /// @param pjob_to_notify: handle to job to be notified.
 /// @param pjob_to_run: job that should be launched by the notified job.
 /// @param from_isr: specifies ISR or non-ISR origin.
-void __job_notify_with_job(job_struct_t* pjob_to_notify, 
-                           job_struct_t* pjob_to_run, 
-                           uint8_t from_isr);
+/// @returns status, `e_err_no_err` if OK.
+jes_err_t __job_notify_with_job(job_struct_t* pjob_to_notify, 
+                                job_struct_t* pjob_to_run, 
+                                uint8_t from_isr);
 
 
 /// @brief Task notification wrapper for FreeRTOS "ulTaskNotifyTake".

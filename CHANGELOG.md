@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.2.3 - 2025-11-23
+
+### Added
+- 🖥️ Inline flag for CLI responses to reuse same line
+- 🔆 New logo banner and function diagram 
+- 📜 Short installation paragraph in main README
+- 🚫 `e_err_NUM_ERR` enum for better "inheritance" of errors
+- 🔢 Baudrate of firmware now settable with `CLI_BAUDRATE` macro
+
+### Fixed
+- 🚫 Notifying a non-existent job will now no longer crash
+
+### Removed
+- 🐍 `jescorecli` python wrapper now moved to own [repo](https://github.com/jesdev-io/jescorecli)
+
 ## 2.2.2 - 2025-10-07
 
 ### Added

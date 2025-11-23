@@ -7,11 +7,15 @@ extern "C" {
 
 #include <inttypes.h>
 
+#ifndef CLI_BUF_SIZE
 #define CLI_BUF_SIZE    256
+#endif // CLI_BUF_SIZE
+#ifndef CLI_BAUDRATE
 #define CLI_BAUDRATE    115200
+#endif // CLI_BAUDRATE
 
 #ifndef CLI_HEADER
-#define CLI_HEADER      "\rjescore $ "
+#define CLI_HEADER      "jescore"
 #endif
 
 #define CLR_R   (uint8_t*)"\x1b[31m"
