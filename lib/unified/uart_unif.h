@@ -54,7 +54,15 @@ int32_t uart_unif_write(const char *msg);
 /// @param format String buffer.
 /// @param ... Format arguments.
 /// @return Status. 0 if OK, -1 in platform specific driver failure.
+/// @warning DEPRECATED. Use `jes_print()` instead.
 int32_t uart_unif_writef(const char *format, ...);
+
+/// @brief Write a formated string with prefix to the platform's UART.
+/// @param pfx Arbitrary message prefix. Pass `NULL` to skip the prefix.
+/// @param format String buffer.
+/// @param ... Format arguments.
+/// @return Status. 0 if OK, -1 in platform specific driver failure.
+int32_t uart_unif_writef_pfx(const char *pfx, const char *format, ...);
 
 /// @brief Read a string from the platform's UART.
 /// @param buf Buffer to read into.

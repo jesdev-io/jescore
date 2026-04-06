@@ -30,12 +30,12 @@ void blink_switch(void* p){
     */
     char* arg = jes_job_arg_next();
     if(!arg){
-        uart_unif_write("Usage: switch <time in ms>\r\n");
+        jes_print("Usage: switch <time in ms>\r\n");
         return;
     }
     while(arg != NULL){
         blink_pause = atoi(arg);
-        uart_unif_writef("Blink rate set to %s ms\n\r", arg);
+        jes_print("Blink rate set to %s ms\n\r", arg);
         arg = jes_job_arg_next();
     }
 }

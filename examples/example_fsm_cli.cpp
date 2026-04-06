@@ -18,7 +18,7 @@ void lights(void* p){
     char* args = jes_job_get_args();
     char* arg = strtok(args, " ");
     if (!arg){
-        uart_unif_write("No argument specified! Use <on> or <off>\n\r");
+        jes_print("No argument specified! Use <on> or <off>\n\r");
         return;
     }
     if (strcmp(arg, "on") == 0){
@@ -44,10 +44,10 @@ void lights(void* p){
         processing = false;
     }
     else if (strcmp(arg, "state") == 0){
-        uart_unif_writef("lights are %s\n\r",(is_on ? "on" : "off"));
+        jes_print("lights are %s\n\r",(is_on ? "on" : "off"));
     }
     else{
-        uart_unif_write("unknown argument!\n\r");
+        jes_print("unknown argument!\n\r");
     }
 }
 
