@@ -17,3 +17,6 @@ compile_commands.json
 # packages
 *.egg-info
 build
+
+# local FreeRTOS clone for non-pio projects
+FreeRTOS
