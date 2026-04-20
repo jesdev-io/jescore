@@ -99,7 +99,7 @@ static inline void __core_err_handler_inline(jes_err_t e, void* args){
         description = "Unknown error.";
         break;
     }
-    uart_unif_writef("(E:) %s (%d)\n\r", description, e);
+    uart_unif_writef_pfx(CORE_JOB_NAME, "(E:) %s (%d)\n\r", description, e);
     __cli_close_sess();
 }
 
@@ -185,11 +185,12 @@ log_entry_t __core_read_from_log_next(void){
 
 #ifndef JES_DISABLE_CLI
 void __core_log_printer(void* p){
+    job_struct_t* pj = (job_struct_t*)p;
     log_entry_t le = __core_read_from_log_next();
     char desc[__MAX_JOB_ARGS_LEN_BYTE*4] = {0};
     char header[] = "systime (ms) type\t name\t\tinstances\terror\targs\n\r";
     uint8_t* clr;
-    uart_unif_write(header);
+    uart_unif_writef_pfx(pj->name, header);
     for(uint32_t i = 0; i < __JES_LOG_LEN; i++){
         if(le.type == NULL){
             continue;
@@ -211,7 +212,7 @@ void __core_log_printer(void* p){
                 le.job_state.error,
                 le.job_state.args,
                 CLR_X);
-        uart_unif_write(desc);
+        uart_unif_writef_pfx(pj->name, desc);
     }
 }
 #endif // JES_DISABLE_CLI
