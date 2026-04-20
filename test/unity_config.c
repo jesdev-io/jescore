@@ -1,8 +1,9 @@
 #include "unity_config.h"
 #include "uart_unif.h"
+#include "cli.h"
 
 void unityOutputStart(){
-    if (uart_unif_init(115200, 64, 64, NULL) != 0){
+    if (uart_unif_init(115200, CLI_BUF_SIZE, CLI_BUF_SIZE, NULL) != 0){
         while(1);
     }
 }

@@ -15,6 +15,7 @@ int32_t uart_unif_init(uint32_t baud, uint32_t rx_buf_len, uint32_t tx_buf_len, 
         .source_clk = UART_SCLK_APB,
     };
     p_queue = (QueueHandle_t*)args;
+    uart_driver_delete(BASE_UART); // enables reset of UART module
     esp_err_t stat = uart_driver_install(BASE_UART, rx_buf_len, tx_buf_len, 20, p_queue, 0);
     if(stat != ESP_OK){
         return (int32_t)stat;
@@ -36,7 +37,7 @@ int32_t uart_unif_init(uint32_t baud, uint32_t rx_buf_len, uint32_t tx_buf_len, 
 
 int32_t uart_unif_write(const char *msg) {
     uint16_t len = strlen(msg);
-    return uart_write_bytes(BASE_UART, msg, len);
+    return uart_write_bytes(BASE_UART, msg, len) - len;
 }
 
 int32_t uart_unif_read(char* buf, uint32_t len, uint32_t timeout){
