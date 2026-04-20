@@ -162,9 +162,10 @@ void jes_delay_job_ms(uint32_t ms);
     uart_unif_writef_pfx(pj->name, format, ##__VA_ARGS__)
 
 #define jes_print(format, ...) \
-    TaskHandle_t hj = xTaskGetCurrentTaskHandle(); \
-    job_struct_t* pj = __job_get_job_by_handle(hj); \
-    uart_unif_writef_pfx(pj->name, format, ##__VA_ARGS__)
+    uart_unif_writef_pfx(__job_get_job_by_handle(\
+                            xTaskGetCurrentTaskHandle()\
+                        )->name,\
+                        format, ##__VA_ARGS__)
 
 #endif
 
