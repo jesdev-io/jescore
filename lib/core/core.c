@@ -21,7 +21,7 @@ jes_err_t __core_init(){
     if(core.state != e_state_init) return e_err_no_err;
     jes_err_t e;
     // Register the bare minimum of core and error handler
-    e = __job_register_job(CORE_JOB_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __core_job, 1, e_role_core);
+    e = __job_register_job(CORE_JOB_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __core_job, 1, 1, e_role_core);
     if(e != e_err_no_err){ return e; }
 
     // Launch the core
@@ -35,18 +35,18 @@ jes_err_t __core_init(){
     if(e != e_err_no_err){ return e; }
 
     // register jobs associated with CLI
-    e = __job_register_job(CLI_SERVER_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, cli_server, 1, e_role_core);
+    e = __job_register_job(CLI_SERVER_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, cli_server, 1, 1, e_role_core);
     if(e != e_err_no_err){ return e; }
     #if __JES_LOG_LEN > 0
-    e = __job_register_job(LOG_PRINTER_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __core_log_printer, 0, e_role_base);
+    e = __job_register_job(LOG_PRINTER_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __core_log_printer, 0, 1, e_role_base);
     #endif // __JES_LOG_LEN > 0
-    e = __job_register_job(HELP_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __base_job_help, 0, e_role_base);
+    e = __job_register_job(HELP_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __base_job_help, 0, 1, e_role_base);
     if(e != e_err_no_err){ return e; }
-    e = __job_register_job(STATS_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __base_job_stats, 0, e_role_base);
+    e = __job_register_job(STATS_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __base_job_stats, 0, 1, e_role_base);
     if(e != e_err_no_err){ return e; }
-    e = __job_register_job(BENCH_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __base_job_bench, 0, e_role_base);
+    e = __job_register_job(BENCH_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __base_job_bench, 0, 1, e_role_base);
     if(e != e_err_no_err){ return e; }
-    e = __job_register_job(PRINT_JOB_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __base_job_echo, 0, e_role_base);
+    e = __job_register_job(PRINT_JOB_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __base_job_echo, 0, 1, e_role_base);
     if(e != e_err_no_err){ return e; }
     // Launch CLI server
     e = __job_launch_job_by_name(CLI_SERVER_NAME, e_origin_core);

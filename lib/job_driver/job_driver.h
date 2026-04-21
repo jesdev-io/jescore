@@ -59,6 +59,7 @@ typedef enum{
 /// @param function void(*)(void* p): function itself, function pointer.
 /// @param args (char*): optional args obtained from CLI.
 /// @param is_loop (uint8_t): defines if job runs forever or terminates
+/// @param is_singleton (uint8_t): defines if jobs can be launched more than once
 /// @param instances (uint8_t): number of active instances of same job type.
 /// @param role (e_role_t): Role of job in usage context.
 /// @param caller (origin_t): Requesting entity of job.
@@ -76,6 +77,7 @@ typedef struct job_struct_t{
     void (*function) (void* p);
     char args[__MAX_JOB_ARGS_LEN_BYTE];
     uint8_t is_loop;
+    uint8_t is_singleton;
     uint8_t instances;
     e_role_t role;
     origin_t caller;
@@ -105,6 +107,7 @@ jes_err_t __job_register_job(const char* n,
                          uint8_t p, 
                          void (*f)(void* p),
                          uint8_t is_loop,
+                         uint8_t is_singleton,
                          e_role_t role);
 
 

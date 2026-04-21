@@ -43,8 +43,8 @@ void blink_switch(void* p){
 void setup() {
     jes_init();
     pinMode(LED_PIN, OUTPUT);
-    jes_register_job("switch", 2048, 1, blink_switch, false);
-    jes_register_and_launch_job("blink", 2048, 1, blink_forever, true);
+    jes_register_job("switch", 2048, 1, blink_switch, 0, 1);
+    jes_register_and_launch_job("blink", 2048, 1, blink_forever, 1, 1);
 }
 
 void loop() {

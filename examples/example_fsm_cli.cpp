@@ -54,7 +54,7 @@ void lights(void* p){
 void setup() {
     jes_init();
     pinMode(LED_PIN, OUTPUT);
-    jes_register_job("lights", 2048, 1, lights, false);
+    jes_register_job("lights", 2048, 1, lights, 0, 1);
 }
 
 void loop() {
