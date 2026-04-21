@@ -68,7 +68,7 @@ void __base_job_stats(void* p){
         uart_unif_writef_pfx(pj->name, header);
     }
     uart_unif_writef_pfx(pj->name, desc);
-    uint8_t* clr;
+    uint8_t* clr; 
 
     while(cur != NULL){
         if ((flag_none && (cur->role == e_role_core || cur->role == e_role_base)) || 
@@ -86,7 +86,9 @@ void __base_job_stats(void* p){
             case e_role_user: clr = CLR_G;  break;
             default:          clr = CLR_X;  break;
         }
-        sprintf(desc, "%s%s%s%lx%s%ld\t%d\t%d\t%d\t\t%d%s\n\r", 
+        char singleton = 'x';
+        if(cur->is_singleton) singleton = '1';
+        sprintf(desc, "%s%s%s%lx%s%ld\t%d\t%d\t%d/%c\t\t%d%s\n\r", 
                 clr,
                 cur->name, 
                 spacing_name,
@@ -96,6 +98,7 @@ void __base_job_stats(void* p){
                 cur->priority,
                 cur->is_loop,
                 cur->instances,
+                singleton,
                 cur->error,
                 CLR_X);
         uart_unif_writef_pfx(pj->name, desc);
