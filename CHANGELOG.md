@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.3.0 - 2026-04-21
+
+### Added
+- 🏹 API CHANGE: "singleton" argument in job registration
+- 🖨️ New `jes_print()` macro for formatted strings
+- 🔍 `jes_print()` identifies calling job in print statement
+
+### Fixed
+- 💬 ESP32 UART driver doesn't behave faulty when initialized twice
+
+### Removed
+- 👷 ESP32 `esp-builtin` specifier removed for C3
+
 ## 2.2.3 - 2025-11-23
 
 ### Added

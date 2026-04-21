@@ -10,6 +10,7 @@ jes_err_t __job_register_job(const char* n,
                          uint8_t p, 
                          void (*f)(void* p),
                          uint8_t is_loop,
+                         uint8_t is_singleton,
                          e_role_t role){
     if(n == NULL || f == NULL){
         return e_err_is_zero;
@@ -30,6 +31,7 @@ jes_err_t __job_register_job(const char* n,
     pj->function = f;
     memset(pj->args, 0, __MAX_JOB_ARGS_LEN_BYTE);
     pj->is_loop = is_loop;
+    pj->is_singleton = is_singleton;
     pj->instances = 0;
     pj->role = role;
     pj->caller = e_origin_undefined;
@@ -92,6 +94,9 @@ jes_err_t __job_launch_job(job_struct_t* pj, origin_t o){
         // Prohibit the calling of core jobs from API and CLI
         return e_err_prohibited;
     }
+    if(pj->is_singleton && pj->instances > 0){
+        return e_err_duplicate;
+    }
     stat = xTaskCreate(__job_runtime_env,
                 pj->name,
                 pj->mem_size,
@@ -112,7 +117,8 @@ jes_err_t __job_launch_job_by_name(const char* n, origin_t o){
 jes_err_t __job_launch_job_by_name_args_core(const char* n, origin_t o, const char* args){
     if (args == NULL) { return e_err_is_zero; }
     job_struct_t* pj = __job_get_job_by_name(n);
-    if (pj == NULL) { return e_err_is_zero; }
+    if (pj == NULL) { return e_err_unknown_job; }
+    if(pj->is_singleton && pj->instances > 0){ return e_err_duplicate; }
     jes_err_t e = __job_set_args((char*)args, pj);
     if (e != e_err_no_err) { return e; }
     pj->caller = o;

@@ -33,12 +33,14 @@ void jes_dispatch(void);
 /// @param priority: Priority of the job (1 is highest).
 /// @param function: Function to run when the job is called. has to be of signature `void my_func(void* p)`.
 /// @param is_loop: flag which describes the lifetime of the job.
+/// @param is_singleton: flag which describes the instance count of the job.
 /// @return Status. Returns `e_err_no_err` in case of successful registration.
 jes_err_t jes_register_job(const char* name,
                        uint32_t mem_size,
                        uint8_t priority,
                        void (*function)(void* p),
-                       uint8_t is_loop);
+                       uint8_t is_loop,
+                       uint8_t is_singleton);
 
 
 /// @brief Start a registered job.
@@ -63,12 +65,14 @@ jes_err_t jes_launch_job_args(const char* name, const char* args);
 /// @param priority: Priority of the job (1 is highest).
 /// @param function: Function to run when the job is called. has to be of signature `void my_func(void* p)`.
 /// @param is_loop: flag which describes the lifetime of the job.
+/// @param is_singleton: flag which describes the instance count of the job.
 /// @return Status. Returns `e_err_no_err` in case of successful launch.
 jes_err_t jes_register_and_launch_job(const char* name,
                                   uint32_t mem_size,
                                   uint8_t priority,
                                   void (*function)(void* p),
-                                  uint8_t is_loop);
+                                  uint8_t is_loop,
+                                  uint8_t is_singleton);
 
 
 /// @brief Set the field `args` of the calling job.
@@ -157,6 +161,16 @@ void* jes_wait_for_notification(void);
 /// @param ms Milliseconds of delay.
 /// @note Timing is handled by FreeRTOS.
 void jes_delay_job_ms(uint32_t ms);
+
+#define jes_print_pj(pj, format, ...) \
+    uart_unif_writef_pfx(pj->name, format, ##__VA_ARGS__)
+
+#define jes_print(format, ...) \
+    uart_unif_writef_pfx(__job_get_job_by_handle(\
+                            xTaskGetCurrentTaskHandle()\
+                        )->name,\
+                        format, ##__VA_ARGS__)
+
 #endif
 
 #ifdef __cplusplus

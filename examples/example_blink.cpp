@@ -23,7 +23,7 @@ void setup() {
     if(e != e_err_no_err){
         digitalWrite(LED_PIN, HIGH);
     }
-    jes_register_and_launch_job("blink", 2048, 1, blink, 1);
+    jes_register_and_launch_job("blink", 2048, 1, blink, 1, 0);
 }
 
 void loop() {

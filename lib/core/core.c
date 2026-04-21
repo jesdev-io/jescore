@@ -21,7 +21,7 @@ jes_err_t __core_init(){
     if(core.state != e_state_init) return e_err_no_err;
     jes_err_t e;
     // Register the bare minimum of core and error handler
-    e = __job_register_job(CORE_JOB_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __core_job, 1, e_role_core);
+    e = __job_register_job(CORE_JOB_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __core_job, 1, 1, e_role_core);
     if(e != e_err_no_err){ return e; }
 
     // Launch the core
@@ -35,18 +35,18 @@ jes_err_t __core_init(){
     if(e != e_err_no_err){ return e; }
 
     // register jobs associated with CLI
-    e = __job_register_job(CLI_SERVER_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, cli_server, 1, e_role_core);
+    e = __job_register_job(CLI_SERVER_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, cli_server, 1, 1, e_role_core);
     if(e != e_err_no_err){ return e; }
     #if __JES_LOG_LEN > 0
-    e = __job_register_job(LOG_PRINTER_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __core_log_printer, 0, e_role_base);
+    e = __job_register_job(LOG_PRINTER_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __core_log_printer, 0, 1, e_role_base);
     #endif // __JES_LOG_LEN > 0
-    e = __job_register_job(HELP_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __base_job_help, 0, e_role_base);
+    e = __job_register_job(HELP_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __base_job_help, 0, 1, e_role_base);
     if(e != e_err_no_err){ return e; }
-    e = __job_register_job(STATS_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __base_job_stats, 0, e_role_base);
+    e = __job_register_job(STATS_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __base_job_stats, 0, 1, e_role_base);
     if(e != e_err_no_err){ return e; }
-    e = __job_register_job(BENCH_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __base_job_bench, 0, e_role_base);
+    e = __job_register_job(BENCH_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __base_job_bench, 0, 1, e_role_base);
     if(e != e_err_no_err){ return e; }
-    e = __job_register_job(PRINT_JOB_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __base_job_echo, 0, e_role_base);
+    e = __job_register_job(PRINT_JOB_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __base_job_echo, 0, 1, e_role_base);
     if(e != e_err_no_err){ return e; }
     // Launch CLI server
     e = __job_launch_job_by_name(CLI_SERVER_NAME, e_origin_core);
@@ -99,7 +99,7 @@ static inline void __core_err_handler_inline(jes_err_t e, void* args){
         description = "Unknown error.";
         break;
     }
-    uart_unif_writef("(E:) %s (%d)\n\r", description, e);
+    uart_unif_writef_pfx(CORE_JOB_NAME, "(E:) %s (%d)\n\r", description, e);
     __cli_close_sess();
 }
 
@@ -185,11 +185,12 @@ log_entry_t __core_read_from_log_next(void){
 
 #ifndef JES_DISABLE_CLI
 void __core_log_printer(void* p){
+    job_struct_t* pj = (job_struct_t*)p;
     log_entry_t le = __core_read_from_log_next();
     char desc[__MAX_JOB_ARGS_LEN_BYTE*4] = {0};
     char header[] = "systime (ms) type\t name\t\tinstances\terror\targs\n\r";
     uint8_t* clr;
-    uart_unif_write(header);
+    uart_unif_writef_pfx(pj->name, header);
     for(uint32_t i = 0; i < __JES_LOG_LEN; i++){
         if(le.type == NULL){
             continue;
@@ -211,7 +212,7 @@ void __core_log_printer(void* p){
                 le.job_state.error,
                 le.job_state.args,
                 CLR_X);
-        uart_unif_write(desc);
+        uart_unif_writef_pfx(pj->name, desc);
     }
 }
 #endif // JES_DISABLE_CLI

@@ -9,26 +9,27 @@
 
 void __base_job_echo(void* p){
     job_struct_t* pj = (job_struct_t*)p;
-    uart_unif_writef("%s\n\r", (char*)pj->args);
+    uart_unif_writef_pfx(pj->name, "%s\n\r", (char*)pj->args);
 }
 
 
 void __base_job_help(void* p){
+    job_struct_t* pj = (job_struct_t*)p;
     char desc[__MAX_JOB_ARGS_LEN_BYTE*2] = {0};
 
     job_struct_t** job_list = __core_get_job_list();
     job_struct_t* cur = *job_list;
 
     sprintf(desc, "\x1b[1mAvailable jobs:\x1b[0m\n\r");
-    uart_unif_write(desc);
+    uart_unif_writef_pfx(pj->name, desc);
     while(cur != NULL){
         if(cur->role == e_role_base){
-            sprintf(desc, "\t- (base) %s\n\r", cur->name);
-            uart_unif_write(desc);
+            sprintf(desc, "- (base) %s\n\r", cur->name);
+            uart_unif_writef_pfx(pj->name, desc);
         }
         else if(cur->role == e_role_user){
-            sprintf(desc, "\t- (user) %s\n\r", cur->name);
-            uart_unif_write(desc);
+            sprintf(desc, "- (user) %s\n\r", cur->name);
+            uart_unif_writef_pfx(pj->name, desc);
         }
         cur = cur->pn;
     }
@@ -47,7 +48,7 @@ void __base_job_stats(void* p){
     else{
         char msg[__MAX_JOB_ARGS_LEN_BYTE*2];
         sprintf(msg, "Unknown specifier <%s>.\n\r", pj->args);
-        uart_unif_write(msg);
+        uart_unif_writef_pfx(pj->name, msg);
         pj->error = e_err_param;
         return;
     }
@@ -64,10 +65,10 @@ void __base_job_stats(void* p){
     if(!flag_none){
         sprintf(header, "%sjescore%s running on %s%s%s (FW %s)\n\r\n\r", 
             CLR_Y, CLR_X, CLR_G, BUILD_PLATFORM_NAME, CLR_X, JES_FW_VER);
-        uart_unif_write(header);
+        uart_unif_writef_pfx(pj->name, header);
     }
-    uart_unif_write(desc);
-    uint8_t* clr;
+    uart_unif_writef_pfx(pj->name, desc);
+    uint8_t* clr; 
 
     while(cur != NULL){
         if ((flag_none && (cur->role == e_role_core || cur->role == e_role_base)) || 
@@ -85,7 +86,9 @@ void __base_job_stats(void* p){
             case e_role_user: clr = CLR_G;  break;
             default:          clr = CLR_X;  break;
         }
-        sprintf(desc, "%s%s%s%lx%s%ld\t%d\t%d\t%d\t\t%d%s\n\r", 
+        char singleton = 'x';
+        if(cur->is_singleton) singleton = '1';
+        sprintf(desc, "%s%s%s%lx%s%ld\t%d\t%d\t%d/%c\t\t%d%s\n\r", 
                 clr,
                 cur->name, 
                 spacing_name,
@@ -95,9 +98,10 @@ void __base_job_stats(void* p){
                 cur->priority,
                 cur->is_loop,
                 cur->instances,
+                singleton,
                 cur->error,
                 CLR_X);
-        uart_unif_write(desc);
+        uart_unif_writef_pfx(pj->name, desc);
         cur = cur->pn;
     }
 }
@@ -106,24 +110,24 @@ void __base_job_stats(void* p){
 void __base_job_bench(void* p){
     job_struct_t* pj_self = (job_struct_t*)p;
     if(strcmp(pj_self->args, "") == 0){
-        uart_unif_write("Provide a job name to bench!\n\r");
+        uart_unif_writef_pfx(pj_self->name, "Provide a job name to bench!\n\r");
         return;
     }
     job_struct_t* pj_arg = __job_get_job_by_name(pj_self->args);
     if(!pj_arg){
-        uart_unif_writef("Unknown job <%s> to benchmark!\n\r", pj_self->args);
+        uart_unif_writef_pfx(pj_self->name, "Unknown job <%s> to benchmark!\n\r", pj_self->args);
         return;
     }
     if(pj_arg->timing_end == 0 && !pj_arg->is_loop){
-        uart_unif_writef("Job <%s> has not yet run once!\n\r", pj_arg->name);
+        uart_unif_writef_pfx(pj_self->name, "Job <%s> has not yet run once!\n\r", pj_arg->name);
         return;
     }
     if(pj_arg->timing_end == 0 && pj_arg->is_loop){
-        uart_unif_writef("Job <%s> is a loop without timing hooks!\n\r", pj_arg->name);
+        uart_unif_writef_pfx(pj_self->name, "Job <%s> is a loop without timing hooks!\n\r", pj_arg->name);
         return;
     }
     char lesser[] = "<";
     uint32_t timing = __job_get_timing(pj_arg);
     if(timing) lesser[0] = '\0';
-    uart_unif_writef("Roundtrip time (%s) = [ %s%ld ] ms\n\r", pj_arg->name, lesser, ++timing);
+    uart_unif_writef_pfx(pj_self->name, "Roundtrip time (%s) = [ %s%ld ] ms\n\r", pj_arg->name, lesser, ++timing);
 }

@@ -15,6 +15,7 @@ int32_t uart_unif_init(uint32_t baud, uint32_t rx_buf_len, uint32_t tx_buf_len, 
         .source_clk = UART_SCLK_APB,
     };
     p_queue = (QueueHandle_t*)args;
+    uart_driver_delete(BASE_UART); // enables reset of UART module
     esp_err_t stat = uart_driver_install(BASE_UART, rx_buf_len, tx_buf_len, 20, p_queue, 0);
     if(stat != ESP_OK){
         return (int32_t)stat;
@@ -36,18 +37,7 @@ int32_t uart_unif_init(uint32_t baud, uint32_t rx_buf_len, uint32_t tx_buf_len, 
 
 int32_t uart_unif_write(const char *msg) {
     uint16_t len = strlen(msg);
-    return uart_write_bytes(BASE_UART, msg, len);
-}
-
-int32_t uart_unif_writef(const char *format, ...) {
-    char buffer[__UNIF_UART_WRITE_BUF_SIZE];
-    va_list args;
-    va_start(args, format);
-    int len = vsnprintf(buffer, sizeof(buffer), format, args);
-    va_end(args);
-    if (len < 0) return -1;
-    len = (len < sizeof(buffer)) ? len : sizeof(buffer) - 1;
-    return uart_write_bytes(BASE_UART, buffer, len);
+    return uart_write_bytes(BASE_UART, msg, len) - len;
 }
 
 int32_t uart_unif_read(char* buf, uint32_t len, uint32_t timeout){
@@ -180,17 +170,6 @@ int32_t uart_unif_write(const char* msg){
     return HAL_UART_Transmit(&huart_num, (uint8_t*)msg, (uint16_t)strlen((char*)msg), HAL_MAX_DELAY);
 }
 
-int32_t uart_unif_writef(const char *format, ...) {
-    char buffer[__UNIF_UART_WRITE_BUF_SIZE];
-    va_list args;
-    va_start(args, format);
-    int len = vsnprintf(buffer, sizeof(buffer), format, args);
-    va_end(args);
-    if (len < 0) return -1;
-    len = (len < sizeof(buffer)) ? len : sizeof(buffer) - 1;
-    return HAL_UART_Transmit(&huart_num, (uint8_t*)buffer, len, HAL_MAX_DELAY);
-}
-
 int32_t uart_unif_read(char* buf, uint32_t len, uint32_t timeout){
     UNUSED(timeout);
     if(len > __UNIF_UART_WRITE_BUF_SIZE) return -1;
@@ -261,3 +240,33 @@ int32_t uart_unif_deinit(void){
     #endif
 
 #endif
+
+int32_t uart_unif_writef(const char *format, ...) {
+    char buffer[__UNIF_UART_WRITE_BUF_SIZE];
+    va_list args;
+    va_start(args, format);
+    int len = vsnprintf(buffer, sizeof(buffer), format, args);
+    va_end(args);
+    if (len < 0) return -1;
+    return uart_unif_write(buffer);
+}
+
+int32_t uart_unif_writef_pfx(const char* pfx, const char *format, ...) {
+    char buffer[__UNIF_UART_WRITE_BUF_SIZE + __UNIF_UART_WRITE_PFX_SIZE];
+    const uint8_t siz = sizeof(buffer);
+    uint8_t offs = 0;
+    if(pfx){
+        offs = snprintf(buffer, siz, "[%s]: ", pfx);
+        if(offs < 0 || offs >= siz){
+            return -1;
+        }
+    }
+    uint8_t siz_rem = siz - offs;
+    va_list args;
+    va_start(args, format);
+    uint8_t len = vsnprintf(buffer + offs, siz_rem, format, args) + offs;
+    va_end(args);
+    if (len < 0) return -1;
+    len = (len < siz_rem) ? len : siz_rem - 1;
+    return uart_unif_write(buffer);
+}

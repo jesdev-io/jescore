@@ -83,7 +83,8 @@ void test_register_job(void){
                                   DUMMY_JOB_MEM,
                                   DUMMY_JOB_PRIO,
                                   dummy_job_single,
-                                  0);
+                                  0,
+                                  1);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
 
     char dummy[__MAX_JOB_ARGS_LEN_BYTE] = {0};
@@ -105,6 +106,7 @@ void test_register_job(void){
                         DUMMY_JOB_MEM,
                         DUMMY_JOB_PRIO,
                         dummy_job_loop,
+                        1,
                         1);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
 
@@ -126,7 +128,8 @@ void test_register_job(void){
                         DUMMY_JOB_MEM,
                         DUMMY_JOB_PRIO,
                         dummy_job_args_holder,
-                        0);
+                        0,
+                        1);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
 
     pj = __job_get_job_by_name(DUMMY_JOB_ARGS_HOLDER_NAME);
@@ -236,38 +239,31 @@ void test_error_throw_get(void){
 }
 
 
-void test_core_job_launch_prohibited(void){
+void test_core_job_launch_duplicate(void){
     jes_err_t stat;
-    #if __JES_LOG_LEN > 0
-    /*  The core refreshes its error state to `e_err_no_err`
-        after every iteration. However, the error is logged.
-    */
     stat = jes_launch_job(CORE_JOB_NAME);
-    TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
-    jes_delay_job_ms(20);
-    log_entry_t le = __core_read_from_log_next();
-    TEST_ASSERT_EQUAL(e_err_prohibited, le.job_state.error);
-    #endif // __JES_LOG_LEN > 0
+    TEST_ASSERT_EQUAL_INT(e_err_duplicate, stat);
     stat = jes_launch_job(CLI_SERVER_NAME);
-    TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
-    jes_delay_job_ms(20);
-    TEST_ASSERT_EQUAL(e_err_prohibited, jes_error_get(CLI_SERVER_NAME));
+    TEST_ASSERT_EQUAL_INT(e_err_duplicate, stat);
 }
 
 
 void test_notify_job_and_wait(void){
+    jes_delay_job_ms(100);
     jes_err_t stat = jes_register_and_launch_job(DUMMY_JOB_NOTIFY_TAKE,
                                              DUMMY_JOB_MEM,
                                              DUMMY_JOB_PRIO,
                                              dummy_job_notify_take,
-                                             0);
+                                             0,
+                                             1);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
     jes_delay_job_ms(100);
     stat = jes_register_and_launch_job(DUMMY_JOB_NOTIFY,
                                    DUMMY_JOB_MEM,
                                    DUMMY_JOB_PRIO,
                                    dummy_job_notify,
-                                   0);
+                                   0,
+                                   1);
     TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
     jes_delay_job_ms(100);
 
@@ -282,4 +278,9 @@ void test_notify_job_and_wait(void){
 void test_notify_job_non_existing(void){
     jes_err_t je = jes_notify_job("foo", NULL);
     TEST_ASSERT_EQUAL(e_err_is_zero, je);
+}
+
+void test_singleton_launch_immunity(void){
+    jes_err_t stat = jes_launch_job(DUMMY_JOB_LOOP_NAME);
+    TEST_ASSERT_EQUAL(e_err_duplicate, stat);
 }

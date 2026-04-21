@@ -7,7 +7,7 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 void Error_Handler();
 
-// definitions for a Nucleo-L476RG
+// definitions for a Nucleo-G431KB
 #define LED_PORT GPIOB
 #define LED_GPIO GPIO_PIN_8
 #define LED_ENABLE_PORT() __HAL_RCC_GPIOB_CLK_ENABLE()
@@ -27,7 +27,7 @@ int main(void){
   MX_GPIO_Init();
 
   jes_init();
-  jes_register_and_launch_job("blink", 256, 1, blink, 1);
+  jes_register_and_launch_job("blink", 256, 1, blink, 1, 0);
   jes_dispatch();
 }
 
