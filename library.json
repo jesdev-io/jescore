@@ -23,7 +23,8 @@
         ".pio",
         ".venv*",
         ".vscode",
-        "jescore.wiki"
+        "jescore.wiki",
+        "FreeRTOS"
       ]
     },
     "headers": [
