@@ -53,7 +53,7 @@ void __base_job_stats(void* p){
         return;
     }
     
-    char desc[__MAX_JOB_ARGS_LEN_BYTE*2] = {0};
+    char desc[__MAX_JOB_ARGS_LEN_BYTE*4] = {0};
     char header[__MAX_JOB_ARGS_LEN_BYTE*3] = {0};
     char spacing_name[] = {'\t', 0, 0};
     char spacing_addr[] = {'\t', 0, 0};
