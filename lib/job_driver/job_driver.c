@@ -3,7 +3,6 @@
 #include "core_job_names.h"
 #include "cli.h"
 #include "delay_unif.h"
-#include <malloc.h>
 
 jes_err_t __job_register_job(const char* n, 
                          uint32_t m,
@@ -22,7 +21,7 @@ jes_err_t __job_register_job(const char* n,
     if(__job_get_job_by_name(n) != NULL){
         return e_err_duplicate;
     }
-    job_struct_t* pj = (job_struct_t*)malloc(sizeof(job_struct_t));
+    job_struct_t* pj = (job_struct_t*)pvPortMalloc(sizeof(job_struct_t));
     jes_err_t stat = __job_copy_str(pj->name, (char*)n, __MAX_JOB_NAME_LEN_BYTE);
     if(stat != e_err_no_err){ return stat; }
     pj->handle = NULL;
