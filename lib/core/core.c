@@ -192,11 +192,7 @@ void __core_log_printer(void* p){
     uint8_t* clr;
     uart_unif_writef_pfx(pj->name, header);
     for(uint32_t i = 0; i < __JES_LOG_LEN; i++){
-        if(le.type == NULL){
-            continue;
-        }
         le = __core_read_from_log_next();
-
         switch (le.job_state.role) {
             case e_role_core: clr = CLR_Gr; break;
             case e_role_base: clr = CLR_Y;  break;
