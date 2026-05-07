@@ -141,7 +141,7 @@ void cli_server(void *p){
                 pj_to_do->caller = e_origin_cli;
                 if(args){
                     pj_to_do->error = e_err_no_err;
-                    strncpy(pj_to_do->args, args, __MAX_JOB_ARGS_LEN_BYTE);
+                    snprintf(pj_to_do->args, __MAX_JOB_ARGS_LEN_BYTE, "%s", args);
                 }
                 else{
                     memset(pj_to_do->args, 0, __MAX_JOB_ARGS_LEN_BYTE);
