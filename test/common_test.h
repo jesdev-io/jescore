@@ -32,6 +32,7 @@ void test_core_job_launch_duplicate(void);
 void test_notify_job_and_wait(void);
 void test_notify_job_non_existing(void);
 void test_singleton_launch_immunity(void);
+void test_unregister_job(void);
 
 void test_all(void* p);
 

@@ -56,6 +56,7 @@ void test_all(void* p) {
     RUN_TEST(test_notify_job_and_wait);
     RUN_TEST(test_notify_job_non_existing);
     RUN_TEST(test_singleton_launch_immunity);
+    RUN_TEST(test_unregister_job);
     
     UNITY_END();
 }
