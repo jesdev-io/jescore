@@ -62,7 +62,7 @@ jes_err_t jes_register_and_launch_job(const char* name,
 }
 
 
-jes_err_t jes_job_set_args(char* s){
+jes_err_t jes_job_set_args(const char* s){
     TaskHandle_t caller = xTaskGetCurrentTaskHandle();
     job_struct_t* pj = __job_get_job_by_handle(caller);
     if (pj == NULL) { return e_err_is_zero; }
@@ -95,12 +95,12 @@ char* jes_job_arg_next(void) {
 }
 
 
-uint8_t jes_job_is_arg(char* arg, const char* name){
+uint8_t jes_job_is_arg(const char* arg, const char* name){
     return strcmp((const char*)arg, name) == 0;
 }
 
 
-jes_err_t jes_job_set_param(void* p){
+jes_err_t jes_job_set_param(const void* p){
     TaskHandle_t caller = xTaskGetCurrentTaskHandle();
     job_struct_t* pj = __job_get_job_by_handle(caller);
     if (pj == NULL) { return e_err_is_zero; }
@@ -133,13 +133,13 @@ void jes_throw_error(jes_err_t e){
 }
 
 
-jes_err_t jes_notify_job(const char* name, void* notification){
-    return __job_notify_generic(__job_get_job_by_name(name), notification, 0);
+jes_err_t jes_notify_job(const char* name, const void* notification){
+    return __job_notify_generic(__job_get_job_by_name(name), (void*)notification, 0);
 }
 
 
-jes_err_t jes_notify_job_ISR(const char* name, void* notification){
-    return __job_notify_generic(__job_get_job_by_name(name), notification, 1);
+jes_err_t jes_notify_job_ISR(const char* name, const void* notification){
+    return __job_notify_generic(__job_get_job_by_name(name), (void*)notification, 1);
 }
 
 
