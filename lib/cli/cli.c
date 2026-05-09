@@ -101,7 +101,17 @@ void cli_server(void *p){
         if (xQueueReceive(queue_uart, (void *)&event, (TickType_t)portMAX_DELAY)) {
             switch (event.type) {
             case UART_DATA:
+                if(event.size >= __MAX_JOB_STR_LEN_BYTE) {
+                    uart_unif_flush();
+                    xQueueReset(queue_uart);
+                    pj_to_do = pself;
+                    pj_to_do->caller = e_origin_core;
+                    pj_to_do->error = e_err_too_long;
+                    __core_notify(pj_to_do, 0);
+                    continue;
+                }
                 uart_unif_read(raw_str, event.size, portMAX_DELAY);
+                raw_str[event.size] = '\0';
                 // skip nonsense or empty input
                 if(!raw_str[0] || raw_str[0] == '\r'){
                     __cli_reprint_header();
