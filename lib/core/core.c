@@ -20,6 +20,11 @@ static core_t core = {
 jes_err_t __core_init(){
     if(core.state != e_state_init) return e_err_no_err;
     jes_err_t e;
+    
+    // Initialize core lock first - needed for job registration and all atomic operations
+    core.lock = xSemaphoreCreateMutex();
+    if(core.lock == NULL) return e_err_mem_null;
+    
     // Register the bare minimum of core and error handler
     e = __job_register_job(CORE_JOB_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __core_job, 1, 1, e_role_core);
     if(e != e_err_no_err){ return e; }
@@ -53,7 +58,6 @@ jes_err_t __core_init(){
     if(e != e_err_no_err){ return e; }
     #endif
 
-    core.lock = xSemaphoreCreateMutex();
     core.state = e_state_idle;
     return e_err_no_err;
 }
@@ -116,6 +120,11 @@ job_struct_t** __core_get_job_list(void){
 }
 
 
+SemaphoreHandle_t __core_get_lock(void){
+    return core.lock;
+}
+
+
 void __core_notify(job_struct_t* pjob_to_run, uint8_t from_isr){
     /* Return value is only a failure if the core job does not
     exist, which is impossible. Check is not needed.*/
@@ -152,34 +161,49 @@ void __core_error_throw(jes_err_t e, job_struct_t* pj){
 
 #if __JES_LOG_LEN > 0
 void __core_add_to_log_index(job_struct_t* pj, uint32_t idx, const char* type){
-    core.log[idx].sys_time = __get_systime_ms();
-    strncpy(core.log[idx].type, type, JES_LOG_TYPE_NAME_LEN);
-    if(pj == NULL){
-        memset(&core.log[idx].job_state, 0, sizeof(job_struct_t));
-    }
-    else{
-        memcpy(&core.log[idx].job_state, pj, sizeof(job_struct_t));
-    }
+    WITH_CORE_LOCK({
+        core.log[idx].sys_time = __get_systime_ms();
+        strncpy(core.log[idx].type, type, JES_LOG_TYPE_NAME_LEN);
+        core.log[idx].type[JES_LOG_TYPE_NAME_LEN - 1] = '\0';
+        if(pj == NULL){
+            memset(&core.log[idx].job_state, 0, sizeof(job_struct_t));
+        }
+        else{
+            memcpy(&core.log[idx].job_state, pj, sizeof(job_struct_t));
+        }
+    });
 }
 
 
 void __core_add_to_log_auto(job_struct_t* pj, const char* type){
-    __core_add_to_log_index(pj, core.log_write, type);
-    core.log_read = core.log_write;
-    if(++core.log_write == __JES_LOG_LEN){
-        core.log_write = 0;
-    }
+    WITH_CORE_LOCK({
+        core.log[core.log_write].sys_time = __get_systime_ms();
+        strncpy(core.log[core.log_write].type, type, JES_LOG_TYPE_NAME_LEN);
+        core.log[core.log_write].type[JES_LOG_TYPE_NAME_LEN - 1] = '\0';
+        if(pj == NULL){
+            memset(&core.log[core.log_write].job_state, 0, sizeof(job_struct_t));
+        }
+        else{
+            memcpy(&core.log[core.log_write].job_state, pj, sizeof(job_struct_t));
+        }
+        core.log_read = core.log_write;
+        if(++core.log_write == __JES_LOG_LEN){
+            core.log_write = 0;
+        }
+    });
 }
 
 log_entry_t __core_read_from_log_next(void){
-    log_entry_t le = {
-        .sys_time = core.log[core.log_read].sys_time,
-        .job_state = core.log[core.log_read].job_state,
-    };
-    strcpy(le.type, core.log[core.log_read].type);
-    if(++core.log_read == __JES_LOG_LEN){
-        core.log_read = 0;
-    }
+    log_entry_t le;
+    WITH_CORE_LOCK({
+        le.sys_time = core.log[core.log_read].sys_time;
+        le.job_state = core.log[core.log_read].job_state;
+        strncpy(le.type, core.log[core.log_read].type, JES_LOG_TYPE_NAME_LEN);
+        le.type[JES_LOG_TYPE_NAME_LEN - 1] = '\0';
+        if(++core.log_read == __JES_LOG_LEN){
+            core.log_read = 0;
+        }
+    });
     return le;
 }
 
@@ -217,27 +241,37 @@ void __core_log_printer(void* p){
 void __core_job(void* p){
     job_struct_t* pself = (job_struct_t*)p;
     while(1){
-        job_struct_t* pj = __job_sleep_until_notified_with_job();
-        if(pj == NULL){
+        /* Use xTaskNotifyWait with timeout to prevent deadlock
+           This distinguishes between timeout and actual NULL notification.
+           Determined by JES_CORE_NOTIFY_TIMEOUT_MS.*/
+        BaseType_t received;
+        uint32_t notification_value;
+        received = xTaskNotifyWait(pdFALSE, pdFALSE, &notification_value, pdMS_TO_TICKS(JES_CORE_NOTIFY_TIMEOUT_MS));
+        if(received == pdFALSE) {
+            core.state = e_state_idle;
+            continue;
+        }
+        job_struct_t* pj = (job_struct_t*)notification_value;
+        if(pj == NULL) {
             core.state = e_state_fault;
             jes_err_t e = e_err_unknown_job;
             job_struct_t placeholder;
             memset(&placeholder, 0, sizeof(job_struct_t));
-            strcpy(placeholder.name, "<?>");
+            strncpy(placeholder.name, "<?>", __MAX_JOB_NAME_LEN_BYTE);
             placeholder.error = e_err_unknown_job;
             JES_LOG_FAULT(&placeholder);
             __core_err_handler_inline(e, NULL);
+            core.state = e_state_idle;
+            continue;
         }
-        else{
-            core.state = e_state_spawning;
-            if(pj->error == e_err_no_err){
-                pj->error = __job_launch_job(pj, pj->caller);
-            }
-            if(pj->error != e_err_no_err){
-                core.state = e_state_fault;
-                __core_err_handler_inline(pj->error, NULL);
-                JES_LOG_FAULT(pj);
-            }
+        core.state = e_state_spawning;
+        if(pj->error == e_err_no_err){
+            pj->error = __job_launch_job(pj, pj->caller);
+        }
+        if(pj->error != e_err_no_err){
+            core.state = e_state_fault;
+            __core_err_handler_inline(pj->error, NULL);
+            JES_LOG_FAULT(pj);
         }
         pself->error = e_err_no_err;
         core.state = e_state_idle;
