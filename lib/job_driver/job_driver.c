@@ -166,7 +166,7 @@ void __job_runtime_env(void* p){
 }
 
 
-jes_err_t __job_copy_str(char* buf, char* str, uint16_t max_len){
+jes_err_t __job_copy_str(char* buf, const char* str, uint16_t max_len){
     if(buf == NULL || str == NULL){ return e_err_is_zero; }
     uint8_t i = 0;
     while(str[i] != '\0'){
@@ -228,7 +228,7 @@ job_struct_t* __job_sleep_until_notified_with_job(void){
 }
 
 
-jes_err_t __job_set_args(char* s, job_struct_t* pj){
+jes_err_t __job_set_args(const char* s, job_struct_t* pj){
     return __job_copy_str(pj->args, s, __MAX_JOB_ARGS_LEN_BYTE);
 }
 
@@ -239,7 +239,7 @@ char* __job_get_args(job_struct_t* pj){
 }
 
 
-jes_err_t __job_set_param(void* p, job_struct_t* pj){
+jes_err_t __job_set_param(const void* p, job_struct_t* pj){
     if(pj == NULL){ return e_err_is_zero; }
     pj->param = p;
     return e_err_no_err;
