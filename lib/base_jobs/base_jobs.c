@@ -20,15 +20,15 @@ void __base_job_help(void* p){
     job_struct_t** job_list = __core_get_job_list();
     job_struct_t* cur = *job_list;
 
-    sprintf(desc, "\x1b[1mAvailable jobs:\x1b[0m\n\r");
+    snprintf(desc, sizeof(desc), "\x1b[1mAvailable jobs:\x1b[0m\n\r");
     uart_unif_writef_pfx(pj->name, desc);
     while(cur != NULL){
         if(cur->role == e_role_base){
-            sprintf(desc, "- (base) %s\n\r", cur->name);
+            snprintf(desc, sizeof(desc), "- (base) %s\n\r", cur->name);
             uart_unif_writef_pfx(pj->name, desc);
         }
         else if(cur->role == e_role_user){
-            sprintf(desc, "- (user) %s\n\r", cur->name);
+            snprintf(desc, sizeof(desc), "- (user) %s\n\r", cur->name);
             uart_unif_writef_pfx(pj->name, desc);
         }
         cur = cur->pn;
@@ -47,7 +47,7 @@ void __base_job_stats(void* p){
     else if(strcmp(pj->args, "-aa") == 0); // no filtering; every iteration is printed.
     else{
         char msg[__MAX_JOB_ARGS_LEN_BYTE*2];
-        sprintf(msg, "Unknown specifier <%s>.\n\r", pj->args);
+        snprintf(msg, sizeof(msg), "Unknown specifier <%s>.\n\r", pj->args);
         uart_unif_writef_pfx(pj->name, msg);
         pj->error = e_err_param;
         return;
@@ -61,9 +61,9 @@ void __base_job_stats(void* p){
     job_struct_t** job_list = __core_get_job_list();
     job_struct_t* cur = *job_list;
 
-    sprintf(desc, "\x1b[1mname\t\thandle\t\tmemory\tprio\tloop\tinstances\terror\x1b[0m\n\r");
+    snprintf(desc, sizeof(desc), "\x1b[1mname\t\thandle\t\tmemory\tprio\tloop\tinstances\terror\x1b[0m\n\r");
     if(!flag_none){
-        sprintf(header, "%sjescore%s running on %s%s%s (FW %s)\n\r\n\r", 
+        snprintf(header, sizeof(desc), "%sjescore%s running on %s%s%s (FW %s)\n\r\n\r", 
             CLR_Y, CLR_X, CLR_G, BUILD_PLATFORM_NAME, CLR_X, JES_FW_VER);
         uart_unif_writef_pfx(pj->name, header);
     }
@@ -88,7 +88,7 @@ void __base_job_stats(void* p){
         }
         char singleton = 'x';
         if(cur->is_singleton) singleton = '1';
-        sprintf(desc, "%s%s%s%lx%s%ld\t%d\t%d\t%d/%c\t\t%d%s\n\r", 
+        snprintf(desc, sizeof(desc), "%s%s%s%lx%s%ld\t%d\t%d\t%d/%c\t\t%d%s\n\r", 
                 clr,
                 cur->name, 
                 spacing_name,
