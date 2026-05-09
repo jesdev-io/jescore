@@ -88,7 +88,7 @@ void __base_job_stats(void* p){
         }
         char singleton = 'x';
         if(cur->is_singleton) singleton = '1';
-        snprintf(desc, sizeof(desc), "%s%s%s%lx%s%d\t%d\t%d\t%d/%c\t\t%d%s\n\r", 
+        snprintf(desc, sizeof(desc), "%s%s%s%lx%s%ld\t%d\t%d\t%d/%c\t\t%d%s\n\r", 
                 clr,
                 cur->name, 
                 spacing_name,
