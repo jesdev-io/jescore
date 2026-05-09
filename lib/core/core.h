@@ -20,8 +20,18 @@ extern "C" {
 #define JES_LOG_TYPE_NAME_LEN 10
 
 /// @brief Timeout for core job notification wait (ms).
-/// @note Set to a reasonable interval that doesn't strain the system.
-///       The core will still preempt all jobs when timeout is reached.
+/// @note The core job runs at the highest priority (0), so when it wakes due to timeout,
+///       it will preempt all other tasks. This ensures timely job dispatching.
+///       A 100ms timeout provides a good balance: the core checks for work frequently
+///       enough for responsiveness, but not so frequently as to cause excessive
+///       context switching. The idle work is minimal (just checking notifications).
+///       
+///       Analysis: With priority 0 and 100ms timeout, in a system with many
+///       circular tasks, the core will briefly preempt them every 100ms. However,
+///       since the core's idle loop does very little work (just a notification check),
+///       the actual preemption overhead is minimal (a few CPU cycles). This is
+///       acceptable for most embedded applications where job dispatching latency
+///       of 100ms is tolerable.
 #ifndef JES_CORE_NOTIFY_TIMEOUT_MS
 #define JES_CORE_NOTIFY_TIMEOUT_MS 100
 #endif

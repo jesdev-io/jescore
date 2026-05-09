@@ -26,7 +26,11 @@ jes_err_t __core_init(){
     if(core.lock == NULL) return e_err_mem_null;
     
     // Register the bare minimum of core and error handler
-    e = __job_register_job(CORE_JOB_NAME, BOARD_MIN_JOB_HEAP_MEM, 1, __core_job, 1, 1, e_role_core);
+    // Priority 0 = highest priority (ensures core can always preempt other tasks)
+    // With a 100ms timeout, the core will wake every 100ms when idle.
+    // This is acceptable because the core's idle work is minimal (just checking notifications).
+    // The preemption ensures timely job launching even under heavy load.
+    e = __job_register_job(CORE_JOB_NAME, BOARD_MIN_JOB_HEAP_MEM, 0, __core_job, 1, 1, e_role_core);
     if(e != e_err_no_err){ return e; }
 
     // Launch the core
