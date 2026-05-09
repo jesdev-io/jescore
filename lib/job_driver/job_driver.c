@@ -14,7 +14,7 @@ jes_err_t __job_register_job(const char* n,
     if(n == NULL || f == NULL){
         return e_err_is_zero;
     }
-    if(m == 0 || p == 0){
+    if(m == 0){
         return e_err_is_zero;
     }
     job_struct_t* pj = (job_struct_t*)pvPortMalloc(sizeof(job_struct_t));
