@@ -19,6 +19,30 @@ extern "C" {
 
 #define JES_LOG_TYPE_NAME_LEN 10
 
+/// @brief Timeout for core job notification wait (ms).
+/// @note Set to a reasonable interval that doesn't strain the system.
+///       The core will still preempt all jobs when timeout is reached.
+#ifndef JES_CORE_NOTIFY_TIMEOUT_MS
+#define JES_CORE_NOTIFY_TIMEOUT_MS 100
+#endif
+
+/// @brief Get the core's job list lock semaphore.
+/// @return Pointer to the core's lock semaphore.
+/// @note This allows other modules to synchronize access to the job list.
+SemaphoreHandle_t __core_get_lock(void);
+
+/// @brief Macro for thread-safe access to the job list.
+/// @param code Block of code to execute with job list locked.
+/// @note This macro acquires core.lock before executing the code block
+///       and releases it afterwards, ensuring atomic access to the job list.
+#define CORE_WITH_JOB_LIST(code) \
+    do { \
+        SemaphoreHandle_t _lock = __core_get_lock(); \
+        xSemaphoreTake(_lock, portMAX_DELAY); \
+        code \
+        xSemaphoreGive(_lock); \
+    } while(0)
+
 #if __JES_LOG_LEN > 0
 #define JES_LOG_FAULT(pj) __core_add_to_log_auto((job_struct_t*)pj, "\x1b[31m" "fault" "\x1b[0m")
 #define JES_LOG_REGISTER(pj) __core_add_to_log_auto((job_struct_t*)pj, "rgistr")
@@ -59,6 +83,7 @@ typedef struct core_t{
     job_struct_t* job_list;
     SemaphoreHandle_t lock;
     #if __JES_LOG_LEN > 0
+    SemaphoreHandle_t log_lock;
     log_entry_t log[__JES_LOG_LEN];
     uint32_t log_write;
     uint32_t log_read;
