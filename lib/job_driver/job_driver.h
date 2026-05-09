@@ -110,6 +110,13 @@ jes_err_t __job_register_job(const char* n,
                          uint8_t is_singleton,
                          e_role_t role);
 
+/// @brief Remove a job from the job list and free its resources.
+/// @param n: job name (callable by CLI).
+/// @returns status, `e_err_no_err` if OK.
+/// @note Will not free the job if it has active instances running.
+/// @note Frees the job struct, its queue, and semaphore.
+jes_err_t __job_unregister_job(const char* n);
+
 
 /// @brief Job getter based on name identifier.
 /// @param n: job name (callable by CLI).
@@ -120,7 +127,7 @@ job_struct_t* __job_get_job_by_name(const char* n);
 /// @brief Job getter based on function signature.
 /// @param f: function pointer of existing job.
 /// @returns job handle.
-job_struct_t* __job_get_job_by_func(void (*f)(void* p));
+job_struct_t* __job_get_job_by_func(void (*const f)(void* p));
 
 
 /// @brief Job getter based on task handle.
@@ -173,7 +180,7 @@ void __job_runtime_env(void* p);
 /// @param str: given string to copy.
 /// @param max_len: max length of string to be copied.
 /// @returns status, `e_err_no_err` if OK.
-jes_err_t __job_copy_str(char* buf, char* str, uint16_t max_len);
+jes_err_t __job_copy_str(char* buf, const char* str, uint16_t max_len);
 
 
 /// @brief Task notification wrapper for FreeRTOS "xTaskNotify()".
@@ -224,7 +231,7 @@ job_struct_t* __job_sleep_until_notified_with_job(void);
 /// @param s: String to insert into `args` field.
 /// @param pj: Pointer to job.
 /// @return status, `e_err_no_err` if OK.
-jes_err_t __job_set_args(char* s, job_struct_t* pj);
+jes_err_t __job_set_args(const char* s, job_struct_t* pj);
 
 
 /// @brief Get the field `args` of the job.
@@ -242,7 +249,7 @@ char* __job_get_args(job_struct_t* pj);
 /// @param p: Arbitrary reference to parameter.
 /// @param pj: Pointer to job. 
 /// @return status, `e_err_no_err` if OK.
-jes_err_t __job_set_param(void* p, job_struct_t* pj);
+jes_err_t __job_set_param(const void* p, job_struct_t* pj);
 
 
 /// @brief Get the field `param` of the job.
