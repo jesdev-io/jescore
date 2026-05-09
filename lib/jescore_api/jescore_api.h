@@ -75,6 +75,14 @@ jes_err_t jes_register_and_launch_job(const char* name,
                                   uint8_t is_singleton);
 
 
+/// @brief Remove a job from the job list and free its resources.
+/// @param name: Name of job to unregister.
+/// @return Status. Returns `e_err_no_err` if OK.
+/// @note Will not unregister a job that has active instances running.
+/// @note Frees the job struct, its queue, and semaphore.
+jes_err_t jes_unregister_job(const char* name);
+
+
 /// @brief Set the field `args` of the calling job.
 /// @param s: String to insert into `args` field.
 /// @return status, `e_err_no_err` if OK.

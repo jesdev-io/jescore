@@ -62,6 +62,11 @@ jes_err_t jes_register_and_launch_job(const char* name,
 }
 
 
+jes_err_t jes_unregister_job(const char* name){
+    return __job_unregister_job(name);
+}
+
+
 jes_err_t jes_job_set_args(const char* s){
     TaskHandle_t caller = xTaskGetCurrentTaskHandle();
     job_struct_t* pj = __job_get_job_by_handle(caller);
