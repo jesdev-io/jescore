@@ -26,16 +26,16 @@ extern "C" {
 #define JES_CORE_NOTIFY_TIMEOUT_MS 100
 #endif
 
-/// @brief Get the core's job list lock semaphore.
+/// @brief Get the core's lock semaphore.
 /// @return Pointer to the core's lock semaphore.
-/// @note This allows other modules to synchronize access to the job list.
+/// @note This allows other modules to synchronize access to core data structures.
 SemaphoreHandle_t __core_get_lock(void);
 
-/// @brief Macro for thread-safe access to the job list.
-/// @param code Block of code to execute with job list locked.
+/// @brief Macro for atomic access to core data structures.
+/// @param code Block of code to execute with core.lock held.
 /// @note This macro acquires core.lock before executing the code block
-///       and releases it afterwards, ensuring atomic access to the job list.
-#define CORE_WITH_JOB_LIST(code) \
+///       and releases it afterwards, creating an atomic context for the operation.
+#define WITH_CORE_LOCK(code) \
     do { \
         SemaphoreHandle_t _lock = __core_get_lock(); \
         xSemaphoreTake(_lock, portMAX_DELAY); \
@@ -83,7 +83,6 @@ typedef struct core_t{
     job_struct_t* job_list;
     SemaphoreHandle_t lock;
     #if __JES_LOG_LEN > 0
-    SemaphoreHandle_t log_lock;
     log_entry_t log[__JES_LOG_LEN];
     uint32_t log_write;
     uint32_t log_read;
