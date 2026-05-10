@@ -166,8 +166,13 @@ int32_t uart_unif_init(uint32_t baud, uint32_t rx_buf_len, uint32_t tx_buf_len, 
     return 0;
 }
 
+/// @brief Default UART write timeout in ms. Prevents indefinite blocking.
+#ifndef UART_WRITE_TIMEOUT_MS
+#define UART_WRITE_TIMEOUT_MS 100
+#endif
+
 int32_t uart_unif_write(const char* msg){
-    return HAL_UART_Transmit(&huart_num, (uint8_t*)msg, (uint16_t)strlen((char*)msg), HAL_MAX_DELAY);
+    return HAL_UART_Transmit(&huart_num, (uint8_t*)msg, (uint16_t)strlen((char*)msg), pdMS_TO_TICKS(UART_WRITE_TIMEOUT_MS));
 }
 
 int32_t uart_unif_read(char* buf, uint32_t len, uint32_t timeout){
