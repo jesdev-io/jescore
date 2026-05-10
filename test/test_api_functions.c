@@ -279,7 +279,7 @@ void test_notify_job_and_wait(void){
 
 void test_notify_job_non_existing(void){
     jes_err_t je = jes_notify_job("foo", NULL);
-    TEST_ASSERT_EQUAL(e_err_is_zero, je);
+    TEST_ASSERT_EQUAL(e_err_unknown_job, je);
 }
 
 void test_singleton_launch_immunity(void){
