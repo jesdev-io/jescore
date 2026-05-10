@@ -227,7 +227,7 @@ void __core_log_printer(void* p){
             case e_role_user: clr = CLR_G;  break;
             default:          clr = CLR_X;  break;
         }
-        sprintf(desc, "(%010ld) %s:\t %s%s\t\t%d\t\t%d\t%s%s\n\r", 
+        sprintf(desc, "(%010u) %s:\t %s%s\t\t%d\t\t%d\t%s%s\n\r", 
                 le.sys_time,
                 le.type,
                 clr,
