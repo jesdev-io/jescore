@@ -21,13 +21,16 @@ void __base_job_help(void* p){
     job_struct_t* cur = *job_list;
 
     snprintf(desc, sizeof(desc), "\x1b[1mAvailable jobs:\x1b[0m\n\r");
+    snprintf(desc, sizeof(desc), "\x1b[1mAvailable jobs:\x1b[0m\n\r");
     uart_unif_writef_pfx(pj->name, desc);
     while(cur != NULL){
         if(cur->role == e_role_base){
             snprintf(desc, sizeof(desc), "- (base) %s\n\r", cur->name);
+            snprintf(desc, sizeof(desc), "- (base) %s\n\r", cur->name);
             uart_unif_writef_pfx(pj->name, desc);
         }
         else if(cur->role == e_role_user){
+            snprintf(desc, sizeof(desc), "- (user) %s\n\r", cur->name);
             snprintf(desc, sizeof(desc), "- (user) %s\n\r", cur->name);
             uart_unif_writef_pfx(pj->name, desc);
         }
@@ -48,6 +51,7 @@ void __base_job_stats(void* p){
     else{
         char msg[__MAX_JOB_ARGS_LEN_BYTE*2];
         snprintf(msg, sizeof(msg), "Unknown specifier <%s>.\n\r", pj->args);
+        snprintf(msg, sizeof(msg), "Unknown specifier <%s>.\n\r", pj->args);
         uart_unif_writef_pfx(pj->name, msg);
         pj->error = e_err_param;
         return;
@@ -61,6 +65,7 @@ void __base_job_stats(void* p){
     job_struct_t** job_list = __core_get_job_list();
     job_struct_t* cur = *job_list;
 
+    snprintf(desc, sizeof(desc), "\x1b[1mname\t\thandle\t\tmemory\tprio\tloop\tinstances\terror\x1b[0m\n\r");
     snprintf(desc, sizeof(desc), "\x1b[1mname\t\thandle\t\tmemory\tprio\tloop\tinstances\terror\x1b[0m\n\r");
     if(!flag_none){
         snprintf(header, sizeof(header), "%sjescore%s running on %s%s%s (FW %s)\n\r\n\r", 
