@@ -134,17 +134,21 @@ jes_err_t jes_error_get_any(void){
 void jes_throw_error(jes_err_t e){
     TaskHandle_t hj = xTaskGetCurrentTaskHandle();
     job_struct_t* pj = __job_get_job_by_handle(hj);
-    return __core_error_throw(e, pj);
+    __core_error_throw(e, pj);
 }
 
 
 jes_err_t jes_notify_job(const char* name, const void* notification){
-    return __job_notify_generic(__job_get_job_by_name(name), (void*)notification, 0);
+    job_struct_t* pj = __job_get_job_by_name(name);
+    if (pj == NULL) { return e_err_unknown_job; }
+    return __job_notify_generic(pj, (void*)notification, 0);
 }
 
 
 jes_err_t jes_notify_job_ISR(const char* name, const void* notification){
-    return __job_notify_generic(__job_get_job_by_name(name), (void*)notification, 1);
+    job_struct_t* pj = __job_get_job_by_name(name);
+    if (pj == NULL) { return e_err_unknown_job; }
+    return __job_notify_generic(pj, (void*)notification, 1);
 }
 
 
