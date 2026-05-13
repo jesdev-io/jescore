@@ -1,0 +1,3 @@
+[submodule "jescore.wiki"]
+	path = jescore.wiki
+	url = https://github.com/jake-is-ESD-protected/jescore.wiki.git
