@@ -35,10 +35,6 @@
 #ifndef _BOARD_PARSER_H_
 #define _BOARD_PARSER_H_
 
-#ifdef JES_UART_CUSTOM
-#include "uart_cfg.h"
-#endif // JES_UART_CUSTOM
-
 // --- ESP32 -- //
 #ifdef ESP32
 #define BUILD_FOR_ESP32
@@ -269,6 +265,10 @@
 
 #ifdef BUILD_FOR_STM32
 #include "FreeRTOS.h"
+
+#ifdef JES_UART_CUSTOM
+#include "uart_cfg.h"
+#endif // JES_UART_CUSTOM
 
 #define BOARD_MIN_JOB_HEAP_MEM 256
 #ifndef BUILD_PLATFORM_NAME
