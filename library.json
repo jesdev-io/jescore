@@ -24,7 +24,7 @@
         ".venv*",
         ".vscode",
         "jescore.wiki",
-        "FreeRTOS"
+        "FreeRTOS-Kernel"
       ]
     },
     "headers": [
