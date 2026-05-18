@@ -29,20 +29,18 @@ lib_deps =
 ```
 Find more instructions on [project setup in the wiki](https://github.com/jesdev-io/jescore/wiki/API-Documentation#imports).
 
+### Don't want to use PlatformIO? No problem!
+Use the standard way of `make` instead! Clone this repo and obtain a local copy of the [FreeRTOS-Kernel](https://github.com/FreeRTOS/FreeRTOS-Kernel). You can now follow the example [`Makefile`](https://github.com/jesdev-io/jescore-examples/blob/dev/Makefile_template_stm32) and adjust it for your project.
+
 ## Why?
 Many times I find myself needing the same type of overarching architecture for embedded systems projects. This includes things like multitasking, interrupts, sampling tasks and user input tasks. As of now, every project consists of me setting up this architecture manually for every project, always slightly different with new knowledge added. At one point I stopped and thought, why not outsource this specific framework into its own project, software, module... Something that is always at the center of my projects: **jescore**.
 
 The great thing about this name is that it can stand for "**J**'s **e**mbedded **s**ystems **core**" but it can also be an homage to the legacy YouTube name "**J's e-shack**", which inspired this core system in the first place.
 
 ## Currently supported platforms
-|ESP32|STM32|
-|-|-|
-|ESP32|STM32L476|
-|ESP32-C3|STM32L432|
-|ESP32-S3|STM32G431|
-|ESP32-WROVER|STM32H753|
+`jescore` runs on all ESP32 boards with the Arduino FW for beginners and hobbyists and on selected STM32 boards with the STM32 HAL for the nerds.
 
-**Want more boards?** Check out [Board Support](https://github.com/jesdev-io/jescore/wiki/Backend-Documentation#board-support) or open an issue!
+**Want more boards?** See the complete list at [Board Support](https://github.com/jesdev-io/jescore/wiki/Board-Support) or open an issue!
 
 ## Get started, examples and use-cases
 
