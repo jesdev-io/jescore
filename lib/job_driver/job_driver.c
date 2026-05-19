@@ -24,7 +24,6 @@ jes_err_t __job_register_job(const char* n,
         vPortFree(pj); 
         return stat; 
     }
-    
     pj->handle = NULL;
     pj->mem_size = m;
     pj->priority = p;
