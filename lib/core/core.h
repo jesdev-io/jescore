@@ -19,6 +19,40 @@ extern "C" {
 
 #define JES_LOG_TYPE_NAME_LEN 10
 
+/// @brief Timeout for core job notification wait (ms).
+/// @note The core job runs at the highest priority (0), so when it wakes due to timeout,
+///       it will preempt all other tasks. This ensures timely job dispatching.
+///       A 100ms timeout provides a good balance: the core checks for work frequently
+///       enough for responsiveness, but not so frequently as to cause excessive
+///       context switching. The idle work is minimal (just checking notifications).
+///       
+///       Analysis: With priority 0 and 100ms timeout, in a system with many
+///       circular tasks, the core will briefly preempt them every 100ms. However,
+///       since the core's idle loop does very little work (just a notification check),
+///       the actual preemption overhead is minimal (a few CPU cycles). This is
+///       acceptable for most embedded applications where job dispatching latency
+///       of 100ms is tolerable.
+#ifndef JES_CORE_NOTIFY_TIMEOUT_MS
+#define JES_CORE_NOTIFY_TIMEOUT_MS 100
+#endif
+
+/// @brief Get the core's lock semaphore.
+/// @return Pointer to the core's lock semaphore.
+/// @note This allows other modules to synchronize access to core data structures.
+SemaphoreHandle_t __core_get_lock(void);
+
+/// @brief Macro for atomic access to core data structures.
+/// @param code Block of code to execute with core.lock held.
+/// @note This macro acquires core.lock before executing the code block
+///       and releases it afterwards, creating an atomic context for the operation.
+#define WITH_CORE_LOCK(code) \
+    do { \
+        SemaphoreHandle_t _lock = __core_get_lock(); \
+        xSemaphoreTake(_lock, portMAX_DELAY); \
+        code \
+        xSemaphoreGive(_lock); \
+    } while(0)
+
 #if __JES_LOG_LEN > 0
 #define JES_LOG_FAULT(pj) __core_add_to_log_auto((job_struct_t*)pj, "\x1b[31m" "fault" "\x1b[0m")
 #define JES_LOG_REGISTER(pj) __core_add_to_log_auto((job_struct_t*)pj, "rgistr")

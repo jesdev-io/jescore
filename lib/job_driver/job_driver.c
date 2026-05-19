@@ -14,12 +14,15 @@ jes_err_t __job_register_job(const char* n,
     if(n == NULL || f == NULL){
         return e_err_is_zero;
     }
-    if(m == 0 || p == 0){
+    if(m == 0){
         return e_err_is_zero;
     }
-    job_struct_t** job_list = __core_get_job_list();
-    if(__job_get_job_by_name(n) != NULL){
-        return e_err_duplicate;
+    job_struct_t* pj = (job_struct_t*)pvPortMalloc(sizeof(job_struct_t));
+    if(pj == NULL) { return e_err_mem_null; }
+    jes_err_t stat = __job_copy_str(pj->name, n, __MAX_JOB_NAME_LEN_BYTE);
+    if(stat != e_err_no_err) { 
+        vPortFree(pj); 
+        return stat; 
     }
     job_struct_t* pj = (job_struct_t*)pvPortMalloc(sizeof(job_struct_t));
     jes_err_t stat = __job_copy_str(pj->name, (char*)n, __MAX_JOB_NAME_LEN_BYTE);
@@ -37,58 +40,125 @@ jes_err_t __job_register_job(const char* n,
     pj->param = NULL;
     pj->error = e_err_no_err;
     pj->notif_queue = xQueueCreate(MAX_JOB_NOTIF_QUEUE_SIZE, sizeof(void*));
-    if(pj->notif_queue == NULL) { return e_err_mem_null; }
+    if(pj->notif_queue == NULL) { 
+        vPortFree(pj); 
+        return e_err_mem_null; 
+    }
     pj->lock = xSemaphoreCreateMutex();
-    if(pj->lock == NULL) { return e_err_mem_null; }
+    if(pj->lock == NULL) { 
+        vQueueDelete(pj->notif_queue);
+        vPortFree(pj); 
+        return e_err_mem_null; 
+    }
     pj->timing_begin = 0;
     pj->timing_end = 0;
-    pj->pn = *job_list;
-    *job_list = pj;
+    
+    WITH_CORE_LOCK({
+        job_struct_t** job_list = __core_get_job_list();
+        job_struct_t* cur = *job_list;
+        while(cur != NULL){
+            if(strcmp(cur->name, n) == 0){ 
+                vQueueDelete(pj->notif_queue);
+                vPortFree(pj);
+                return e_err_duplicate;
+            }
+            cur = cur->pn;
+        }
+        pj->pn = *job_list;
+        *job_list = pj;
+    });
+    
     JES_LOG_REGISTER(pj);
     return e_err_no_err;
 }
 
 
 job_struct_t* __job_get_job_by_name(const char* n){
-    job_struct_t** job_list = __core_get_job_list();
-    job_struct_t* cur = *job_list;
-    while(cur != NULL){
-        if(strcmp((cur)->name, n) == 0){ 
-            return cur; }
-        cur = cur->pn;
-    }
-    return NULL;
+    job_struct_t* pj = NULL;
+    WITH_CORE_LOCK({
+        job_struct_t** job_list = __core_get_job_list();
+        job_struct_t* cur = *job_list;
+        while(cur != NULL){
+            if(strcmp(cur->name, n) == 0){ 
+                pj = cur;
+                break; 
+            }
+            cur = cur->pn;
+        }
+    });
+    return pj;
 }
 
 
-job_struct_t* __job_get_job_by_func(void (*f)(void* p)){
-    job_struct_t** job_list = __core_get_job_list();
-    job_struct_t* cur = *job_list;
-    while(cur != NULL){
-        if(cur->function == f){ 
-            return cur; }
-        cur = cur->pn;
-    }
-    return NULL;
+job_struct_t* __job_get_job_by_func(void (*const f)(void* p)){
+    job_struct_t* pj = NULL;
+    WITH_CORE_LOCK({
+        job_struct_t** job_list = __core_get_job_list();
+        job_struct_t* cur = *job_list;
+        while(cur != NULL){
+            if(cur->function == f){ 
+                pj = cur; 
+                break; 
+            }
+            cur = cur->pn;
+        }
+    });
+    return pj;
 }
 
 
 job_struct_t* __job_get_job_by_handle(TaskHandle_t t){
-    job_struct_t** job_list = __core_get_job_list();
-    job_struct_t* cur = *job_list;
-    while(cur != NULL){
-        if(cur->handle == t){ 
-            return cur; }
-        cur = cur->pn;
-    }
-    return NULL;
+    job_struct_t* pj = NULL;
+    WITH_CORE_LOCK({
+        job_struct_t** job_list = __core_get_job_list();
+        job_struct_t* cur = *job_list;
+        while(cur != NULL){
+            if(cur->handle == t){ 
+                pj = cur; 
+                break; 
+            }
+            cur = cur->pn;
+        }
+    });
+    return pj;
+}
+
+
+jes_err_t __job_unregister_job(const char* n){
+    if(n == NULL) return e_err_is_zero;
+    job_struct_t* pj_to_remove = NULL;
+    job_struct_t** prev_pn = NULL;
+    WITH_CORE_LOCK({
+        job_struct_t** job_list = __core_get_job_list();
+        job_struct_t* cur = *job_list;
+        job_struct_t** prev = job_list;
+        
+        while(cur != NULL){
+            if(strcmp(cur->name, n) == 0){ 
+                pj_to_remove = cur;
+                prev_pn = prev;
+                break; 
+            }
+            prev = &(cur->pn);
+            cur = cur->pn;
+        }
+    });
+    if(pj_to_remove == NULL) return e_err_unknown_job;
+    if(pj_to_remove->instances > 0) return e_err_prohibited;
+    WITH_CORE_LOCK({
+        *prev_pn = pj_to_remove->pn;
+    });
+    if(pj_to_remove->notif_queue != NULL) vQueueDelete(pj_to_remove->notif_queue);
+    if(pj_to_remove->lock != NULL) vSemaphoreDelete(pj_to_remove->lock);
+    vPortFree(pj_to_remove);
+    return e_err_no_err;
 }
 
 
 jes_err_t __job_launch_job(job_struct_t* pj, origin_t o){
     BaseType_t stat;
-    pj->caller = o;
     if(pj == NULL){ return e_err_unknown_job; }
+    pj->caller = o;
     if((o == e_origin_cli || o == e_origin_api) && pj->role == e_role_core){
         // Prohibit the calling of core jobs from API and CLI
         return e_err_prohibited;
@@ -166,13 +236,14 @@ void __job_runtime_env(void* p){
 }
 
 
-jes_err_t __job_copy_str(char* buf, char* str, uint16_t max_len){
+jes_err_t __job_copy_str(char* buf, const char* str, uint16_t max_len){
     if(buf == NULL || str == NULL){ return e_err_is_zero; }
-    uint8_t i = 0;
-    while(str[i] != '\0'){
-        if(++i == max_len){ return e_err_too_long; }
-    }
-    strcpy(buf, str);
+    if(max_len == 0) return e_err_is_zero;
+    uint16_t i = 0;
+    while(i < max_len && str[i] != '\0') i++;
+    if(i == max_len) return e_err_too_long;
+    strncpy(buf, str, max_len);
+    buf[max_len - 1] = '\0';
     return e_err_no_err;
 }
 
@@ -228,7 +299,7 @@ job_struct_t* __job_sleep_until_notified_with_job(void){
 }
 
 
-jes_err_t __job_set_args(char* s, job_struct_t* pj){
+jes_err_t __job_set_args(const char* s, job_struct_t* pj){
     return __job_copy_str(pj->args, s, __MAX_JOB_ARGS_LEN_BYTE);
 }
 
@@ -239,9 +310,9 @@ char* __job_get_args(job_struct_t* pj){
 }
 
 
-jes_err_t __job_set_param(void* p, job_struct_t* pj){
+jes_err_t __job_set_param(const void* p, job_struct_t* pj){
     if(pj == NULL){ return e_err_is_zero; }
-    pj->param = p;
+    pj->param = (void*)p;
     return e_err_no_err;
 }
 

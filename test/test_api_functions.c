@@ -18,6 +18,8 @@
 #define DUMMY_JOB_ARGS_HOLDER_NAME  "dummyargs"
 #define DUMMY_JOB_NOTIFY            "dummynotify"
 #define DUMMY_JOB_NOTIFY_TAKE       "dummynotifytake"
+#define DUMMY_JOB_UNREGISTER        "dummyunrgstr"
+#define DUMMY_JOB_UNREGISTER_RUN    "dummyunrgstrrun"
 #define DUMMY_NOTIFICATION_VALUE    1234
 #define DUMMY_PRINT                 "hello world!"
 #define DUMMY_FAIL_MSG              "Assert failed"
@@ -277,10 +279,39 @@ void test_notify_job_and_wait(void){
 
 void test_notify_job_non_existing(void){
     jes_err_t je = jes_notify_job("foo", NULL);
-    TEST_ASSERT_EQUAL(e_err_is_zero, je);
+    TEST_ASSERT_EQUAL(e_err_unknown_job, je);
 }
 
 void test_singleton_launch_immunity(void){
     jes_err_t stat = jes_launch_job(DUMMY_JOB_LOOP_NAME);
     TEST_ASSERT_EQUAL(e_err_duplicate, stat);
+}
+
+
+void test_unregister_job(void){
+    jes_err_t stat = jes_register_job(DUMMY_JOB_UNREGISTER,
+                                      DUMMY_JOB_MEM,
+                                      DUMMY_JOB_PRIO,
+                                      dummy_job_single,
+                                      0,
+                                      1);
+    TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
+    job_struct_t* pj = __job_get_job_by_name(DUMMY_JOB_UNREGISTER);
+    TEST_ASSERT_NOT_EQUAL(NULL, pj);
+    stat = jes_unregister_job(DUMMY_JOB_UNREGISTER);
+    TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
+    pj = __job_get_job_by_name(DUMMY_JOB_UNREGISTER);
+    TEST_ASSERT_EQUAL(NULL, pj);
+    stat = jes_unregister_job("nonexistent_job");
+    TEST_ASSERT_EQUAL_INT(e_err_unknown_job, stat);
+    stat = jes_register_and_launch_job(DUMMY_JOB_UNREGISTER_RUN,
+                                       DUMMY_JOB_MEM,
+                                       DUMMY_JOB_PRIO,
+                                       dummy_job_loop,
+                                       1,
+                                       0);
+    TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
+    jes_delay_job_ms(100);
+    stat = jes_unregister_job(DUMMY_JOB_UNREGISTER_RUN);
+    TEST_ASSERT_EQUAL_INT(e_err_prohibited, stat);
 }

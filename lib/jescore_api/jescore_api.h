@@ -75,10 +75,18 @@ jes_err_t jes_register_and_launch_job(const char* name,
                                   uint8_t is_singleton);
 
 
+/// @brief Remove a job from the job list and free its resources.
+/// @param name: Name of job to unregister.
+/// @return Status. Returns `e_err_no_err` if OK.
+/// @note Will not unregister a job that has active instances running.
+/// @note Frees the job struct, its queue, and semaphore.
+jes_err_t jes_unregister_job(const char* name);
+
+
 /// @brief Set the field `args` of the calling job.
 /// @param s: String to insert into `args` field.
 /// @return status, `e_err_no_err` if OK.
-jes_err_t jes_job_set_args(char* s);
+jes_err_t jes_job_set_args(const char* s);
 
 
 /// @brief Get the field `args` of the calling job.
@@ -102,13 +110,13 @@ char* jes_job_arg_next(void);
 /// @param name Name of arg to compare.
 /// @return 1 if matching, 0 if not.
 /// @note Use this in an arg-parsing loop.
-uint8_t jes_job_is_arg(char* arg, const char* name);
+uint8_t jes_job_is_arg(const char* arg, const char* name);
 
 
 /// @brief Set the field `param` of the calling job.
 /// @param p: Arbitrary reference to parameter.
 /// @return status, `e_err_no_err` if OK.
-jes_err_t jes_job_set_param(void* p);
+jes_err_t jes_job_set_param(const void* p);
 
 
 /// @brief Get the field `param` of the calling job.
@@ -143,14 +151,14 @@ void jes_throw_error(jes_err_t e);
 /// @param name Name of job which should be notified.
 /// @param notification Optional pointer to notification value.
 /// @return status, `e_err_no_err` if OK.
-jes_err_t jes_notify_job(const char* name, void* notification);
+jes_err_t jes_notify_job(const char* name, const void* notification);
 
 
 /// @brief Notify a job with an optional message from within an interrupt.
 /// @param name Name of job which should be notified.
 /// @param notification Optional pointer to notification value. 
 /// @return status, `e_err_no_err` if OK.
-jes_err_t jes_notify_job_ISR(const char* name, void* notification);
+jes_err_t jes_notify_job_ISR(const char* name, const void* notification);
 
 
 /// @brief Pause the calling job until a notification arrives.
