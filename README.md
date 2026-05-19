@@ -38,7 +38,7 @@ Many times I find myself needing the same type of overarching architecture for e
 The great thing about this name is that it can stand for "**J**'s **e**mbedded **s**ystems **core**" but it can also be an homage to the legacy YouTube name "**J's e-shack**", which inspired this core system in the first place.
 
 ## Currently supported platforms
-`jescore` runs on all ESP32 boards with the Arduino FW for beginners and hobbyists and on selected STM32 boards with the STM32 HAL for the nerds.
+`jescore` runs on all ESP32 boards with the Arduino FW for beginners and hobbyists and on selected STM32 boards with the STM32 HAL for the nerds. Note that Cortex-M0 series (STM32F0, STM32L0, STM32G0, STM32C0) are not supported due to RAM constraints.
 
 **Want more boards?** See the complete list at [Board Support](https://github.com/jesdev-io/jescore/wiki/Board-Support) or open an issue!
 
