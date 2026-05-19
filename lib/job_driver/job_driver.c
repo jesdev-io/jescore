@@ -24,9 +24,6 @@ jes_err_t __job_register_job(const char* n,
         vPortFree(pj); 
         return stat; 
     }
-    job_struct_t* pj = (job_struct_t*)pvPortMalloc(sizeof(job_struct_t));
-    jes_err_t stat = __job_copy_str(pj->name, (char*)n, __MAX_JOB_NAME_LEN_BYTE);
-    if(stat != e_err_no_err){ return stat; }
     pj->handle = NULL;
     pj->mem_size = m;
     pj->priority = p;
