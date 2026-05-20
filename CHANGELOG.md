@@ -1,5 +1,29 @@
 # Changelog
 
+## 2.3.1 - 2026-05-20 **The safety update**
+
+### Added
+- 📜 Static analysis script
+- ⏲️ UART timeout for STM32
+- 🔧 Job unregistration API
+- 🔒 Self-closing mutex context
+- ⏱️ Core timeout mechanism
+- 🛡️ Experimental Daisy Seed H7 support (the hardware, not the library)
+
+### Fixed
+- 🪨 `const` parameter declarations where appropriate
+- ✒️ ~~`sprintf`~~ -> `snprintf`
+- 📦 Increased stats descriptor size
+- 🔄 Switched to PortMalloc
+- 🔒 Core and job task locking
+- 🚫 Null dereference prevention
+- 🏃 Faster return on parameter errors
+
+### Changed
+- 🔆 Core job has priority 0
+- 📝 Updated README with board list and makefile references
+- 📋 Noted Cortex M0 series exclusion
+
 ## 2.3.0 - 2026-04-21
 
 ### Added
