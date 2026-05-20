@@ -1,18 +1,18 @@
 {
     "name": "jescore",
-    "version": "2.3.0",
+    "version": "2.3.1",
     "description": "FreeRTOS attached core for easier multitasking and native CLI support",
     "keywords": "core, FreeRTOS",
     "repository":
     {
       "type": "git",
-      "url": "https://github.com/jake-is-ESD-protected/jescore"
+      "url": "https://github.com/jesdev-io/jescore"
     },
     "authors":
     [
       {
-        "name": "jake-is-ESD-protected",
-        "url": "https://github.com/jake-is-ESD-protected"
+        "name": "jesdev-io",
+        "url": "https://github.com/jesdev-io"
       }
     ],
     "license": "Apache-2.0",
