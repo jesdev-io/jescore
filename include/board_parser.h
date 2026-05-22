@@ -35,10 +35,6 @@
 #ifndef _BOARD_PARSER_H_
 #define _BOARD_PARSER_H_
 
-#ifdef JES_UART_CUSTOM
-#include "uart_cfg.h"
-#endif // JES_UART_CUSTOM
-
 // --- ESP32 -- //
 #ifdef ESP32
 #define BUILD_FOR_ESP32
@@ -166,6 +162,26 @@
 #endif // JES_UART_CUSTOM
 #endif // STM32H753xx
 
+#ifdef STM32H750xx
+#include "stm32h7xx_hal.h"
+#define BUILD_PLATFORM_NAME "STM32H750"
+#ifndef JES_UART_CUSTOM
+#define USART_RCC_PERIPH RCC_PERIPHCLK_USART1
+#define USART_CLK_SRC_DEFAULT(PeriphClkInit_struct) PeriphClkInit_struct.Usart16ClockSelection = __HAL_RCC_GET_USART16_SOURCE()
+#define USART_CLK_ENABLE() __HAL_RCC_USART1_CLK_ENABLE()
+#define USART_CLK_GPIO_ENABLE() __HAL_RCC_GPIOB_CLK_ENABLE()
+#define USART_CLK_GPIO_DISABLE() __USART1_CLK_DISABLE()
+#define USART_NUM USART1
+#define USART_GPIO_TX_PORT GPIOB
+#define USART_GPIO_RX_PORT GPIOB
+#define USART_GPIO_TX_NUM GPIO_PIN_6
+#define USART_GPIO_RX_NUM GPIO_PIN_7
+#define USART_GPIO_TX_ALT GPIO_AF7_USART1
+#define USART_GPIO_RX_ALT GPIO_AF7_USART1
+#define USART_IRQn_NUM USART1_IRQn
+#endif // JES_UART_CUSTOM
+#endif // STM32H750xx
+
 #endif
 
 #ifdef STM32L0
@@ -269,6 +285,10 @@
 
 #ifdef BUILD_FOR_STM32
 #include "FreeRTOS.h"
+
+#ifdef JES_UART_CUSTOM
+#include "uart_cfg.h"
+#endif // JES_UART_CUSTOM
 
 #define BOARD_MIN_JOB_HEAP_MEM 256
 #ifndef BUILD_PLATFORM_NAME
