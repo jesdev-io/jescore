@@ -61,9 +61,6 @@ jobs:
           if [ "$AGENT_AVAILABLE" = true ]; then
             echo "✓ Agent $AGENT_NAME is available"
             
-            # Change to jescore directory
-            cd jescore
-            
             # Run tests using the remote agent with USB port information
             echo "Running tests on $AGENT_NAME with environment $TEST_ENV (USB: $USB_PORT)..."
             pio remote run -t "$AGENT_NAME" -e "$TEST_ENV" --target test
