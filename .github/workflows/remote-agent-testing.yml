@@ -66,5 +66,6 @@ jobs:
             pio remote --agent "$AGENT_NAME" test -e "$TEST_ENV" --upload-port "$USB_PORT" --test-port "$USB_PORT" 
           else
             echo "Agent $AGENT_NAME is not available"
-            echo "Skipping tests for $TEST_ENV (USB: $USB_PORT)"
+            echo "Cannot run tests for $TEST_ENV (USB: $USB_PORT)"
+            exit 1
           fi
