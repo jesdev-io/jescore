@@ -1,4 +1,4 @@
-name: PlatformIO Remote Agent Testing
+name: jescore deployment system
 
 on:
   push:
@@ -13,7 +13,7 @@ env:
 
 jobs:
   test-on-remote-agents:
-    name: Run Tests on Remote Agents
+    name: Physical MCU unit test
     runs-on: ubuntu-latest
     strategy:
       matrix:
