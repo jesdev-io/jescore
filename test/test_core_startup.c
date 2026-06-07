@@ -27,9 +27,17 @@
 #include "base_jobs.h"
 #include "core.h"
 
+// Empty function for assertion of API block before init
+void foo(void* p){
+
+}
 
 void test_core_init(void){
-    jes_err_t stat = jes_init();
+    jes_err_t stat;
+    // try to use a jescore API function before init
+    stat = jes_register_job("foo", 1024, 1, foo, 0, 1);
+    TEST_ASSERT_EQUAL_INT(e_err_uninitialized, stat);
+    stat = jes_init();
     TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
     // Test double init
     stat = jes_init();

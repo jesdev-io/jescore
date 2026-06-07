@@ -26,6 +26,10 @@ void jes_dispatch(void);
 
 #endif // BUILD_FOR_STM32
 
+/// @brief Check if jescore has been initialized.
+/// @return 1 if yes, 0 if no. 
+uint8_t jes_is_init(void);
+
 
 /// @brief Add a job (function block) to the list of all known jobs.
 /// @param name: Name of job. Can't be longer than `MAX_JOB_NAME_LEN_BYTE`.
@@ -174,10 +178,16 @@ void jes_delay_job_ms(uint32_t ms);
     uart_unif_writef_pfx(pj->name, format, ##__VA_ARGS__)
 
 #define jes_print(format, ...) \
-    uart_unif_writef_pfx(__job_get_job_by_handle(\
-                            xTaskGetCurrentTaskHandle()\
-                        )->name,\
-                        format, ##__VA_ARGS__)
+    do { \
+        if (jes_is_init()) { \
+            uart_unif_writef_pfx(__job_get_job_by_handle( \
+                                xTaskGetCurrentTaskHandle() \
+                            )->name, \
+                            format, ##__VA_ARGS__); \
+        } else { \
+            uart_unif_writef_pfx("init", format, ##__VA_ARGS__); \
+        } \
+    } while(0)
 
 #endif
 
