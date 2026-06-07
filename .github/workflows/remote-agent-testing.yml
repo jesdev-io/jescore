@@ -59,12 +59,12 @@ jobs:
           fi
           
           if [ "$AGENT_AVAILABLE" = true ]; then
-            echo "✓ Agent $AGENT_NAME is available"
+            echo "Agent $AGENT_NAME is available"
             
             # Run tests using the remote agent with USB port information
             echo "Running tests on $AGENT_NAME with environment $TEST_ENV (USB: $USB_PORT)..."
-            pio remote run -t "$AGENT_NAME" -e "$TEST_ENV" --target test
+            pio remote --agent "$AGENT_NAME" test -e "$TEST_ENV" --upload-port "$USB_PORT" --test-port "$USB_PORT" 
           else
-            echo "⚠ Agent $AGENT_NAME is not available"
+            echo "Agent $AGENT_NAME is not available"
             echo "Skipping tests for $TEST_ENV (USB: $USB_PORT)"
           fi
