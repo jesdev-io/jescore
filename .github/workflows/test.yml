@@ -1,0 +1,17 @@
+name: 🧪 Test
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Test on Runner 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+      - run: pip install platformio
+      - run: pio account login --username "${{ secrets.PIO_USERNAME }}" --password "${{ secrets.PIO_PASSWORD }}"
+      - run: pio remote run --environment nodemcu-32s-test-arduino --runner runner_1
+      - run: pio remote run --environment esp32-s3-devkitc-1-test-arduino --runner runner_1
+      - run: pio remote run --environment az-delivery-devkit-v4-test-arduino --runner runner_1
+      - run: pio remote run --environment esp32-c3-devkitm-1-test-arduino --runner runner_1
