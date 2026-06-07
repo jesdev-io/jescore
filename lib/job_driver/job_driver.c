@@ -249,6 +249,7 @@ jes_err_t __job_notify_generic(job_struct_t* pjob_to_notify,
                                void* notif, 
                                uint8_t from_isr){
     if(!pjob_to_notify) return e_err_is_zero;
+    if(pjob_to_notify->instances == 0) return e_err_prohibited;
     if(from_isr){
         BaseType_t dummy = pdFALSE;
         xTaskNotifyFromISR(pjob_to_notify->handle, 
