@@ -1,0 +1,66 @@
+name: PlatformIO Remote Agent Testing
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+env:
+  PIO_USERNAME: ${{ secrets.PIO_USERNAME }}
+  PIO_PASSWORD: ${{ secrets.PIO_PASSWORD }}
+
+jobs:
+  test-on-remote-agents:
+    name: Run Tests on Remote Agents
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        test-config: [
+          { agent: 'pihole', env: 'az-delivery-devkit-v4-test-arduino', platform: 'esp32', usb_port: '/dev/ttyUSB0' },
+          { agent: 'pihole', env: 'esp32-s3-devkitc-1-test-arduino', platform: 'esp32', usb_port: '/dev/ttyUSB3' }
+        ]
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+
+      - name: Install PlatformIO
+        run: pip install platformio
+
+      - name: Login to PlatformIO
+        run: pio account login -u "$PIO_USERNAME" -p "$PIO_PASSWORD"
+
+      - name: Check if agent is available and run tests
+        run: |
+          AGENT_NAME="${{ matrix.test-config.agent }}"
+          TEST_ENV="${{ matrix.test-config.env }}"
+          PLATFORM="${{ matrix.test-config.platform }}"
+          USB_PORT="${{ matrix.test-config.usb_port }}"
+          
+          echo "Checking agent: $AGENT_NAME"
+          echo "Test environment: $TEST_ENV"
+          echo "USB port: $USB_PORT"
+          
+          # Check if the agent is available
+          AGENT_INFO=$(pio remote agent list --json 2>/dev/null | jq -r ".[] | select(.name == \"$AGENT_NAME\")" || echo '')
+          
+          if [ -n "$AGENT_INFO" ]; then
+            echo "✓ Agent $AGENT_NAME is available"
+            
+            # Change to jescore directory
+            cd jescore
+            
+            # Run tests using the remote agent with USB port information
+            echo "Running tests on $AGENT_NAME with environment $TEST_ENV (USB: $USB_PORT)..."
+            pio remote run -t "$AGENT_NAME" -e "$TEST_ENV" --target test
+          else
+            echo "⚠ Agent $AGENT_NAME is not available"
+            echo "Skipping tests for $TEST_ENV (USB: $USB_PORT)"
+          fi
