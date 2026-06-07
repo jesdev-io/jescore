@@ -13,17 +13,20 @@
 
 **Usage**:
 ```bash
-# Make executable
+# 1. Login to PlatformIO (one-time)
+pio account login
+
+# 2. Make executable
 chmod +x pio_remote_scheduler.sh
 
-# Edit configuration (top of file)
+# 3. Edit configuration (top of file)
 RUNNER_NAME="runner_1"
 WORKDAY_START="08:00"
 WORKDAY_END="16:00"
 WEEKEND_START="11:00"
 WEEKEND_END="19:00"
 
-# Run in background (use nohup or systemd)
+# 4. Run in background (use nohup or systemd)
 nohup ./pio_remote_scheduler.sh > /dev/null 2>&1 &
 
 # Or with systemd (recommended)
