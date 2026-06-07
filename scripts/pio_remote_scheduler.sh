@@ -6,7 +6,7 @@ WORKDAY_END="16:00"
 WEEKEND_START="11:00"
 WEEKEND_END="19:00"
 
-LOG_FILE="/var/log/pio_remote_${RUNNER_NAME}.log"
+LOG_FILE="${HOME}/pio_remote_${RUNNER_NAME}.log"
 LOCK_FILE="/tmp/pio_remote_${RUNNER_NAME}.lock"
 
 log() {
@@ -34,7 +34,7 @@ start_remote() {
     fi
     log "Starting PlatformIO Remote for $RUNNER_NAME"
     touch "$LOCK_FILE"
-    pio remote start --runner "$RUNNER_NAME"
+    ~/.local/bin/pio remote agent start --runner "$RUNNER_NAME"
     if [ $? -eq 0 ]; then
         log "PlatformIO Remote started successfully"
     else
@@ -50,7 +50,7 @@ stop_remote() {
         return
     fi
     log "Stopping PlatformIO Remote for $RUNNER_NAME"
-    pio remote stop --runner "$RUNNER_NAME"
+    ~/.local/bin/pio remote agent stop --runner "$RUNNER_NAME"
     rm -f "$LOCK_FILE"
     log "✅ PlatformIO Remote stopped"
 }
