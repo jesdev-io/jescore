@@ -48,10 +48,17 @@ jobs:
           echo "Test environment: $TEST_ENV"
           echo "USB port: $USB_PORT"
           
-          # Check if the agent is available
-          AGENT_INFO=$(pio remote agent list --json 2>/dev/null | jq -r ".[] | select(.name == \"$AGENT_NAME\")" || echo '')
+          # Check if the agent is available (handle potential JSON parsing issues)
+          AGENT_AVAILABLE=false
           
-          if [ -n "$AGENT_INFO" ]; then
+          # Try to list agents and check if our agent is there
+          if AGENT_LIST=$(pio remote agent list 2>/dev/null); then
+            if echo "$AGENT_LIST" | grep -q "$AGENT_NAME"; then
+              AGENT_AVAILABLE=true
+            fi
+          fi
+          
+          if [ "$AGENT_AVAILABLE" = true ]; then
             echo "✓ Agent $AGENT_NAME is available"
             
             # Change to jescore directory
