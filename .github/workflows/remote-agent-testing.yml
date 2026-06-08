@@ -7,65 +7,28 @@ on:
     branches: [ main, dev ]
   workflow_dispatch:
 
-env:
-  PIO_USERNAME: ${{ secrets.PIO_USERNAME }}
-  PIO_PASSWORD: ${{ secrets.PIO_PASSWORD }}
-
 jobs:
   test-on-remote-agents:
     name: Physical MCU unit test
-    runs-on: ubuntu-latest
+    runs-on: rpi-cm5-1
+    environment:
+      name: hardware-test
     strategy:
       matrix:
         test-config: [
-          { agent: 'pihole', env: 'az-delivery-devkit-v4-test-arduino', platform: 'esp32', usb_port: '/dev/ttyUSB0' },
-          { agent: 'pihole', env: 'esp32-s3-devkitc-1-test-arduino', platform: 'esp32', usb_port: '/dev/ttyACM0' }
+          { env: 'az-delivery-devkit-v4-test-arduino', platform: 'esp32', usb_port: '/dev/ttyUSB0' },
+          { env: 'esp32-s3-devkitc-1-test-arduino', platform: 'stm32', usb_port: '/dev/ttyACM0' }
         ]
     
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.13'
-
-      - name: Install PlatformIO
-        run: pip install platformio
-
-      - name: Login to PlatformIO
-        run: pio account login -u "$PIO_USERNAME" -p "$PIO_PASSWORD"
-
       - name: Check if agent is available and run tests
+        env:
+          TEST_ENV: ${{ matrix.test-config.env }}
+          PLATFORM: ${{ matrix.test-config.platform }}
+          USB_PORT: ${{ matrix.test-config.usb_port }}
         run: |
-          AGENT_NAME="${{ matrix.test-config.agent }}"
-          TEST_ENV="${{ matrix.test-config.env }}"
-          PLATFORM="${{ matrix.test-config.platform }}"
-          USB_PORT="${{ matrix.test-config.usb_port }}"
-          
-          echo "Checking agent: $AGENT_NAME"
-          echo "Test environment: $TEST_ENV"
-          echo "USB port: $USB_PORT"
-          
-          # Check if the agent is available (handle potential JSON parsing issues)
-          AGENT_AVAILABLE=false
-          
-          # Try to list agents and check if our agent is there
-          if AGENT_LIST=$(pio remote agent list 2>/dev/null); then
-            if echo "$AGENT_LIST" | grep -q "$AGENT_NAME"; then
-              AGENT_AVAILABLE=true
-            fi
-          fi
-          
-          if [ "$AGENT_AVAILABLE" = true ]; then
-            echo "Agent $AGENT_NAME is available"
-            
-            # Run tests using the remote agent with USB port information
-            echo "Running tests on $AGENT_NAME with environment $TEST_ENV (USB: $USB_PORT)..."
-            pio remote --agent "$AGENT_NAME" test -e "$TEST_ENV" --upload-port "$USB_PORT" --test-port "$USB_PORT" 
-          else
-            echo "Agent $AGENT_NAME is not available"
-            echo "Cannot run tests for $TEST_ENV (USB: $USB_PORT)"
-            exit 1
-          fi
+          echo "Running tests with environment $TEST_ENV (USB: $USB_PORT)..."
+          pio test -e "$TEST_ENV" --upload-port "$USB_PORT" --test-port "$USB_PORT"
+
