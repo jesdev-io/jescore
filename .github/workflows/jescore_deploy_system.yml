@@ -7,6 +7,10 @@ on:
     branches: [ main, dev ]
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test-on-remote-agents:
     name: Physical MCU unit test
@@ -24,6 +28,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Check if agent is available and run tests
+        shell: bash -l {0}
         env:
           TEST_ENV: ${{ matrix.test-config.env }}
           PLATFORM: ${{ matrix.test-config.platform }}
