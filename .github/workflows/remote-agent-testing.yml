@@ -17,7 +17,7 @@ jobs:
       matrix:
         test-config: [
           { env: 'az-delivery-devkit-v4-test-arduino', platform: 'esp32', usb_port: '/dev/ttyUSB0' },
-          { env: 'esp32-s3-devkitc-1-test-arduino', platform: 'stm32', usb_port: '/dev/ttyACM0' }
+          { env: 'stm32_h753zi-test-cube', platform: 'stm32', usb_port: '/dev/ttyACM0' }
         ]
     
     steps:
