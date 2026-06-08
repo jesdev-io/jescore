@@ -6,18 +6,23 @@
 #include "delay_unif.h"
 
 static uint8_t api_initialized = 0;
+static uint8_t sched_run = 0;
 
 
 jes_err_t jes_init(void){
     jes_err_t je = __core_init();
     if(je != e_err_no_err) return je;
     api_initialized = 1;
+    #ifdef BUILD_FOR_ESP32
+    sched_run = 1;
+    #endif // BUILD_FOR_ESP32
     return e_err_no_err;
 }
 
 #ifdef BUILD_FOR_STM32
 
 void jes_dispatch(void){
+    sched_run = 1;
     vTaskStartScheduler();
 }
 
@@ -48,12 +53,20 @@ jes_err_t jes_register_job(const char* name,
 
 jes_err_t jes_launch_job(const char* name){
     if(!api_initialized) return e_err_uninitialized;
+    if(!sched_run) return __job_launch_job_by_name(name, e_origin_api);
     return __job_launch_job_by_name_args_core(name, e_origin_api, "");
 }
 
 
 jes_err_t jes_launch_job_args(const char* name, const char* args){
     if(!api_initialized) return e_err_uninitialized;
+    if(!sched_run){
+        job_struct_t* pj = __job_get_job_by_name(name);
+        if (pj == NULL) { return e_err_unknown_job; }
+        jes_err_t e = __job_set_args((char*)args, pj);
+        if (e != e_err_no_err) { return e; }
+        return __job_launch_job_by_name(name, e_origin_api);
+    } 
     return __job_launch_job_by_name_args_core(name, e_origin_api, args);
 }
 
@@ -84,7 +97,7 @@ jes_err_t jes_unregister_job(const char* name){
 
 
 jes_err_t jes_job_set_args(const char* s){
-    // if(!api_initialized) return e_err_uninitialized;
+    if(!api_initialized || !sched_run) return e_err_uninitialized;
     TaskHandle_t caller = xTaskGetCurrentTaskHandle();
     job_struct_t* pj = __job_get_job_by_handle(caller);
     if (pj == NULL) { return e_err_is_zero; }
@@ -93,7 +106,7 @@ jes_err_t jes_job_set_args(const char* s){
 
 
 char* jes_job_get_args(void){
-    if(!api_initialized) return NULL;
+    if(!api_initialized || !sched_run) return NULL;
     TaskHandle_t caller = xTaskGetCurrentTaskHandle();
     job_struct_t* pj = __job_get_job_by_handle(caller);
     if (pj == NULL) { return NULL; }
@@ -102,7 +115,7 @@ char* jes_job_get_args(void){
 
 
 char* jes_job_arg_next(void) {
-    if(!api_initialized) return NULL;
+    if(!api_initialized || !sched_run) return NULL;
     static char* input = NULL;
     char* token;
     if (input == NULL) {
@@ -125,7 +138,7 @@ uint8_t jes_job_is_arg(const char* arg, const char* name){
 
 
 jes_err_t jes_job_set_param(const void* p){
-    if(!api_initialized) return e_err_uninitialized;
+    if(!api_initialized || !sched_run) return e_err_uninitialized;
     TaskHandle_t caller = xTaskGetCurrentTaskHandle();
     job_struct_t* pj = __job_get_job_by_handle(caller);
     if (pj == NULL) { return e_err_is_zero; }
@@ -134,7 +147,7 @@ jes_err_t jes_job_set_param(const void* p){
 
 
 void* jes_job_get_param(void){
-    if(!api_initialized) return NULL;
+    if(!api_initialized || !sched_run) return NULL;
     TaskHandle_t caller = xTaskGetCurrentTaskHandle();
     job_struct_t* pj = __job_get_job_by_handle(caller);
     if (pj == NULL) { return NULL; }
@@ -155,7 +168,7 @@ jes_err_t jes_error_get_any(void){
 
 
 void jes_throw_error(jes_err_t e){
-    if(!api_initialized) return;
+    if(!api_initialized || !sched_run) return;
     TaskHandle_t hj = xTaskGetCurrentTaskHandle();
     job_struct_t* pj = __job_get_job_by_handle(hj);
     __core_error_throw(e, pj);
@@ -163,7 +176,7 @@ void jes_throw_error(jes_err_t e){
 
 
 jes_err_t jes_notify_job(const char* name, const void* notification){
-    if(!api_initialized) return e_err_uninitialized;
+    if(!api_initialized || !sched_run) return e_err_uninitialized;
     job_struct_t* pj = __job_get_job_by_name(name);
     if (pj == NULL) { return e_err_unknown_job; }
     return __job_notify_generic(pj, (void*)notification, 0);
@@ -171,7 +184,7 @@ jes_err_t jes_notify_job(const char* name, const void* notification){
 
 
 jes_err_t jes_notify_job_ISR(const char* name, const void* notification){
-    if(!api_initialized) return e_err_uninitialized;
+    if(!api_initialized || !sched_run) return e_err_uninitialized;
     job_struct_t* pj = __job_get_job_by_name(name);
     if (pj == NULL) { return e_err_unknown_job; }
     return __job_notify_generic(pj, (void*)notification, 1);
@@ -179,7 +192,7 @@ jes_err_t jes_notify_job_ISR(const char* name, const void* notification){
 
 
 void* jes_wait_for_notification(void){
-    if(!api_initialized) return NULL;
+    if(!api_initialized || !sched_run) return NULL;
     return __job_sleep_until_notified_generic();
 }
 
