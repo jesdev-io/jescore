@@ -27,8 +27,7 @@
       ]
     },
     "headers": [
-      "jescore.h",
-      "uart_unif.h"
+      "jescore.h"
     ],
     "build": {
         "srcDir": ".",
@@ -46,6 +45,6 @@
           "-I lib/job_names",
           "-I lib/unified"
         ],
-        "extraScript": "scripts/jescore_linking.py"
+        "extraScript": "shared/scripts/jescore_linking.py"
       }
   }
