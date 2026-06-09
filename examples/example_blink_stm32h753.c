@@ -1,5 +1,4 @@
 #include "jescore.h"
-#include "stm32h7xx_hal.h"
 
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
