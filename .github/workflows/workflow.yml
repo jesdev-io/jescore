@@ -40,8 +40,6 @@ jobs:
           - stm32_g431kb-debug-cube
           - stm32_h753zi-release-cube
           - stm32_h753zi-debug-cube
-          - stm32_f413zh-release-cube
-          - stm32_f413zh-debug-cube
 
     steps:
       - name: Checkout repository
