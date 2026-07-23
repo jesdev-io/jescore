@@ -60,4 +60,4 @@ jobs:
             ${{ runner.os }}-pio-
 
       - name: Build ${{ matrix.environment }}
-        run: uvx --from platformio pio run -e "${{ matrix.environment }}"
+        run: uv --from platformio pio run -e "${{ matrix.environment }}"
