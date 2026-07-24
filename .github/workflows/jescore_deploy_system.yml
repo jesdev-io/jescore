@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       build_run_id:
-        description: GitHub Actions run id of a successful jescore build system run to download firmware artifacts from
+        description: Numeric run id of a successful jescore build system run, e.g. 30078427403 from /actions/runs/30078427403
         required: true
 
 permissions:
@@ -64,26 +64,54 @@ jobs:
             platform: 'stm32'
             usb_port: '/dev/ttyACM10'
             stlink_serial: '066DFF574857847167033357'
+            openocd_target: 'stm32l4x.cfg'
           - env: 'stm32_l432kc-test-cube'
             platform: 'stm32'
             usb_port: '/dev/ttyACM4'
             stlink_serial: '066AFF574884654867052433'
+            openocd_target: 'stm32l4x.cfg'
           - env: 'stm32_g431kb-test-cube'
             platform: 'stm32'
             usb_port: '/dev/ttyACM3'
             stlink_serial: '003600253137510639383538'
+            openocd_target: 'stm32g4x.cfg'
           - env: 'stm32_h753zi-test-cube'
             platform: 'stm32'
             usb_port: '/dev/ttyACM8'
             stlink_serial: '004300483033511935393935'
+            openocd_target: 'stm32h7x.cfg'
           # Supported test MCUs not currently connected. Fill usb_port and stable identifier before enabling.
-          # - { env: 'nodemcu-32s-test-arduino', platform: 'esp32', usb_port: '', usb_id: '', esp_mac: '' }
-          # - { env: 'esp32-heltec-v3-test-arduino', platform: 'esp32', usb_port: '', usb_id: '', esp_mac: '' }
+          # - env: 'nodemcu-32s-test-arduino'
+          #   platform: 'esp32'
+          #   usb_port: ''
+          #   usb_id: ''
+          #   esp_mac: ''
+          # - env: 'esp32-heltec-v3-test-arduino'
+          #   platform: 'esp32'
+          #   usb_port: ''
+          #   usb_id: ''
+          #   esp_mac: ''
           # Planned and already connected
-          # - { env: 'stm32_u5-test-cube', platform: 'stm32', usb_port: '/dev/ttyACM5', stlink_serial: '003000313156501920323443' }
-          # - { env: 'stm32_l5-test-cube', platform: 'stm32', usb_port: '/dev/ttyACM6', stlink_serial: '066DFF505048878667122910' }
-          # - { env: 'stm32_f4-test-cube', platform: 'stm32', usb_port: '/dev/ttyACM7', stlink_serial: '0672FF505453707867175134' }
-          # - { env: 'stm32_n6-test-cube', platform: 'stm32', usb_port: '/dev/ttyACM9', stlink_serial: '001200174142501620353451' }
+          # - env: 'stm32_u5-test-cube'
+          #   platform: 'stm32'
+          #   usb_port: '/dev/ttyACM5'
+          #   stlink_serial: '003000313156501920323443'
+          #   openocd_target: 'stm32u5x.cfg'
+          # - env: 'stm32_l5-test-cube'
+          #   platform: 'stm32'
+          #   usb_port: '/dev/ttyACM6'
+          #   stlink_serial: '066DFF505048878667122910'
+          #   openocd_target: 'stm32l5x.cfg'
+          # - env: 'stm32_f4-test-cube'
+          #   platform: 'stm32'
+          #   usb_port: '/dev/ttyACM7'
+          #   stlink_serial: '0672FF505453707867175134'
+          #   openocd_target: 'stm32f4x.cfg'
+          # - env: 'stm32_n6-test-cube'
+          #   platform: 'stm32'
+          #   usb_port: '/dev/ttyACM9'
+          #   stlink_serial: '001200174142501620353451'
+          #   openocd_target: ''
 
     steps:
       - name: Checkout repository
@@ -91,12 +119,26 @@ jobs:
         with:
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
+      - name: Resolve build run id
+        id: build-run
+        env:
+          WORKFLOW_RUN_ID: ${{ github.event.workflow_run.id }}
+          MANUAL_BUILD_RUN_ID: ${{ inputs.build_run_id }}
+        run: |
+          raw="${WORKFLOW_RUN_ID:-$MANUAL_BUILD_RUN_ID}"
+          run_id="$(printf '%s' "$raw" | grep -Eo '[0-9]+' | tail -n 1)"
+          if [ -z "$run_id" ]; then
+            echo "Could not resolve a numeric run id from: $raw" >&2
+            exit 1
+          fi
+          echo "run-id=$run_id" >> "$GITHUB_OUTPUT"
+
       - name: Download precompiled test firmware
         uses: actions/download-artifact@v5
         with:
           name: firmware-${{ matrix.test-config.env }}
           path: .pio/build/${{ matrix.test-config.env }}
-          run-id: ${{ github.event.workflow_run.id || inputs.build_run_id }}
+          run-id: ${{ steps.build-run.outputs.run-id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Verify selected USB device matches matrix entry
@@ -130,6 +172,28 @@ jobs:
           TEST_ENV: ${{ matrix.test-config.env }}
           PLATFORM: ${{ matrix.test-config.platform }}
           USB_PORT: ${{ matrix.test-config.usb_port }}
+          STLINK_SERIAL: ${{ matrix.test-config.stlink_serial }}
+          OPENOCD_TARGET: ${{ matrix.test-config.openocd_target }}
         run: |
+          set -euo pipefail
           echo "Running tests with precompiled firmware for $TEST_ENV (USB: $USB_PORT)..."
-          pio test -e "$TEST_ENV" --without-building --upload-port "$USB_PORT" --test-port "$USB_PORT" -vvv
+
+          if [ "$PLATFORM" = "stm32" ]; then
+            openocd \
+              -f interface/stlink.cfg \
+              -c "adapter serial $STLINK_SERIAL" \
+              -f "target/$OPENOCD_TARGET" \
+              -c "program .pio/build/$TEST_ENV/firmware.elf verify reset exit"
+
+            pio test -e "$TEST_ENV" --without-building --without-uploading --test-port "$USB_PORT" -vvv &
+            test_pid=$!
+            sleep 2
+            openocd \
+              -f interface/stlink.cfg \
+              -c "adapter serial $STLINK_SERIAL" \
+              -f "target/$OPENOCD_TARGET" \
+              -c "init; reset run; shutdown"
+            wait "$test_pid"
+          else
+            pio test -e "$TEST_ENV" --without-building --upload-port "$USB_PORT" --test-port "$USB_PORT" -vvv
+          fi
