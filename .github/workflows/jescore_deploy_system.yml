@@ -40,22 +40,50 @@ jobs:
       max-parallel: 2
       matrix:
         test-config:
-          - { env: 'az-delivery-devkit-v4-test-arduino', platform: 'esp32', usb_port: '/dev/ttyUSB1' }
-          - { env: 'esp32-c3-devkitm-1-test-arduino', platform: 'esp32', usb_port: '/dev/ttyUSB0' }
-          - { env: 'esp32-wrover-kit-test-arduino', platform: 'esp32', usb_port: '/dev/ttyACM1' }
-          - { env: 'esp32-s3-devkitc-1-test-arduino', platform: 'esp32', usb_port: '/dev/ttyACM2' }
-          - { env: 'stm32_l476rg-test-cube', platform: 'stm32', usb_port: '/dev/ttyACM10' }
-          - { env: 'stm32_l432kc-test-cube', platform: 'stm32', usb_port: '/dev/ttyACM4' }
-          - { env: 'stm32_g431kb-test-cube', platform: 'stm32', usb_port: '/dev/ttyACM3' }
-          - { env: 'stm32_h753zi-test-cube', platform: 'stm32', usb_port: '/dev/ttyACM8' }
-          # Supported test MCUs not currently connected. Fill usb_port before enabling.
-          # - { env: 'nodemcu-32s-test-arduino', platform: 'esp32', usb_port: '' }
-          # - { env: 'esp32-heltec-v3-test-arduino', platform: 'esp32', usb_port: '' }
+          - env: 'az-delivery-devkit-v4-test-arduino'
+            platform: 'esp32'
+            usb_port: '/dev/ttyUSB1'
+            usb_id: 'Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001'
+            esp_mac: 'c8:c9:a3:d2:31:00'
+          - env: 'esp32-c3-devkitm-1-test-arduino'
+            platform: 'esp32'
+            usb_port: '/dev/ttyUSB0'
+            usb_id: '1a86_USB_Serial'
+            esp_mac: '34:b4:72:f9:cd:88'
+          - env: 'esp32-wrover-kit-test-arduino'
+            platform: 'esp32'
+            usb_port: '/dev/ttyACM1'
+            usb_id: '1a86_USB_Single_Serial_54F4019606'
+            esp_mac: 'c0:49:ef:1f:70:d8'
+          - env: 'esp32-s3-devkitc-1-test-arduino'
+            platform: 'esp32'
+            usb_port: '/dev/ttyACM2'
+            usb_id: '1a86_USB_Single_Serial_578E007460'
+            esp_mac: '80:65:99:c7:a1:8c'
+          - env: 'stm32_l476rg-test-cube'
+            platform: 'stm32'
+            usb_port: '/dev/ttyACM10'
+            stlink_serial: '066DFF574857847167033357'
+          - env: 'stm32_l432kc-test-cube'
+            platform: 'stm32'
+            usb_port: '/dev/ttyACM4'
+            stlink_serial: '066AFF574884654867052433'
+          - env: 'stm32_g431kb-test-cube'
+            platform: 'stm32'
+            usb_port: '/dev/ttyACM3'
+            stlink_serial: '003600253137510639383538'
+          - env: 'stm32_h753zi-test-cube'
+            platform: 'stm32'
+            usb_port: '/dev/ttyACM8'
+            stlink_serial: '004300483033511935393935'
+          # Supported test MCUs not currently connected. Fill usb_port and stable identifier before enabling.
+          # - { env: 'nodemcu-32s-test-arduino', platform: 'esp32', usb_port: '', usb_id: '', esp_mac: '' }
+          # - { env: 'esp32-heltec-v3-test-arduino', platform: 'esp32', usb_port: '', usb_id: '', esp_mac: '' }
           # Planned and already connected
-          # - { env: 'stm32_u5-test-cube', platform: 'stm32', usb_port: '/dev/ttyACM5' }
-          # - { env: 'stm32_l5-test-cube', platform: 'stm32', usb_port: '/dev/ttyACM6' }
-          # - { env: 'stm32_f4-test-cube', platform: 'stm32', usb_port: '/dev/ttyACM7' }
-          # - { env: 'stm32_n6-test-cube', platform: 'stm32', usb_port: '/dev/ttyACM9' }
+          # - { env: 'stm32_u5-test-cube', platform: 'stm32', usb_port: '/dev/ttyACM5', stlink_serial: '003000313156501920323443' }
+          # - { env: 'stm32_l5-test-cube', platform: 'stm32', usb_port: '/dev/ttyACM6', stlink_serial: '066DFF505048878667122910' }
+          # - { env: 'stm32_f4-test-cube', platform: 'stm32', usb_port: '/dev/ttyACM7', stlink_serial: '0672FF505453707867175134' }
+          # - { env: 'stm32_n6-test-cube', platform: 'stm32', usb_port: '/dev/ttyACM9', stlink_serial: '001200174142501620353451' }
 
     steps:
       - name: Checkout repository
@@ -70,6 +98,31 @@ jobs:
           path: .pio/build/${{ matrix.test-config.env }}
           run-id: ${{ github.event.workflow_run.id || inputs.build_run_id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify selected USB device matches matrix entry
+        shell: bash -l {0}
+        env:
+          PLATFORM: ${{ matrix.test-config.platform }}
+          USB_PORT: ${{ matrix.test-config.usb_port }}
+          USB_ID: ${{ matrix.test-config.usb_id }}
+          ESP_MAC: ${{ matrix.test-config.esp_mac }}
+          STLINK_SERIAL: ${{ matrix.test-config.stlink_serial }}
+        run: |
+          set -euo pipefail
+          echo "Selected USB port: $USB_PORT"
+          test -e "$USB_PORT"
+          udevadm info -q property -n "$USB_PORT" | sort
+
+          if [ "$PLATFORM" = "stm32" ]; then
+            actual="$(udevadm info -q property -n "$USB_PORT" | awk -F= '/^ID_SERIAL_SHORT=/{print $2}')"
+            test "$actual" = "$STLINK_SERIAL"
+            echo "Verified STM32 ST-LINK serial $STLINK_SERIAL on $USB_PORT"
+          elif [ "$PLATFORM" = "esp32" ]; then
+            udevadm info -q property -n "$USB_PORT" | grep -F "ID_SERIAL=$USB_ID"
+            uvx --from esptool esptool --port "$USB_PORT" chip-id 2>&1 | tee /tmp/esptool-chip-id.log
+            grep -F "MAC:                $ESP_MAC" /tmp/esptool-chip-id.log
+            echo "Verified ESP MAC $ESP_MAC on $USB_PORT"
+          fi
 
       - name: Upload firmware and run tests
         shell: bash -l {0}
