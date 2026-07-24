@@ -1,22 +1,39 @@
 name: jescore deployment system
 
 on:
-  push:
-    branches: [ main, dev ]
-  pull_request:
-    branches: [ main, dev ]
+  workflow_run:
+    workflows: [jescore build system]
+    types: [completed]
   workflow_dispatch:
+    inputs:
+      build_run_id:
+        description: GitHub Actions run id of a successful jescore build system run to download firmware artifacts from
+        required: true
+
+permissions:
+  actions: read
+  contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.workflow_run.head_branch || github.ref }}
   cancel-in-progress: true
 
 jobs:
-  test-on-remote-agents:
-    name: Physical MCU unit test
-    runs-on: rpi-cm5-1
+  approve-hardware-tests:
+    name: Approve hardware tests
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
     environment:
       name: hardware-test
+    steps:
+      - name: Approval granted
+        run: echo "Hardware test deployment approved."
+
+  test-on-remote-agents:
+    name: Physical MCU unit test (${{ matrix.test-config.env }})
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    needs: approve-hardware-tests
+    runs-on: rpi-cm5-1
     strategy:
       fail-fast: false
       max-parallel: 2
@@ -26,24 +43,34 @@ jobs:
           - { env: 'esp32-c3-devkitm-1-test-arduino', platform: 'esp32', usb_port: '/dev/ttyUSB0' }
           - { env: 'esp32-wrover-kit-test-arduino', platform: 'esp32', usb_port: '/dev/ttyACM1' }
           - { env: 'esp32-s3-devkitc-1-test-arduino', platform: 'esp32', usb_port: '/dev/ttyACM2' }
-          - { env: 'stm32_l476rg-test-cube', platform: 'stm32', usb_port: '/dev/ttyACM9' }
-          - { env: 'stm32_l432kc-test-cube', platform: 'stm32', usb_port: '/dev/ttyACM10' }
+          - { env: 'stm32_l476rg-test-cube', platform: 'stm32', usb_port: '/dev/ttyACM10' }
+          - { env: 'stm32_l432kc-test-cube', platform: 'stm32', usb_port: '/dev/ttyACM4' }
           - { env: 'stm32_g431kb-test-cube', platform: 'stm32', usb_port: '/dev/ttyACM3' }
-          - { env: 'stm32_h753zi-test-cube', platform: 'stm32', usb_port: '/dev/ttyACM7' }
+          - { env: 'stm32_h753zi-test-cube', platform: 'stm32', usb_port: '/dev/ttyACM8' }
           # Supported test MCUs not currently connected. Fill usb_port before enabling.
           # - { env: 'nodemcu-32s-test-arduino', platform: 'esp32', usb_port: '' }
           # - { env: 'esp32-heltec-v3-test-arduino', platform: 'esp32', usb_port: '' }
-    
+
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Check if agent is available and run tests
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - name: Download precompiled test firmware
+        uses: actions/download-artifact@v5
+        with:
+          name: firmware-${{ matrix.test-config.env }}
+          path: .pio/build/${{ matrix.test-config.env }}
+          run-id: ${{ github.event.workflow_run.id || inputs.build_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload firmware and run tests
         shell: bash -l {0}
         env:
           TEST_ENV: ${{ matrix.test-config.env }}
           PLATFORM: ${{ matrix.test-config.platform }}
           USB_PORT: ${{ matrix.test-config.usb_port }}
         run: |
-          echo "Running tests with environment $TEST_ENV (USB: $USB_PORT)..."
-          pio test -e "$TEST_ENV" --upload-port "$USB_PORT" --test-port "$USB_PORT"
-
+          echo "Running tests with precompiled firmware for $TEST_ENV (USB: $USB_PORT)..."
+          pio test -e "$TEST_ENV" --without-building --upload-port "$USB_PORT" --test-port "$USB_PORT"
