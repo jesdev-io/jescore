@@ -71,6 +71,7 @@ jobs:
           TEST_ENV: ${{ matrix.test-config.env }}
           PLATFORM: ${{ matrix.test-config.platform }}
           USB_PORT: ${{ matrix.test-config.usb_port }}
+        # --upload-port "$USB_PORT" --test-port "$USB_PORT"
         run: |
           echo "Running tests with precompiled firmware for $TEST_ENV (USB: $USB_PORT)..."
-          pio test -e "$TEST_ENV" --without-building --upload-port "$USB_PORT" --test-port "$USB_PORT"
+          pio test -e "$TEST_ENV" --without-building
