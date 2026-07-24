@@ -20,9 +20,37 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  classify-deploy:
+    name: Classify deploy trust
+    runs-on: ubuntu-latest
+    outputs:
+      trusted: ${{ steps.classify.outputs.trusted }}
+    steps:
+      - name: Trust successful builds from protected in-repo branches
+        id: classify
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          HEAD_REPOSITORY: ${{ github.event.workflow_run.head_repository.full_name }}
+          REPOSITORY: ${{ github.repository }}
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+        run: |
+          trusted=false
+          if [ "$EVENT_NAME" = "workflow_run" ] \
+            && [ "$CONCLUSION" = "success" ] \
+            && [ "$HEAD_REPOSITORY" = "$REPOSITORY" ] \
+            && { [ "$HEAD_BRANCH" = "dev" ] || [ "$HEAD_BRANCH" = "main" ]; }; then
+            trusted=true
+          fi
+
+          echo "trusted=$trusted" >> "$GITHUB_OUTPUT"
+          echo "trusted=$trusted"
+          echo "event=$EVENT_NAME conclusion=$CONCLUSION repository=$HEAD_REPOSITORY branch=$HEAD_BRANCH"
+
   approve-hardware-tests:
     name: Approve hardware tests
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    needs: classify-deploy
+    if: ${{ (github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success') && needs.classify-deploy.outputs.trusted != 'true' }}
     runs-on: ubuntu-latest
     environment:
       name: hardware-test
@@ -30,10 +58,19 @@ jobs:
       - name: Approval granted
         run: echo "Hardware test deployment approved."
 
+  trusted-hardware-tests:
+    name: Trusted hardware test gate
+    needs: classify-deploy
+    if: ${{ github.event.workflow_run.conclusion == 'success' && needs.classify-deploy.outputs.trusted == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trusted source accepted
+        run: echo "Trusted in-repo protected branch build; skipping manual hardware-test approval."
+
   test-on-remote-agents:
     name: Physical MCU unit test (${{ matrix.test-config.env }})
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
-    needs: approve-hardware-tests
+    if: ${{ always() && needs.classify-deploy.result == 'success' && (needs.approve-hardware-tests.result == 'success' || needs.trusted-hardware-tests.result == 'success') }}
+    needs: [classify-deploy, approve-hardware-tests, trusted-hardware-tests]
     runs-on: rpi-cm5-1
     strategy:
       fail-fast: false
