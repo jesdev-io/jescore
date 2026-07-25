@@ -36,7 +36,7 @@ jes_err_t __job_register_job(const char* n,
     pj->caller = e_origin_undefined;
     pj->param = NULL;
     pj->error = e_err_no_err;
-    pj->notif_queue = xQueueCreate(MAX_JOB_NOTIF_QUEUE_SIZE, sizeof(void*));
+    pj->notif_queue = xQueueCreate(__MAX_JOB_NOTIF_QUEUE_SIZE, sizeof(void*));
     if(pj->notif_queue == NULL) { 
         vPortFree(pj); 
         return e_err_mem_null; 

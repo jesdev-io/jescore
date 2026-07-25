@@ -56,6 +56,7 @@ void test_all(void* p) {
     RUN_TEST(test_dummy_loop_job_launch_duplicate);
     RUN_TEST(test_notify_job_and_wait);
     RUN_TEST(test_notify_job_non_existing);
+    RUN_TEST(test_core_launch_burst);
     RUN_TEST(test_singleton_launch_immunity);
     RUN_TEST(test_unregister_job);
     
