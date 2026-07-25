@@ -43,7 +43,11 @@ extern "C" {
                                                       protected = value; \
                                                       xSemaphoreGive(lock); 
 
-#define MAX_JOB_NOTIF_QUEUE_SIZE    4
+#ifndef MAX_JOB_NOTIF_QUEUE_SIZE
+#define MAX_JOB_NOTIF_QUEUE_SIZE 4
+#endif
+#define __MAX_JOB_NOTIF_QUEUE_SIZE_LIMIT 32
+#define __MAX_JOB_NOTIF_QUEUE_SIZE __GET_SAFE_SIZE(MAX_JOB_NOTIF_QUEUE_SIZE, __MAX_JOB_NOTIF_QUEUE_SIZE_LIMIT)
 
 typedef enum{
     e_role_core,

@@ -130,10 +130,15 @@ SemaphoreHandle_t __core_get_lock(void){
 
 
 void __core_notify(job_struct_t* pjob_to_run, uint8_t from_isr){
-    /* Return value is only a failure if the core job does not
-    exist, which is impossible. Check is not needed.*/
-    __job_notify_with_job(__job_get_job_by_name(CORE_JOB_NAME),
-                          pjob_to_run, from_isr);
+    job_struct_t* pcore = __job_get_job_by_name(CORE_JOB_NAME);
+    if(pcore == NULL || pcore->notif_queue == NULL) return;
+    if(from_isr){
+        BaseType_t dummy = pdFALSE;
+        xQueueSendFromISR(pcore->notif_queue, &pjob_to_run, &dummy);
+    }
+    else{
+        xQueueSend(pcore->notif_queue, &pjob_to_run, portMAX_DELAY);
+    }
 }
 
 
@@ -245,17 +250,14 @@ void __core_log_printer(void* p){
 void __core_job(void* p){
     job_struct_t* pself = (job_struct_t*)p;
     while(1){
-        /* Use xTaskNotifyWait with timeout to prevent deadlock
-           This distinguishes between timeout and actual NULL notification.
-           Determined by JES_CORE_NOTIFY_TIMEOUT_MS.*/
-        BaseType_t received;
-        uint32_t notification_value;
-        received = xTaskNotifyWait(pdFALSE, pdFALSE, &notification_value, pdMS_TO_TICKS(JES_CORE_NOTIFY_TIMEOUT_MS));
+        job_struct_t* pj = NULL;
+        BaseType_t received = xQueueReceive(pself->notif_queue,
+                                            &pj,
+                                            pdMS_TO_TICKS(JES_CORE_NOTIFY_TIMEOUT_MS));
         if(received == pdFALSE) {
             core.state = e_state_idle;
             continue;
         }
-        job_struct_t* pj = (job_struct_t*)notification_value;
         if(pj == NULL) {
             core.state = e_state_fault;
             jes_err_t e = e_err_unknown_job;

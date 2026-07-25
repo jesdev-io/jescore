@@ -20,6 +20,7 @@
 #define DUMMY_JOB_NOTIFY_TAKE       "dummynotifytake"
 #define DUMMY_JOB_UNREGISTER        "dummyunrgstr"
 #define DUMMY_JOB_UNREGISTER_RUN    "dummyunrgstrrun"
+#define DUMMY_JOB_BURST             "dummyburst"
 #define DUMMY_NOTIFICATION_VALUE    1234
 #define DUMMY_PRINT                 "hello world!"
 #define DUMMY_FAIL_MSG              "Assert failed"
@@ -28,6 +29,8 @@
 #define DUMMY_ARGS_MODIF            "got args at launch"
 #define DUMMY_JOB_MEM               BOARD_MIN_JOB_HEAP_MEM
 #define DUMMY_JOB_PRIO              1
+
+static volatile uint32_t dummy_job_burst_count = 0;
 
 
 void dummy_job_single(void* p){
@@ -77,6 +80,11 @@ void dummy_job_notify_take(void* p){
     else{
         jes_job_set_args((char*)DUMMY_SUCCESS_MSG);
     }
+}
+
+
+void dummy_job_burst(void* p){
+    dummy_job_burst_count++;
 }
 
 
@@ -288,6 +296,33 @@ void test_notify_job_non_existing(void){
     jes_err_t je = jes_notify_job("foo", NULL);
     TEST_ASSERT_EQUAL(e_err_unknown_job, je);
 }
+
+
+void test_core_launch_burst(void){
+    jes_err_t stat = jes_register_job(DUMMY_JOB_BURST,
+                                      DUMMY_JOB_MEM,
+                                      DUMMY_JOB_PRIO,
+                                      dummy_job_burst,
+                                      0,
+                                      0);
+    TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
+
+    uint32_t burst_n = __MAX_JOB_NOTIF_QUEUE_SIZE * 2;
+    dummy_job_burst_count = 0;
+    for(uint32_t i = 0; i < burst_n; i++){
+        stat = jes_launch_job(DUMMY_JOB_BURST);
+        TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
+    }
+
+    uint32_t t0 = __get_systime_ms();
+    while(dummy_job_burst_count < burst_n &&
+          (__get_systime_ms() - t0) < 1000){
+        jes_delay_job_ms(1);
+    }
+
+    TEST_ASSERT_EQUAL_UINT32(burst_n, dummy_job_burst_count);
+}
+
 
 void test_singleton_launch_immunity(void){
     jes_err_t stat = jes_launch_job(DUMMY_JOB_LOOP_NAME);
