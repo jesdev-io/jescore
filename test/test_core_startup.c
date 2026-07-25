@@ -120,6 +120,9 @@ void test_logging(void){
     le = __core_read_from_log_next();
     TEST_ASSERT_UINT32_WITHIN(500, 3000, le.sys_time);
     TEST_ASSERT_EQUAL_STRING("test", le.type);
-    TEST_ASSERT_EQUAL_STRING(pj->name, le.job_state.name);
+    TEST_ASSERT_EQUAL_STRING(pj->name, le.name);
+    TEST_ASSERT_EQUAL_UINT8(pj->instances, le.instances);
+    TEST_ASSERT_EQUAL_INT(pj->role, le.role);
+    TEST_ASSERT_EQUAL_INT(pj->error, le.error);
 }
 #endif
