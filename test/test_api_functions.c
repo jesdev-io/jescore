@@ -241,11 +241,18 @@ void test_error_throw_get(void){
 }
 
 
-void test_core_job_launch_duplicate(void){
+void test_core_job_launch_prohibited(void){
     jes_err_t stat;
     stat = jes_launch_job(CORE_JOB_NAME);
-    TEST_ASSERT_EQUAL_INT(e_err_duplicate, stat);
+    TEST_ASSERT_EQUAL_INT(e_err_prohibited, stat);
     stat = jes_launch_job(CLI_SERVER_NAME);
+    TEST_ASSERT_EQUAL_INT(e_err_prohibited, stat);
+}
+
+
+void test_dummy_loop_job_launch_duplicate(void){
+    jes_err_t stat;
+    stat = jes_launch_job(DUMMY_JOB_LOOP_NAME);
     TEST_ASSERT_EQUAL_INT(e_err_duplicate, stat);
 }
 
