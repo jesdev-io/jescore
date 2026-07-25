@@ -169,32 +169,33 @@ void __core_error_throw(jes_err_t e, job_struct_t* pj){
 
 
 #if __JES_LOG_LEN > 0
+static void __core_log_entry_set(log_entry_t* le, job_struct_t* pj, const char* type){
+    if(le == NULL) return;
+    memset(le, 0, sizeof(log_entry_t));
+    le->sys_time = __get_systime_ms();
+    strncpy(le->type, type, JES_LOG_TYPE_NAME_LEN);
+    le->type[JES_LOG_TYPE_NAME_LEN - 1] = '\0';
+    if(pj == NULL) return;
+    strncpy(le->name, pj->name, __MAX_JOB_NAME_LEN_BYTE);
+    le->name[__MAX_JOB_NAME_LEN_BYTE - 1] = '\0';
+    strncpy(le->args, pj->args, __MAX_JOB_ARGS_LEN_BYTE);
+    le->args[__MAX_JOB_ARGS_LEN_BYTE - 1] = '\0';
+    le->instances = pj->instances;
+    le->role = pj->role;
+    le->error = pj->error;
+}
+
+
 void __core_add_to_log_index(job_struct_t* pj, uint32_t idx, const char* type){
     WITH_CORE_LOCK({
-        core.log[idx].sys_time = __get_systime_ms();
-        strncpy(core.log[idx].type, type, JES_LOG_TYPE_NAME_LEN);
-        core.log[idx].type[JES_LOG_TYPE_NAME_LEN - 1] = '\0';
-        if(pj == NULL){
-            memset(&core.log[idx].job_state, 0, sizeof(job_struct_t));
-        }
-        else{
-            memcpy(&core.log[idx].job_state, pj, sizeof(job_struct_t));
-        }
+        __core_log_entry_set(&core.log[idx], pj, type);
     });
 }
 
 
 void __core_add_to_log_auto(job_struct_t* pj, const char* type){
     WITH_CORE_LOCK({
-        core.log[core.log_write].sys_time = __get_systime_ms();
-        strncpy(core.log[core.log_write].type, type, JES_LOG_TYPE_NAME_LEN);
-        core.log[core.log_write].type[JES_LOG_TYPE_NAME_LEN - 1] = '\0';
-        if(pj == NULL){
-            memset(&core.log[core.log_write].job_state, 0, sizeof(job_struct_t));
-        }
-        else{
-            memcpy(&core.log[core.log_write].job_state, pj, sizeof(job_struct_t));
-        }
+        __core_log_entry_set(&core.log[core.log_write], pj, type);
         core.log_read = core.log_write;
         if(++core.log_write == __JES_LOG_LEN){
             core.log_write = 0;
@@ -205,10 +206,7 @@ void __core_add_to_log_auto(job_struct_t* pj, const char* type){
 log_entry_t __core_read_from_log_next(void){
     log_entry_t le;
     WITH_CORE_LOCK({
-        le.sys_time = core.log[core.log_read].sys_time;
-        le.job_state = core.log[core.log_read].job_state;
-        strncpy(le.type, core.log[core.log_read].type, JES_LOG_TYPE_NAME_LEN);
-        le.type[JES_LOG_TYPE_NAME_LEN - 1] = '\0';
+        le = core.log[core.log_read];
         if(++core.log_read == __JES_LOG_LEN){
             core.log_read = 0;
         }
@@ -221,26 +219,27 @@ void __core_log_printer(void* p){
     job_struct_t* pj = (job_struct_t*)p;
     log_entry_t le = __core_read_from_log_next();
     char desc[__MAX_JOB_ARGS_LEN_BYTE*4] = {0};
-    char header[] = "systime (ms) type\t name\t\tinstances\terror\targs\n\r";
+    char header[] = "\x1b[1m%-12s %-10s %-16s %-9s %-5s %s\x1b[0m\n\r";
     uint8_t* clr;
-    uart_unif_writef_pfx(pj->name, header);
+    uart_unif_writef_pfx(pj->name, header,
+                         "systime(ms)", "type", "name", "instances", "error", "args");
     for(uint32_t i = 0; i < __JES_LOG_LEN; i++){
         le = __core_read_from_log_next();
-        switch (le.job_state.role) {
+        switch (le.role) {
             case e_role_core: clr = CLR_Gr; break;
             case e_role_base: clr = CLR_Y;  break;
             case e_role_user: clr = CLR_G;  break;
             default:          clr = CLR_X;  break;
         }
-        sprintf(desc, "(%010u) %s:\t %s%s\t\t%d\t\t%d\t%s%s\n\r", 
+        snprintf(desc, sizeof(desc), "%-12u %-10s %s%-16s%s %-9u %-5d %s\n\r", 
                 le.sys_time,
                 le.type,
                 clr,
-                le.job_state.name,
-                le.job_state.instances,
-                le.job_state.error,
-                le.job_state.args,
-                CLR_X);
+                le.name,
+                CLR_X,
+                le.instances,
+                le.error,
+                le.args);
         uart_unif_writef_pfx(pj->name, desc);
     }
 }

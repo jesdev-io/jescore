@@ -77,10 +77,15 @@ typedef enum state_t{
 } state_t;
 
 #if __JES_LOG_LEN > 0
+/// @brief Log entry struct. Contains printable information about jobs.
 typedef struct log_entry_t{
     uint32_t sys_time;
     char type[JES_LOG_TYPE_NAME_LEN];
-    job_struct_t job_state;
+    char name[__MAX_JOB_NAME_LEN_BYTE];
+    char args[__MAX_JOB_ARGS_LEN_BYTE];
+    uint8_t instances;
+    e_role_t role;
+    jes_err_t error;
 } log_entry_t;
 #endif
 
