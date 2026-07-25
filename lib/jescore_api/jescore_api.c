@@ -53,21 +53,25 @@ jes_err_t jes_register_job(const char* name,
 
 jes_err_t jes_launch_job(const char* name){
     if(!api_initialized) return e_err_uninitialized;
-    if(!sched_run) return __job_launch_job_by_name(name, e_origin_api);
-    return __job_launch_job_by_name_args_core(name, e_origin_api, "");
+    job_struct_t* pj = __job_get_job_by_name(name);
+    if(pj->role == e_role_core) { return e_err_prohibited; }
+    if (pj == NULL) { return e_err_unknown_job; }
+    if(!sched_run) return __job_launch_job(pj, e_origin_api);
+    return __job_launch_job_core(pj, e_origin_api);
 }
 
 
 jes_err_t jes_launch_job_args(const char* name, const char* args){
     if(!api_initialized) return e_err_uninitialized;
+    job_struct_t* pj = __job_get_job_by_name(name);
+    if(pj->role == e_role_core) { return e_err_prohibited; }
+    if(pj == NULL) { return e_err_unknown_job; }
     if(!sched_run){
-        job_struct_t* pj = __job_get_job_by_name(name);
-        if (pj == NULL) { return e_err_unknown_job; }
         jes_err_t e = __job_set_args((char*)args, pj);
         if (e != e_err_no_err) { return e; }
-        return __job_launch_job_by_name(name, e_origin_api);
+        return __job_launch_job(pj, e_origin_api);
     } 
-    return __job_launch_job_by_name_args_core(name, e_origin_api, args);
+    return __job_launch_job_args_core(pj, e_origin_api, args);
 }
 
 
