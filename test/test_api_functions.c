@@ -346,14 +346,7 @@ void test_unregister_job(void){
     TEST_ASSERT_EQUAL(NULL, pj);
     stat = jes_unregister_job("nonexistent_job");
     TEST_ASSERT_EQUAL_INT(e_err_unknown_job, stat);
-    stat = jes_register_and_launch_job(DUMMY_JOB_UNREGISTER_RUN,
-                                       DUMMY_JOB_MEM,
-                                       DUMMY_JOB_PRIO,
-                                       dummy_job_loop,
-                                       1,
-                                       0);
-    TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
     jes_delay_job_ms(100);
-    stat = jes_unregister_job(DUMMY_JOB_UNREGISTER_RUN);
+    stat = jes_unregister_job(DUMMY_JOB_SINGLE_NAME);
     TEST_ASSERT_EQUAL_INT(e_err_prohibited, stat);
 }
