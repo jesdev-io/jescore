@@ -51,7 +51,7 @@ void test_job_core(void){
     TEST_ASSERT_EQUAL_STRING(CORE_JOB_NAME, pj->name);
     TEST_ASSERT_NOT_EQUAL(NULL, pj->handle);
     TEST_ASSERT_EQUAL_UINT32(BOARD_MIN_JOB_HEAP_MEM, pj->mem_size);
-    TEST_ASSERT_EQUAL_UINT8(0, pj->priority);
+    TEST_ASSERT_EQUAL_UINT8(JES_CORE_TASK_PRIORITY, pj->priority);
     TEST_ASSERT_EQUAL_HEX32(__core_job, pj->function);    
     TEST_ASSERT_EQUAL_INT8_ARRAY(dummy, pj->args, __MAX_JOB_ARGS_LEN_BYTE);
     TEST_ASSERT_EQUAL_UINT8(1, pj->is_loop);

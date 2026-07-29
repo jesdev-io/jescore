@@ -19,19 +19,25 @@ extern "C" {
 
 #define JES_LOG_TYPE_NAME_LEN 10
 
+/// @brief FreeRTOS task priority for the jescore dispatcher task.
+/// @note FreeRTOS priority numbers are ascending: 0 is the idle/lowest priority,
+///       and larger numbers are higher priority. Keep the core above low-priority
+///       background work so CLI/API dispatch cannot starve, but below application
+///       real-time/control tasks so jescore does not dominate user scheduling.
+#ifndef JES_CORE_TASK_PRIORITY
+#define JES_CORE_TASK_PRIORITY 2
+#endif
+#if JES_CORE_TASK_PRIORITY == 0
+#warning "JES_CORE_TASK_PRIORITY is 0; CLI/API dispatch can starve behind any ready application task."
+#endif
+#if defined(configMAX_PRIORITIES) && (JES_CORE_TASK_PRIORITY >= configMAX_PRIORITIES)
+#error "JES_CORE_TASK_PRIORITY must be less than configMAX_PRIORITIES."
+#endif
+
 /// @brief Timeout for core job notification wait (ms).
-/// @note The core job runs at the highest priority (0), so when it wakes due to timeout,
-///       it will preempt all other tasks. This ensures timely job dispatching.
-///       A 100ms timeout provides a good balance: the core checks for work frequently
-///       enough for responsiveness, but not so frequently as to cause excessive
-///       context switching. The idle work is minimal (just checking notifications).
-///       
-///       Analysis: With priority 0 and 100ms timeout, in a system with many
-///       circular tasks, the core will briefly preempt them every 100ms. However,
-///       since the core's idle loop does very little work (just a notification check),
-///       the actual preemption overhead is minimal (a few CPU cycles). This is
-///       acceptable for most embedded applications where job dispatching latency
-///       of 100ms is tolerable.
+/// @note This bounds the core task's idle wait when no jobs are pending. It does
+///       not determine dispatch latency once a notification is queued; task priority
+///       and scheduler availability do.
 #ifndef JES_CORE_NOTIFY_TIMEOUT_MS
 #define JES_CORE_NOTIFY_TIMEOUT_MS 100
 #endif
