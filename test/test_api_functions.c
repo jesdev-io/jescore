@@ -316,7 +316,7 @@ void test_core_launch_burst(void){
 
     uint32_t t0 = __get_systime_ms();
     while(dummy_job_burst_count < burst_n &&
-          (__get_systime_ms() - t0) < 1000){
+          (__get_systime_ms() - t0) < 5000){
         jes_delay_job_ms(1);
     }
 

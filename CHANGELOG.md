@@ -6,7 +6,7 @@
 - 🚢 Release automation now creates tags only after deployment succeeds
 - 🔌 Remote test runner USB mappings corrected from live `rpi-cm5-1` device inventory
 - 🧪 STM32 unregister test no longer allocates an extra loop job on constrained boards
-- ⏱️ STM32 unregister test waits for the running job to enter its runtime environment
+- ⏱️ STM32 tests wait longer for slower boards to drain burst-launched jobs and enter runtime environments
 
 ## 2.3.2 - 2026-07-29
 
