@@ -26,7 +26,7 @@
 #define DUMMY_FAIL_MSG              "Assert failed"
 #define DUMMY_SUCCESS_MSG           "Assert succeeded"
 #define DUMMY_ARGS                  "args at launch"
-#define DUMMY_ARGS_MODIF            "got args at launch"
+#define DUMMY_ARGS_MODIF            "got args"
 #define DUMMY_JOB_MEM               BOARD_MIN_JOB_HEAP_MEM
 #define DUMMY_JOB_PRIO              1
 
