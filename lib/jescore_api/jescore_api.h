@@ -34,7 +34,7 @@ uint8_t jes_is_init(void);
 /// @brief Add a job (function block) to the list of all known jobs.
 /// @param name: Name of job. Can't be longer than `MAX_JOB_NAME_LEN_BYTE`.
 /// @param mem_size: Dynamic memory size for job.
-/// @param priority: Priority of the job (1 is highest).
+/// @param priority: FreeRTOS task priority. Larger numbers are higher priority; 0 is idle/lowest.
 /// @param function: Function to run when the job is called. has to be of signature `void my_func(void* p)`.
 /// @param is_loop: flag which describes the lifetime of the job.
 /// @param is_singleton: flag which describes the instance count of the job.
@@ -73,7 +73,7 @@ jes_err_t jes_launch_job_args(const char* name, const char* args);
 /// @brief Add a job (function block) to the list of all known jobs.
 /// @param name: Name of job. Can't be longer than `MAX_JOB_NAME_LEN_BYTE`.
 /// @param mem_size: Dynamic memory size for job.
-/// @param priority: Priority of the job (1 is highest).
+/// @param priority: FreeRTOS task priority. Larger numbers are higher priority; 0 is idle/lowest.
 /// @param function: Function to run when the job is called. has to be of signature `void my_func(void* p)`.
 /// @param is_loop: flag which describes the lifetime of the job.
 /// @param is_singleton: flag which describes the instance count of the job.
