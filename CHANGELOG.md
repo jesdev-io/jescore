@@ -7,6 +7,7 @@
 - 🔌 Remote test runner USB mappings corrected from live `rpi-cm5-1` device inventory
 - 🧪 STM32 unregister test no longer allocates an extra loop job on constrained boards
 - ⏱️ STM32 tests wait longer for slower boards to drain burst-launched jobs and enter runtime environments
+- 🧠 STM32G431 uses smaller per-job heap to fit burst tests on the constrained board
 
 ## 2.3.2 - 2026-07-29
 

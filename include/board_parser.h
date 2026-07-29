@@ -290,7 +290,11 @@
 #include "uart_cfg.h"
 #endif // JES_UART_CUSTOM
 
+#ifdef STM32G431xx
+#define BOARD_MIN_JOB_HEAP_MEM 192
+#else
 #define BOARD_MIN_JOB_HEAP_MEM 256
+#endif
 #ifndef BUILD_PLATFORM_NAME
 #define BUILD_PLATFORM_NAME "STM32"
 #endif
