@@ -1,5 +1,26 @@
 # Changelog
 
+## 2.3.2-post.2 - 2026-07-29
+
+### Fixed
+- 🚢 Release automation now creates tags only after deployment succeeds
+- 🔌 Remote test runner USB mappings corrected from live `rpi-cm5-1` device inventory
+- 🧪 STM32 unregister test no longer allocates an extra loop job on constrained boards
+- ⏱️ STM32 tests wait longer for slower boards to drain burst-launched jobs and enter runtime environments
+- 🧠 STM32G431 test env uses shorter job name/argument buffers and a smaller burst queue to fit tests on the constrained board
+
+## 2.3.2 - 2026-07-29
+
+### Added
+- 🛡️ API init protection
+- 🖥️ Physical remote deployer
+- 🖨️ Better printing
+
+### Fixed
+- 📜 GCC version for STM32 builds pinned
+- 🛑 API access denial for core level jobs
+- ❓️ Core jobs no longer lost thanks to queue
+
 ## 2.3.1 - 2026-05-20 **The safety update**
 
 ### Added

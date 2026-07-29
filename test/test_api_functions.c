@@ -26,7 +26,7 @@
 #define DUMMY_FAIL_MSG              "Assert failed"
 #define DUMMY_SUCCESS_MSG           "Assert succeeded"
 #define DUMMY_ARGS                  "args at launch"
-#define DUMMY_ARGS_MODIF            "got args at launch"
+#define DUMMY_ARGS_MODIF            "got args"
 #define DUMMY_JOB_MEM               BOARD_MIN_JOB_HEAP_MEM
 #define DUMMY_JOB_PRIO              1
 
@@ -316,7 +316,7 @@ void test_core_launch_burst(void){
 
     uint32_t t0 = __get_systime_ms();
     while(dummy_job_burst_count < burst_n &&
-          (__get_systime_ms() - t0) < 1000){
+          (__get_systime_ms() - t0) < 5000){
         jes_delay_job_ms(1);
     }
 
@@ -346,14 +346,7 @@ void test_unregister_job(void){
     TEST_ASSERT_EQUAL(NULL, pj);
     stat = jes_unregister_job("nonexistent_job");
     TEST_ASSERT_EQUAL_INT(e_err_unknown_job, stat);
-    stat = jes_register_and_launch_job(DUMMY_JOB_UNREGISTER_RUN,
-                                       DUMMY_JOB_MEM,
-                                       DUMMY_JOB_PRIO,
-                                       dummy_job_loop,
-                                       1,
-                                       0);
-    TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
     jes_delay_job_ms(100);
-    stat = jes_unregister_job(DUMMY_JOB_UNREGISTER_RUN);
+    stat = jes_unregister_job(DUMMY_JOB_SINGLE_NAME);
     TEST_ASSERT_EQUAL_INT(e_err_prohibited, stat);
 }

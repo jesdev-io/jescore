@@ -1,0 +1,102 @@
+name: jescore release tag
+
+on:
+  workflow_run:
+    workflows: [jescore deployment system]
+    types: [completed]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  tag-release:
+    name: Create version tag from library.json
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.workflow_run.head_sha }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Read package version
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          version="$(python -c 'import json; print(json.load(open("library.json", encoding="utf-8"))["version"])')"
+
+          if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$ ]]; then
+            echo "library.json version must be SemVer, got: $version" >&2
+            exit 1
+          fi
+
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=v$version" >> "$GITHUB_OUTPUT"
+          echo "Release tag candidate: v$version"
+
+      - name: Check existing tag
+        id: existing-tag
+        shell: bash
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          set -euo pipefail
+
+          if git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists on origin; assuming this version is already released."
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "exists=false" >> "$GITHUB_OUTPUT"
+
+      - name: Create and push annotated tag
+        if: steps.existing-tag.outputs.exists != 'true'
+        shell: bash
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git tag -a "$TAG" -m "Release $VERSION"
+          git push origin "$TAG"
+
+      - name: Create GitHub release notes
+        if: steps.existing-tag.outputs.exists != 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: jescore ${{ steps.version.outputs.version }}
+          generate_release_notes: true
+
+      - name: Set up Python
+        if: steps.existing-tag.outputs.exists != 'true'
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Publish to PlatformIO registry
+        if: steps.existing-tag.outputs.exists != 'true'
+        shell: bash
+        env:
+          PIO_USERNAME: ${{ secrets.PIO_USERNAME }}
+          PIO_PASSWORD: ${{ secrets.PIO_PASSWORD }}
+        run: |
+          set -euo pipefail
+
+          python -m pip install --upgrade platformio
+          pio account login --username "$PIO_USERNAME" --password "$PIO_PASSWORD"
+          pio pkg publish . --type library --no-interactive
