@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.3.2 - 2026-07-29
+
+### Added
+- 🛡️ API init protection
+- 🖥️ Physical remote deployer
+- 🖨️ Better printing
+
+### Fixed
+- 📜 GCC version for STM32 builds pinned
+- 🛑 API access denial for core level jobs
+- ❓️ Core jobs no longer lost thanks to queue
+
 ## 2.3.1 - 2026-05-20 **The safety update**
 
 ### Added

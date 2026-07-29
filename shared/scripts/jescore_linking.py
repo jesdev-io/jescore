@@ -112,15 +112,27 @@ else:
         "-DUSE_HAL_DRIVER",
     ]
 
-    fpu_args = [
-        "-mfloat-abi=hard",
-        "-mfpu=fpv4-sp-d16",
-    ]
+    if "cortex-m7" in core:
+        fpu_args = [
+            "-mfloat-abi=hard",
+            "-mfpu=fpv5-d16",
+        ]
+    elif "cortex-m33" in core:
+        fpu_args = [
+            "-mfloat-abi=hard",
+            "-mfpu=fpv5-sp-d16",
+        ]
+    else:
+        fpu_args = [
+            "-mfloat-abi=hard",
+            "-mfpu=fpv4-sp-d16",
+        ]
 
     # Fail in case that FPU specifiers are not set from outside (can't be set from in here)
-    help_msg = Color.R + "Please add `build_flags = -mfloat-abi=hard -mfpu=fpv4-sp-d16` to your `platformio.ini` when building jescore for STM32!" + Color.X
+    required_fpu_flags = " ".join(fpu_args)
+    help_msg = Color.R + f"Please add `build_flags = {required_fpu_flags}` to your `platformio.ini` when building jescore for STM32 {core}!" + Color.X
     if env.get("BUILD_FLAGS", None):
-        if not (fpu_args[0] in env["BUILD_FLAGS"] and fpu_args[1] in env["BUILD_FLAGS"]):
+        if not all(flag in env["BUILD_FLAGS"] for flag in fpu_args):
             sleep(0.001)
             Exit(help_msg)
     else:

@@ -125,7 +125,7 @@
 #define USART_GPIO_RX_ALT GPIO_AF7_USART2
 #define USART_IRQn_NUM USART2_IRQn
 #endif // JES_UART_CUSTOM
-#define MAX_JESCORE_KB_MEM 28 // default in FreeRTOSConfig.h is too much
+#define MAX_JESCORE_KB_MEM 24 // default in FreeRTOSConfig.h is too much
 
 #endif // STM32G431xx
 

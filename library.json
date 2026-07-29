@@ -1,6 +1,6 @@
 {
     "name": "jescore",
-    "version": "2.3.1",
+    "version": "2.3.2",
     "description": "FreeRTOS attached core for easier multitasking and native CLI support",
     "keywords": "core, FreeRTOS",
     "repository":
@@ -27,8 +27,7 @@
       ]
     },
     "headers": [
-      "jescore.h",
-      "uart_unif.h"
+      "jescore.h"
     ],
     "build": {
         "srcDir": ".",
@@ -46,6 +45,6 @@
           "-I lib/job_names",
           "-I lib/unified"
         ],
-        "extraScript": "scripts/jescore_linking.py"
+        "extraScript": "shared/scripts/jescore_linking.py"
       }
   }

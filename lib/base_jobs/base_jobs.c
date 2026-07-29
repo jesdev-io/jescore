@@ -21,17 +21,14 @@ void __base_job_help(void* p){
     job_struct_t* cur = *job_list;
 
     snprintf(desc, sizeof(desc), "\x1b[1mAvailable jobs:\x1b[0m\n\r");
-    snprintf(desc, sizeof(desc), "\x1b[1mAvailable jobs:\x1b[0m\n\r");
     uart_unif_writef_pfx(pj->name, desc);
     while(cur != NULL){
         if(cur->role == e_role_base){
-            snprintf(desc, sizeof(desc), "- (base) %s\n\r", cur->name);
-            snprintf(desc, sizeof(desc), "- (base) %s\n\r", cur->name);
+            snprintf(desc, sizeof(desc), "%s%-6s %s%s\n\r", CLR_Y, "base", cur->name, CLR_X);
             uart_unif_writef_pfx(pj->name, desc);
         }
         else if(cur->role == e_role_user){
-            snprintf(desc, sizeof(desc), "- (user) %s\n\r", cur->name);
-            snprintf(desc, sizeof(desc), "- (user) %s\n\r", cur->name);
+            snprintf(desc, sizeof(desc), "%s%-6s %s%s\n\r", CLR_G, "user", cur->name, CLR_X);
             uart_unif_writef_pfx(pj->name, desc);
         }
         cur = cur->pn;
@@ -51,7 +48,6 @@ void __base_job_stats(void* p){
     else{
         char msg[__MAX_JOB_ARGS_LEN_BYTE*2];
         snprintf(msg, sizeof(msg), "Unknown specifier <%s>.\n\r", pj->args);
-        snprintf(msg, sizeof(msg), "Unknown specifier <%s>.\n\r", pj->args);
         uart_unif_writef_pfx(pj->name, msg);
         pj->error = e_err_param;
         return;
@@ -59,14 +55,12 @@ void __base_job_stats(void* p){
     
     char desc[__MAX_JOB_ARGS_LEN_BYTE*4] = {0};
     char header[__MAX_JOB_ARGS_LEN_BYTE*3] = {0};
-    char spacing_name[] = {'\t', 0, 0};
-    char spacing_addr[] = {'\t', 0, 0};
 
     job_struct_t** job_list = __core_get_job_list();
     job_struct_t* cur = *job_list;
 
-    snprintf(desc, sizeof(desc), "\x1b[1mname\t\thandle\t\tmemory\tprio\tloop\tinstances\terror\x1b[0m\n\r");
-    snprintf(desc, sizeof(desc), "\x1b[1mname\t\thandle\t\tmemory\tprio\tloop\tinstances\terror\x1b[0m\n\r");
+    snprintf(desc, sizeof(desc), "\x1b[1m%-16s %-12s %-6s %-4s %-4s %-9s %-5s\x1b[0m\n\r",
+             "name", "handle", "memory", "prio", "loop", "instances", "error");
     if(!flag_none){
         snprintf(header, sizeof(header), "%sjescore%s running on %s%s%s (FW %s)\n\r\n\r", 
             CLR_Y, CLR_X, CLR_G, BUILD_PLATFORM_NAME, CLR_X, JES_FW_VER);
@@ -82,9 +76,6 @@ void __base_job_stats(void* p){
             continue;
         }
 
-        spacing_name[1] = (strlen(cur->name) < 8) ? '\t' : 0;
-        spacing_addr[1] = (cur->handle == NULL) ? '\t' : 0;
-
         switch (cur->role) {
             case e_role_core: clr = CLR_Gr; break;
             case e_role_base: clr = CLR_Y;  break;
@@ -92,20 +83,19 @@ void __base_job_stats(void* p){
             default:          clr = CLR_X;  break;
         }
         char singleton = 'x';
+        char instances[8] = {0};
         if(cur->is_singleton) singleton = '1';
-        snprintf(desc, sizeof(desc), "%s%s%s%p%s%u\t%d\t%d\t%d/%c\t\t%d%s\n\r", 
+        snprintf(instances, sizeof(instances), "%u/%c", cur->instances, singleton);
+        snprintf(desc, sizeof(desc), "%s%-16s%s %-12p %-6u %-4u %-4u %-9s %-5d\n\r", 
                 clr,
                 cur->name, 
-                spacing_name,
+                CLR_X,
                 (void*)cur->handle, 
-                spacing_addr,
                 cur->mem_size, 
                 cur->priority,
                 cur->is_loop,
-                cur->instances,
-                singleton,
-                cur->error,
-                CLR_X);
+                instances,
+                cur->error);
         uart_unif_writef_pfx(pj->name, desc);
         cur = cur->pn;
     }

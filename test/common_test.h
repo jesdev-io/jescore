@@ -28,9 +28,11 @@ void test_set_get_args(void);
 void test_set_job_get_params(void);
 void test_launch_job_args(void);
 void test_error_throw_get(void);
-void test_core_job_launch_duplicate(void);
+void test_core_job_launch_prohibited(void);
+void test_dummy_loop_job_launch_duplicate(void);
 void test_notify_job_and_wait(void);
 void test_notify_job_non_existing(void);
+void test_core_launch_burst(void);
 void test_singleton_launch_immunity(void);
 void test_unregister_job(void);
 

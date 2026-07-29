@@ -27,9 +27,17 @@
 #include "base_jobs.h"
 #include "core.h"
 
+// Empty function for assertion of API block before init
+void foo(void* p){
+
+}
 
 void test_core_init(void){
-    jes_err_t stat = jes_init();
+    jes_err_t stat;
+    // try to use a jescore API function before init
+    stat = jes_register_job("foo", 1024, 1, foo, 0, 1);
+    TEST_ASSERT_EQUAL_INT(e_err_uninitialized, stat);
+    stat = jes_init();
     TEST_ASSERT_EQUAL_INT(e_err_no_err, stat);
     // Test double init
     stat = jes_init();
@@ -43,7 +51,7 @@ void test_job_core(void){
     TEST_ASSERT_EQUAL_STRING(CORE_JOB_NAME, pj->name);
     TEST_ASSERT_NOT_EQUAL(NULL, pj->handle);
     TEST_ASSERT_EQUAL_UINT32(BOARD_MIN_JOB_HEAP_MEM, pj->mem_size);
-    TEST_ASSERT_EQUAL_UINT8(0, pj->priority);
+    TEST_ASSERT_EQUAL_UINT8(JES_CORE_TASK_PRIORITY, pj->priority);
     TEST_ASSERT_EQUAL_HEX32(__core_job, pj->function);    
     TEST_ASSERT_EQUAL_INT8_ARRAY(dummy, pj->args, __MAX_JOB_ARGS_LEN_BYTE);
     TEST_ASSERT_EQUAL_UINT8(1, pj->is_loop);
@@ -112,6 +120,9 @@ void test_logging(void){
     le = __core_read_from_log_next();
     TEST_ASSERT_UINT32_WITHIN(500, 3000, le.sys_time);
     TEST_ASSERT_EQUAL_STRING("test", le.type);
-    TEST_ASSERT_EQUAL_STRING(pj->name, le.job_state.name);
+    TEST_ASSERT_EQUAL_STRING(pj->name, le.name);
+    TEST_ASSERT_EQUAL_UINT8(pj->instances, le.instances);
+    TEST_ASSERT_EQUAL_INT(pj->role, le.role);
+    TEST_ASSERT_EQUAL_INT(pj->error, le.error);
 }
 #endif

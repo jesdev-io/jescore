@@ -26,15 +26,20 @@ void jes_dispatch(void);
 
 #endif // BUILD_FOR_STM32
 
+/// @brief Check if jescore has been initialized.
+/// @return 1 if yes, 0 if no. 
+uint8_t jes_is_init(void);
+
 
 /// @brief Add a job (function block) to the list of all known jobs.
 /// @param name: Name of job. Can't be longer than `MAX_JOB_NAME_LEN_BYTE`.
 /// @param mem_size: Dynamic memory size for job.
-/// @param priority: Priority of the job (1 is highest).
+/// @param priority: FreeRTOS task priority. Larger numbers are higher priority; 0 is idle/lowest.
 /// @param function: Function to run when the job is called. has to be of signature `void my_func(void* p)`.
 /// @param is_loop: flag which describes the lifetime of the job.
 /// @param is_singleton: flag which describes the instance count of the job.
 /// @return Status. Returns `e_err_no_err` in case of successful registration.
+/// @note Requires successful execution of `jes_init()`.
 jes_err_t jes_register_job(const char* name,
                        uint32_t mem_size,
                        uint8_t priority,
@@ -46,6 +51,9 @@ jes_err_t jes_register_job(const char* name,
 /// @brief Start a registered job.
 /// @param name: String name of job as set in `jes_register_job()`
 /// @return Status. Returns `e_err_no_err` in case of successful launch.
+/// @note Requires successful execution of `jes_init()`. On STM32, this
+///       function will only be fully handled by the core if run in a task context,
+///       meaning **after** `jes_dispatch()` has been called in `main()`.
 jes_err_t jes_launch_job(const char* name);
 
 
@@ -56,17 +64,23 @@ jes_err_t jes_launch_job(const char* name);
 /// @note Arguments are expected to be whitespace delimited substrings
 ///       in a string. They should not exceed `MAX_JOB_ARGS_LEN_BYTE`.
 ///       A copy is stored in the `args` field of the job.
+/// @note Requires successful execution of `jes_init()`. On STM32, this
+///       function will only be fully handled by the core if run in a task context,
+///       meaning **after** `jes_dispatch()` has been called in `main()`.
 jes_err_t jes_launch_job_args(const char* name, const char* args);
 
 
 /// @brief Add a job (function block) to the list of all known jobs.
 /// @param name: Name of job. Can't be longer than `MAX_JOB_NAME_LEN_BYTE`.
 /// @param mem_size: Dynamic memory size for job.
-/// @param priority: Priority of the job (1 is highest).
+/// @param priority: FreeRTOS task priority. Larger numbers are higher priority; 0 is idle/lowest.
 /// @param function: Function to run when the job is called. has to be of signature `void my_func(void* p)`.
 /// @param is_loop: flag which describes the lifetime of the job.
 /// @param is_singleton: flag which describes the instance count of the job.
 /// @return Status. Returns `e_err_no_err` in case of successful launch.
+/// @note Requires successful execution of `jes_init()`. On STM32, this
+///       function will only be fully handled by the core if run in a task context,
+///       meaning **after** `jes_dispatch()` has been called in `main()`.
 jes_err_t jes_register_and_launch_job(const char* name,
                                   uint32_t mem_size,
                                   uint8_t priority,
@@ -80,12 +94,16 @@ jes_err_t jes_register_and_launch_job(const char* name,
 /// @return Status. Returns `e_err_no_err` if OK.
 /// @note Will not unregister a job that has active instances running.
 /// @note Frees the job struct, its queue, and semaphore.
+/// @note Requires successful execution of `jes_init()`.
 jes_err_t jes_unregister_job(const char* name);
 
 
 /// @brief Set the field `args` of the calling job.
 /// @param s: String to insert into `args` field.
 /// @return status, `e_err_no_err` if OK.
+/// @note Requires successful execution of `jes_init()`. On STM32, this
+///       function can't be called before `jes_dispatch()`. If you really
+///       need to call it before, use `__job_set_args(args, pj)`.
 jes_err_t jes_job_set_args(const char* s);
 
 
@@ -96,12 +114,18 @@ jes_err_t jes_job_set_args(const char* s);
 ///             within a job, the memory of the job struct persists, which 
 ///             makes a copy of the arg string redundant. If however something
 ///             goes wrong, this function will return NULL.
+/// @note Requires successful execution of `jes_init()`. On STM32, this
+///       function can't be called before `jes_dispatch()`. If you really
+///       need to call it before, use `__job_get_args(pj)`.
 char* jes_job_get_args(void);
 
 
 /// @brief Get the next arg from the args field.
 /// @return Next arg delimited by a whitespace.
 /// @note Use this in an arg-parsing loop.
+/// @note Requires successful execution of `jes_init()`. On STM32, this
+///       function can't be called before `jes_dispatch()`. If you really
+///       need to call it before, use `__job_get_args(pj)`.
 char* jes_job_arg_next(void);
 
 
@@ -116,18 +140,25 @@ uint8_t jes_job_is_arg(const char* arg, const char* name);
 /// @brief Set the field `param` of the calling job.
 /// @param p: Arbitrary reference to parameter.
 /// @return status, `e_err_no_err` if OK.
+/// @note Requires successful execution of `jes_init()`. On STM32, this
+///       function can't be called before `jes_dispatch()`. If you really
+///       need to call it before, use `__job_set_param(param, pj)`.
 jes_err_t jes_job_set_param(const void* p);
 
 
 /// @brief Get the field `param` of the calling job.
 /// @return Pointer to `param` field of the job.
 /// @attention Will return NULL on error.
+/// @note Requires successful execution of `jes_init()`. On STM32, this
+///       function can't be called before `jes_dispatch()`. If you really
+///       need to call it before, use `__job_get_param(pj)`.
 void* jes_job_get_param(void);
 
 
 /// @brief Get the field `error` of a given job.
 /// @param job_name Name of the job.
 /// @return Stored error.
+/// @note Requires successful execution of `jes_init()`.
 jes_err_t jes_error_get(const char* job_name);
 
 
@@ -137,6 +168,7 @@ jes_err_t jes_error_get(const char* job_name);
 ///       job is error-free.
 /// @note Use this function to quickly spot if the
 ///       program is error free.
+/// @note Requires successful execution of `jes_init()`.
 jes_err_t jes_error_get_any(void);
 
 
@@ -144,6 +176,8 @@ jes_err_t jes_error_get_any(void);
 /// @param e Error to throw.
 /// @note This is useful to let other jobs or the core know when
 ///       a job exits based on a user condition.
+/// @note Requires successful execution of `jes_init()`. On STM32, this
+///       function can't be called before `jes_dispatch()`.
 void jes_throw_error(jes_err_t e);
 
 
@@ -151,6 +185,8 @@ void jes_throw_error(jes_err_t e);
 /// @param name Name of job which should be notified.
 /// @param notification Optional pointer to notification value.
 /// @return status, `e_err_no_err` if OK.
+/// @note Requires successful execution of `jes_init()`. On STM32, this
+///       function can't be called before `jes_dispatch()`.
 jes_err_t jes_notify_job(const char* name, const void* notification);
 
 
@@ -158,11 +194,15 @@ jes_err_t jes_notify_job(const char* name, const void* notification);
 /// @param name Name of job which should be notified.
 /// @param notification Optional pointer to notification value. 
 /// @return status, `e_err_no_err` if OK.
+/// @note Requires successful execution of `jes_init()`. On STM32, this
+///       function can't be called before `jes_dispatch()`.
 jes_err_t jes_notify_job_ISR(const char* name, const void* notification);
 
 
 /// @brief Pause the calling job until a notification arrives.
 /// @return The optional notification value.
+/// @note Requires successful execution of `jes_init()`. On STM32, this
+///       function can't be called before `jes_dispatch()`.
 void* jes_wait_for_notification(void);
 
 /// @brief Delay a job in milliseconds.
@@ -174,10 +214,16 @@ void jes_delay_job_ms(uint32_t ms);
     uart_unif_writef_pfx(pj->name, format, ##__VA_ARGS__)
 
 #define jes_print(format, ...) \
-    uart_unif_writef_pfx(__job_get_job_by_handle(\
-                            xTaskGetCurrentTaskHandle()\
-                        )->name,\
-                        format, ##__VA_ARGS__)
+    do { \
+        if (jes_is_init()) { \
+            uart_unif_writef_pfx(__job_get_job_by_handle( \
+                                xTaskGetCurrentTaskHandle() \
+                            )->name, \
+                            format, ##__VA_ARGS__); \
+        } else { \
+            uart_unif_writef_pfx("init", format, ##__VA_ARGS__); \
+        } \
+    } while(0)
 
 #endif
 

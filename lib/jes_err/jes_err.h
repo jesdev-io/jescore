@@ -13,6 +13,7 @@ typedef enum jes_err{
     e_err_mem_null,
     e_err_is_zero,
     e_err_param,
+    e_err_uninitialized,
     e_err_peripheral_block,
     e_err_core_fail,
     e_err_duplicate,

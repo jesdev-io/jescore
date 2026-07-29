@@ -10,9 +10,9 @@ void blink(void* p){
     act = !act;
     while(act){
         digitalWrite(LED_PIN, HIGH);
-        delay(1000);
+        jes_delay_job_ms(1000);
         digitalWrite(LED_PIN, LOW);
-        delay(1000);
+        jes_delay_job_ms(1000);
     }
 }
 

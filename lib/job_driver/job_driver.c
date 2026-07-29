@@ -36,7 +36,7 @@ jes_err_t __job_register_job(const char* n,
     pj->caller = e_origin_undefined;
     pj->param = NULL;
     pj->error = e_err_no_err;
-    pj->notif_queue = xQueueCreate(MAX_JOB_NOTIF_QUEUE_SIZE, sizeof(void*));
+    pj->notif_queue = xQueueCreate(__MAX_JOB_NOTIF_QUEUE_SIZE, sizeof(void*));
     if(pj->notif_queue == NULL) { 
         vPortFree(pj); 
         return e_err_mem_null; 
@@ -180,9 +180,17 @@ jes_err_t __job_launch_job_by_name(const char* n, origin_t o){
 }
 
 
-jes_err_t __job_launch_job_by_name_args_core(const char* n, origin_t o, const char* args){
+jes_err_t __job_launch_job_core(job_struct_t* pj, origin_t o){
+    if (pj == NULL) { return e_err_unknown_job; }
+    if(pj->is_singleton && pj->instances > 0){ return e_err_duplicate; }
+    pj->caller = o;
+    __core_notify(pj, 0);
+    return e_err_no_err;
+}
+
+
+jes_err_t __job_launch_job_args_core(job_struct_t* pj, origin_t o, const char* args){
     if (args == NULL) { return e_err_is_zero; }
-    job_struct_t* pj = __job_get_job_by_name(n);
     if (pj == NULL) { return e_err_unknown_job; }
     if(pj->is_singleton && pj->instances > 0){ return e_err_duplicate; }
     jes_err_t e = __job_set_args((char*)args, pj);
@@ -249,6 +257,7 @@ jes_err_t __job_notify_generic(job_struct_t* pjob_to_notify,
                                void* notif, 
                                uint8_t from_isr){
     if(!pjob_to_notify) return e_err_is_zero;
+    if(pjob_to_notify->instances == 0) return e_err_prohibited;
     if(from_isr){
         BaseType_t dummy = pdFALSE;
         xTaskNotifyFromISR(pjob_to_notify->handle, 

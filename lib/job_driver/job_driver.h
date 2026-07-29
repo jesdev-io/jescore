@@ -43,7 +43,11 @@ extern "C" {
                                                       protected = value; \
                                                       xSemaphoreGive(lock); 
 
-#define MAX_JOB_NOTIF_QUEUE_SIZE    4
+#ifndef MAX_JOB_NOTIF_QUEUE_SIZE
+#define MAX_JOB_NOTIF_QUEUE_SIZE 4
+#endif
+#define __MAX_JOB_NOTIF_QUEUE_SIZE_LIMIT 32
+#define __MAX_JOB_NOTIF_QUEUE_SIZE __GET_SAFE_SIZE(MAX_JOB_NOTIF_QUEUE_SIZE, __MAX_JOB_NOTIF_QUEUE_SIZE_LIMIT)
 
 typedef enum{
     e_role_core,
@@ -154,9 +158,17 @@ jes_err_t __job_launch_job(job_struct_t* pj, origin_t o);
 /// @note This may only be called by the core job.
 jes_err_t __job_launch_job_by_name(const char* n, origin_t o);
 
+/// @brief Job creation wrapper.
+/// @param pj: Pointer to job struct.
+/// @param o: Origin of activation.
+/// @returns status, `e_err_no_err` if OK.
+/// @note Checks if task memory could be allocated.
+/// @note This does not create a task; it notifies the core to create
+///       a task by itself.
+jes_err_t __job_launch_job_core(job_struct_t* pj, origin_t o);
 
 /// @brief Job creation wrapper.
-/// @param n: job name (callable by CLI).
+/// @param pj: Pointer to job struct.
 /// @param o: Origin of activation.
 /// @param args: String of args (whitespace delimited string).
 /// @returns status, `e_err_no_err` if OK.
@@ -166,8 +178,7 @@ jes_err_t __job_launch_job_by_name(const char* n, origin_t o);
 ///       A copy is stored in the `args` field of the job.
 /// @note This does not create a task; it notifies the core to create
 ///       a task by itself.
-jes_err_t __job_launch_job_by_name_args_core(const char* n, origin_t o, const char* args);
-
+jes_err_t __job_launch_job_args_core(job_struct_t* pj, origin_t o, const char* args);
 
 /// @brief Jescore runtime environment. This is the FreeRTOS task that
 ///        then calls the registered job inside its scope.
