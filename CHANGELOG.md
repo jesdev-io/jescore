@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.3.2-post.1 - 2026-07-29
+## 2.3.2-post.2 - 2026-07-29
 
 ### Fixed
 - 🚢 Release automation now creates tags only after deployment succeeds
