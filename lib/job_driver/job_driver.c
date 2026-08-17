@@ -56,15 +56,19 @@ jes_err_t __job_register_job(const char* n,
         while(cur != NULL){
             if(strcmp(cur->name, n) == 0){ 
                 vQueueDelete(pj->notif_queue);
+                vSemaphoreDelete(pj->lock);
                 vPortFree(pj);
-                return e_err_duplicate;
+                pj = NULL;
+                break;
             }
             cur = cur->pn;
         }
-        pj->pn = *job_list;
-        *job_list = pj;
+        if(pj){
+            pj->pn = *job_list;
+            *job_list = pj;
+        }
     });
-    
+    if(!pj) return e_err_duplicate;
     JES_LOG_REGISTER(pj);
     return e_err_no_err;
 }
